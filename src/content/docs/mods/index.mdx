@@ -1,0 +1,27 @@
+---
+title: All mods
+description: 'Mods for Rescue Ops: Wildfire by Tonnie: QLD RFS uniforms, truck reskin and Hazard 1000 siren tones.'
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import truckSide from '../../../assets/screenshots/truck-side.jpg';
+
+<Image src={truckSide} alt="Firefighter in gold QLD RFS bushfire gear standing beside the golden-yellow reskinned CCF fire truck" />
+
+All mods are for the **Steam demo** (Unreal Engine 5.8.1, October 2026). They only add files and never change the game's own, so they can be installed and removed independently. New here? Read [Installing mods](/mods/installing/) first.
+
+<CardGrid>
+	<LinkCard title="QLD RFS Uniforms" href="/mods/qld-rfs-uniforms/" description="Gold bushfire gear with RURAL FIRE BRIGADE on the back and a white helmet. 4K." />
+	<LinkCard title="QLD RFS Truck Reskin" href="/mods/qld-rfs-truck-reskin/" description="The CCF in golden yellow with RFS and QFD logos, red and white chevrons, plus Hazard 1000 tones." />
+	<LinkCard title="Hazard 1000 Tones" href="/mods/hazard-1000-tones/" description="Australian siren and horn for the fire truck. Sounds only." />
+</CardGrid>
+
+## Compatibility
+
+| | Uniforms | Truck Reskin | Hazard 1000 Tones |
+|---|---|---|---|
+| Files added | `z_FirefighterTex_P.*` | `z_QLD_Truck_P.*` + `z_Hazard_1000_Sounds_P.*` | `z_Hazard_1000_Sounds_P.*` |
+| Works with the others | ✅ | ✅ | ✅ (the Truck Reskin already includes it) |
+
+Mod by **Tonnie**. If you enjoy them, [support my mods on Patreon](https://patreon.com/Tonnie001).

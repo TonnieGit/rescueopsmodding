@@ -1,0 +1,109 @@
+---
+title: Package and install your mod
+description: Build your mod in Unreal, check it contains only your files, and install it in the game.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+:::note[In this guide you will]
+- Package your mod from Unreal
+- Check the build contains only your files
+- Rename and install it, and uninstall it again
+:::
+
+Every tutorial ends here. You'll have your new assets in the `Wildfire` project, each folder with a PrimaryAssetLabel holding your mod's **Chunk ID**.
+
+## Step 1: Package
+
+<Steps>
+
+1. **File → Save All**.
+
+2. On the main toolbar, click **Platforms** → **Windows** → **Package Project**.
+
+3. Pick an output folder outside the game, e.g. `Documents\RescueOps_Build`. Packaging takes a few minutes, and progress shows in the bottom-right corner.
+
+4. When it says **Packaging complete**, open the output folder and go to `Windows\Wildfire\Content\Paks\`. You'll see several files. Yours are the three named after your Chunk ID:
+
+   ```text
+   pakchunk1002-Windows.pak
+   pakchunk1002-Windows.utoc
+   pakchunk1002-Windows.ucas
+   ```
+
+   Ignore everything else (`pakchunk0`, `global`, other chunks). That's the blank project's own content, and it never goes into the game.
+
+</Steps>
+
+:::caution[Gotcha: there's no pakchunk file with my number]
+Either the label isn't set up (Chunk ID, **Always Cook**, **Label Assets in My Directory**), or **Additional Asset Directories to Cook** is missing from [Project Settings](/start/mod-project/#step-2-set-the-packaging-options).
+:::
+
+## Step 2: Check the build
+
+Two quick checks catch nearly every mistake before it reaches the game.
+
+**1. The chunk manifest lists only your files.** Open this file in a text editor:
+
+```text
+<your project>\Saved\Cooked\Windows\Wildfire\Metadata\ChunkManifest\pakchunk<ID>.txt
+```
+
+Each line is a file in your mod. It should contain **your assets and nothing else**: no labels, levels, materials, MetaSounds or other mods' files.
+
+**2. The mount point is right.** Open PowerShell and list the container with UnrealPak (it comes with the engine):
+
+```powershell
+& "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealPak.exe" "<output>\Windows\Wildfire\Content\Paks\pakchunk1002-Windows.utoc" -List
+```
+
+The mount point should start with `../../../Wildfire/Content/Wildfire/…`, and the file list should match the manifest.
+
+:::caution[Gotcha: another mod's files are in my chunk]
+A PrimaryAssetLabel copied from another folder keeps its old Chunk ID. Open every label in your mod's folders and check the number. This is exactly how our horn ended up inside the siren mod.
+:::
+
+## Step 3: Rename and install
+
+<Steps>
+
+1. Copy your three `pakchunk<ID>-Windows` files somewhere safe, e.g. a `mods\MyMod_v1\` folder. Keep every version you test.
+
+2. Rename all three to the same new name, starting with `z_` and ending with `_P`:
+
+   ```text
+   z_MyTruck_P.pak
+   z_MyTruck_P.utoc
+   z_MyTruck_P.ucas
+   ```
+
+   `z_` makes it load after the game's files, and `_P` marks it as a patch that overrides them. The middle part can be anything, but should be unique to your mod.
+
+3. Close the game. In Steam, right-click the game → **Manage → Browse local files**, then open `Wildfire\Content\Paks\`.
+
+4. Copy the three renamed files in, next to `Wildfire-Windows.pak`.
+
+5. Start the game and check your change.
+
+</Steps>
+
+:::caution[Gotcha: it only works with all three files]
+The `.pak` is almost empty (the data is in the `.utoc` and `.ucas`), but the game still needs it. All three must be present and share exactly the same name.
+:::
+
+## Uninstall
+
+Delete the three `z_<YourMod>_P` files from `Paks`. That's it: no game files were changed.
+
+Steam's **Verify integrity of game files** does **not** remove mod files. It only repairs changed or missing game files, and these are extra files.
+
+## Sharing your mod
+
+When you release a mod, include:
+
+- the three files inside a `Wildfire\Content\Paks\` folder structure, so users can drag and drop it into the game folder,
+- install and uninstall steps, and the **Texture Quality: Epic** tip for texture mods ([example](/mods/installing/)),
+- the game version it was built for, because an update can break cooked mods,
+- SHA-256 hashes, so users can check their download: `Get-FileHash .\z_MyTruck_P.* -Algorithm SHA256`.
+
+Add your Chunk ID and file name to the [registry](/reference/chunk-ids/) so other modders don't clash with you.

@@ -1,0 +1,165 @@
+---
+title: Replacing 3D models
+description: 'Step by step: replace a static mesh in Rescue Ops: Wildfire, such as the firefighter helmet, with your own model.'
+sidebar:
+  badge:
+    text: Untested
+    variant: caution
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+:::danger[Not yet confirmed in-game]
+This method follows the same rules as the proven [texture](/tutorials/retexturing/) and [sound](/tutorials/sounds/) replacements, but **a model swap hasn't been tested in-game yet**. Follow it carefully, check the build at Step 7, and expect some trial and error. This page will be updated once the helmet swap is confirmed.
+:::
+
+:::note[In this tutorial you will learn]
+- What a replacement model has to match to load in place of the original
+- How to export the original model and read its settings
+- How to prepare your model in Blender so it lines up
+- How to import it into Unreal so it still uses the game's own materials
+:::
+
+:::tip[Before you start]
+You need everything from [Retexturing](/tutorials/retexturing/) working, plus **Blender** (or another 3D tool that exports FBX). This tutorial covers **static meshes** (`S_` props such as the helmet). Skeletal meshes (`SK_`: characters, the truck chassis) need a matching skeleton and aren't covered.
+:::
+
+## How model replacement works
+
+Same idea as textures: a static mesh in your mod at **exactly the same path and name** as the game's replaces it everywhere it's used. The difference is that a model points at **materials**, and those have to keep pointing at the game's own materials. Otherwise your model shows up untextured, or your mod accidentally replaces a material used elsewhere in the game.
+
+The example below uses the firefighter helmet:
+
+```text
+/Game/Wildfire/StaticMeshes/Props/FirefighterEquipment/S_FirefighterHelmet
+```
+
+## Step 1: Export the original and read its settings
+
+<Steps>
+
+1. In FModel, browse to the mesh, right-click → **Save Model** (`.glb`) and **Save Properties (.json)**. If the export is empty, change the Nanite export setting ([see Retexturing](/tutorials/retexturing/#step-3-export-the-original-textures)).
+
+2. In the `.json`, note:
+
+   | Look for | Why it matters |
+   |---|---|
+   | `StaticMaterials` → each `MaterialSlotName` and `ObjectPath` | Your model needs the **same slot names, in the same order**, pointing at the same materials |
+   | `NaniteSettings` → `bEnabled` | Match it on import |
+   | Bounds (`ExtendedBounds` → `BoxExtent`) | Size check: yours should come out about the same |
+   | LODs, sockets, collision (`BodySetup`) | Keep what the original has |
+
+   For the helmet, the slots are:
+
+   | Slot | Material |
+   |---|---|
+   | 0 | `/Game/Wildfire/Materials/Characters/Firefighter/MI_FirefighterCloth` (shell) |
+   | 1 | `/Game/Wildfire/Materials/Environment/Buildings/FireStation/MI_FS_Glass` (visor) |
+
+</Steps>
+
+## Step 2: Build your model in Blender
+
+<Steps>
+
+1. **File → Import → glTF 2.0** and open the original `.glb`. This is your size and position reference.
+
+2. Model your replacement **on top of the original**:
+   - same **pivot**: the origin stays where the original's is (the helmet's is centred),
+   - same **scale and facing direction**,
+   - roughly the same size.
+
+3. Give it the **same material slots, in the same order, with the same names** as the original. Use the slot names from the `.json`.
+
+4. UV-unwrap each part so it uses the **game's existing texture** for that slot (e.g. the helmet shell maps onto the firefighter body texture), or plan to [retexture](/tutorials/retexturing/) that texture in the same mod.
+
+5. Delete the original reference mesh and **File → Export → FBX**: selected objects only, mesh only, default scale.
+
+</Steps>
+
+:::caution[Gotcha: the textures on my model are wrong]
+The game's materials have **no texture parameters**: the textures are fixed inside the parent material. You can't give your model its own textures through a material. You either reuse the game's existing texture layout, or replace that texture too (and it then changes on every model that shares it).
+:::
+
+## Step 3: Create placeholder materials at the game's paths
+
+Unreal won't let your mesh point at materials that don't exist in your project. So create **empty stand-ins** at the game's exact material paths. When the game loads your model, it finds its own real materials at those paths.
+
+<Steps>
+
+1. In the Content Browser, create the material's folder, e.g. `Content/Wildfire/Materials/Characters/Firefighter/`.
+
+2. Right-click → **Material** → **Material Instance**. Give it the exact name, e.g. `MI_FirefighterCloth`. Its parent and settings don't matter.
+
+3. Repeat for every material slot (for the helmet, also `Materials/Environment/Buildings/FireStation/MI_FS_Glass`).
+
+4. In **each** placeholder folder, add a **PrimaryAssetLabel** with **Chunk ID `0`**, **Priority `10`**, Label Assets in My Directory ✔. This keeps the placeholders out of your mod.
+
+</Steps>
+
+:::danger[A placeholder that ends up in your mod replaces the real material game-wide]
+If `MI_FirefighterCloth` is packed into your mod, every firefighter in the game gets your empty placeholder instead of the real uniform material. Step 7 shows how to check this before you install.
+:::
+
+## Step 4: Import the model into Unreal
+
+<Steps>
+
+1. Create the mesh's folder, e.g. `Content/Wildfire/StaticMeshes/Props/FirefighterEquipment/`.
+
+2. Drag your FBX in. In the **FBX Import Options** window:
+   - **Import Materials**: unticked, so it doesn't create new materials
+   - **Import Textures**: unticked
+   - **Build Nanite**: match the original's `NaniteSettings`
+   - leave everything else at its defaults, then click **Import**.
+
+3. Rename the mesh to the exact game name, e.g. `S_FirefighterHelmet`.
+
+</Steps>
+
+## Step 5: Point the slots at the game's materials
+
+<Steps>
+
+1. **Double-click** the mesh to open the **Static Mesh Editor**.
+
+2. In the **Details** panel on the right, find **Material Slots**. For each slot:
+   - check the **slot name** matches the original,
+   - click the material dropdown and choose the matching **placeholder** from Step 3.
+
+3. Compare the size shown in the viewport with the original's bounds. If it's 100× too big or small, re-export from Blender with the correct unit scale.
+
+4. Check **Collision** in the toolbar. If the original had simple collision, add a simple box or sphere (**Collision** menu → **Add Box Simplified Collision**).
+
+5. **Save**.
+
+</Steps>
+
+## Step 6: Add the model to your mod
+
+Add a **PrimaryAssetLabel** to the **mesh's** folder exactly as in [Retexturing, Step 6](/tutorials/retexturing/#step-6-add-the-texture-to-your-mod): Priority **1**, your mod's **Chunk ID** (e.g. 1003), Always Cook, Label Assets in My Directory ✔.
+
+## Step 7: Package and check the build
+
+Package as normal ([Package and install](/start/packaging/)), then **before installing**, open your chunk's manifest:
+
+```text
+<project>\Saved\Cooked\Windows\Wildfire\Metadata\ChunkManifest\pakchunk<ID>.txt
+```
+
+It must list **only your mesh**, and **none** of the placeholder materials. If a placeholder is listed, don't install the build. Check the placeholder labels (Chunk ID 0, higher Priority than your mod's label) and package again.
+
+## Step 8: Install and test
+
+Install as normal, then check in-game:
+
+- the model appears in the right place, at the right size and facing the right way,
+- it uses the right textures (not grey or checkered),
+- **other** firefighters and props that share those materials still look normal.
+
+If anything looks wrong, remove the mod by deleting its three files.
+
+## See also
+
+- [Asset paths](/reference/asset-paths/): helmet and material paths
+- [Retexturing](/tutorials/retexturing/): changing the textures your model uses

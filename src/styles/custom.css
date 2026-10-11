@@ -1,0 +1,251 @@
+/*
+ * Emergency-services theme, based on the official Rescue Ops site
+ * (red #E92125, deep reds, Bebas Neue headings, Rubik body text),
+ * with near-black backgrounds and a hi-vis yellow secondary colour.
+ */
+
+:root {
+	--ro-red: #e92125;
+	--ro-red-deep: #7e0003;
+	--ro-red-darkest: #2e0001;
+	--ro-yellow: #f5b800;
+	--ro-stripe-a: var(--ro-red);
+	--ro-stripe-b: #ffffff;
+
+	--sl-font: 'Rubik Variable', system-ui, sans-serif;
+	--ro-font-display: 'Bebas Neue', 'Rubik Variable', sans-serif;
+
+	/* Dark theme (default) */
+	--sl-color-accent-low: #3a0708;
+	--sl-color-accent: #e92125;
+	--sl-color-accent-high: #ff9a9c;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #ececee;
+	--sl-color-gray-2: #c4c4c9;
+	--sl-color-gray-3: #8e8e96;
+	--sl-color-gray-4: #55555c;
+	--sl-color-gray-5: #2a2a30;
+	--sl-color-gray-6: #16161a;
+	--sl-color-black: #0b0b0d;
+
+	--sl-color-bg-nav: #060607;
+	--sl-color-bg-sidebar: #0f0f12;
+	--sl-color-bg-inline-code: #1f1f24;
+	--sl-color-hairline: #1d1d22;
+	--sl-color-hairline-light: #2a2a30;
+
+	--sl-color-orange: var(--ro-yellow);
+	--sl-color-orange-low: #3b2c00;
+	--sl-color-orange-high: #ffe08a;
+
+	--sl-nav-height: 4rem;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #fde3e3;
+	--sl-color-accent: #c8161a;
+	--sl-color-accent-high: #7e0003;
+	--sl-color-white: #111114;
+	--sl-color-gray-1: #1d1d22;
+	--sl-color-gray-2: #34343b;
+	--sl-color-gray-3: #55555c;
+	--sl-color-gray-4: #8e8e96;
+	--sl-color-gray-5: #d6d6db;
+	--sl-color-gray-6: #ededf0;
+	--sl-color-gray-7: #f6f6f8;
+	--sl-color-black: #ffffff;
+
+	--sl-color-bg-nav: #0b0b0d;
+	--sl-color-bg-sidebar: #f6f6f8;
+	--sl-color-bg-inline-code: #ededf0;
+	--sl-color-hairline: #e3e3e8;
+	--sl-color-hairline-light: #d6d6db;
+
+	--sl-color-orange: #b07d00;
+	--sl-color-orange-low: #fff4d1;
+	--sl-color-orange-high: #5c4100;
+}
+
+/* ---------- Header: dark bar with red/white hazard stripe ---------- */
+
+header.header {
+	border-bottom: none !important;
+	position: relative;
+}
+
+header.header::after {
+	content: '';
+	position: absolute;
+	inset-inline: 0;
+	bottom: -5px;
+	height: 5px;
+	background: repeating-linear-gradient(
+		-45deg,
+		var(--ro-stripe-a) 0 14px,
+		var(--ro-stripe-b) 14px 28px
+	);
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* The header stays dark in both themes, so keep its text and icons light. */
+.header,
+.header .site-title,
+.header a,
+.header button,
+.header starlight-theme-select,
+.header select {
+	color: #f2f2f4 !important;
+}
+
+.header .site-title {
+	font-family: var(--ro-font-display);
+	font-size: 1.75rem;
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* Search box in the dark header */
+:root[data-theme='light'] .header site-search button[data-open-modal] {
+	background-color: #1a1a1f;
+	border-color: #2e2e35;
+	color: #c4c4c9 !important;
+}
+
+/* ---------- Typography ---------- */
+
+h1,
+.sl-markdown-content h2,
+.hero h1,
+.card .title {
+	font-family: var(--ro-font-display);
+	font-weight: 400;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+}
+
+h1#_top {
+	font-size: clamp(2.4rem, 5vw, 3.2rem);
+	line-height: 1;
+}
+
+.sl-markdown-content h2 {
+	font-size: 2rem;
+	line-height: 1.1;
+	padding-bottom: 0.25rem;
+	border-bottom: 2px solid var(--sl-color-accent);
+	display: inline-block;
+}
+
+.sl-markdown-content h3 {
+	color: var(--sl-color-white);
+	font-weight: 600;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar-content summary .group-label {
+	font-family: var(--ro-font-display);
+	font-size: 1.15rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--sl-color-white);
+}
+
+.sidebar-content a[aria-current='page'] {
+	background: linear-gradient(90deg, var(--ro-red-deep), var(--ro-red));
+	color: #fff !important;
+	border-radius: 0.25rem;
+}
+
+/* ---------- Content details ---------- */
+
+.sl-markdown-content table {
+	border-radius: 0.5rem;
+	overflow: hidden;
+}
+
+.sl-markdown-content th {
+	background: var(--sl-color-gray-6);
+	color: var(--sl-color-white);
+	font-weight: 600;
+}
+
+.sl-markdown-content img {
+	border-radius: 0.5rem;
+	border: 1px solid var(--sl-color-hairline-light);
+}
+
+.sl-link-button.primary,
+.action.primary {
+	background: var(--ro-red) !important;
+	border-color: var(--ro-red) !important;
+	color: #fff !important;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.card {
+	border-radius: 0.5rem;
+	border-color: var(--sl-color-hairline-light) !important;
+	background: var(--sl-color-gray-6);
+}
+
+.card .icon {
+	color: var(--ro-red) !important;
+}
+
+/* ---------- Splash hero ---------- */
+
+[data-has-hero] .main-frame {
+	background:
+		radial-gradient(ellipse 80% 60% at 70% 0%, rgba(233, 33, 37, 0.22), transparent 70%),
+		var(--sl-color-black);
+}
+
+.hero h1 {
+	font-size: clamp(3rem, 8vw, 5.5rem) !important;
+	line-height: 0.95;
+	color: #fff;
+}
+
+:root[data-theme='light'] .hero h1 {
+	color: var(--sl-color-white);
+}
+
+.hero h1::after {
+	content: '';
+	display: block;
+	width: 5rem;
+	height: 5px;
+	margin-top: 1rem;
+	background: repeating-linear-gradient(-45deg, var(--ro-red) 0 8px, #fff 8px 16px);
+}
+
+.hero img {
+	border-radius: 0.75rem;
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.08),
+		0 20px 60px -10px rgba(233, 33, 37, 0.45);
+}
+
+/* ---------- Asides ---------- */
+
+/* "Tip" asides use a neutral slate instead of Starlight's purple. */
+:root {
+	--sl-color-purple-low: #1c2230;
+	--sl-color-purple: #8a9bb8;
+	--sl-color-purple-high: #dfe6f2;
+}
+
+:root[data-theme='light'] {
+	--sl-color-purple-low: #eef1f6;
+	--sl-color-purple: #5a6b88;
+	--sl-color-purple-high: #1c2230;
+}
+
+.starlight-aside p + p {
+	margin-top: 0.5rem;
+}

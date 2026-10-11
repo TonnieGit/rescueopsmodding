@@ -1,0 +1,54 @@
+---
+title: Installing mods
+description: 'How to install and uninstall Rescue Ops: Wildfire mods. You only copy files into one folder.'
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed.
+
+## Install
+
+<Steps>
+
+1. Close the game.
+
+2. Open the game folder: **Steam → Library → right-click the Rescue Ops: Wildfire demo → Manage → Browse local files**. It contains `WildfireDemo.exe` and a folder called `Wildfire`. It's usually:
+
+   ```text
+   C:\Program Files (x86)\Steam\steamapps\common\Rescue Ops Demo
+   ```
+
+   It can be on another drive, so use "Browse local files" to be sure.
+
+3. Go into **`Wildfire\Content\Paks`**. You should see `Wildfire-Windows.pak`, `.ucas` and `.utoc`.
+
+4. Copy the mod's files into that `Paks` folder. Keep the names exactly as they are.
+
+   **Shortcut:** each download has a `Wildfire` folder inside. Copy it into the game folder from step 2 and let Windows merge it. If Windows asks to replace a file that **isn't** one of the mod's own, click Cancel and copy the files by hand.
+
+5. Start the game.
+
+</Steps>
+
+:::tip[Set Texture Quality to Epic]
+On Medium the game shows textures at a quarter of their size, so logos and lettering look blurry. In the graphics settings, set **Texture Quality** as high as it goes.
+:::
+
+## Uninstall
+
+Delete the mod's three files from `Wildfire\Content\Paks`.
+
+Steam's **Verify integrity of game files** will **not** remove them. It only repairs changed or missing files, and mod files are extra files.
+
+## Check the files (optional)
+
+Each mod's `INSTALL.txt` lists SHA-256 hashes. In PowerShell:
+
+```powershell
+Get-FileHash .\z_FirefighterTex_P.* -Algorithm SHA256
+```
+
+## After a game update
+
+The mods were built for the demo on Unreal Engine 5.8.1. If an update makes a mod look or sound wrong, or stop working, delete its files. It may need rebuilding.

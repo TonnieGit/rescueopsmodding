@@ -1,0 +1,46 @@
+---
+title: Rescue Ops Modding
+description: 'Tutorials, mods and reference for modding Rescue Ops: Wildfire (Unreal Engine 5.8).'
+template: splash
+hero:
+  tagline: 'The first modding guide for Rescue Ops: Wildfire. Retexture uniforms and trucks, swap sirens, and package your own mods using a stock Unreal Engine 5.8 editor.'
+  image:
+    file: ../../assets/screenshots/truck-side.jpg
+    alt: Firefighter in gold QLD RFS bushfire gear beside the golden-yellow reskinned fire truck
+  actions:
+    - text: Start modding
+      link: /start/introduction/
+      icon: right-arrow
+    - text: Browse mods
+      link: /mods/
+      icon: download
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What works today
+
+<CardGrid stagger>
+	<Card title="Texture replacement" icon="seti:image">
+		Replace any cooked texture by rebuilding it at the same path in a blank `Wildfire` project. Proven on the firefighter uniform, helmet and CCF fire truck.
+	</Card>
+	<Card title="Sound replacement" icon="seti:audio">
+		Swap SoundWaves (sirens, horns) and keep the game's own MetaSounds, so volume sliders and distance fall-off still work.
+	</Card>
+	<Card title="No game files touched" icon="approve-check">
+		Mods are extra `z_*_P` pak containers. Uninstall by deleting three files. The game isn't encrypted or signed and has no anti-cheat.
+	</Card>
+	<Card title="Stock tools only" icon="setting">
+		FModel, a `.usmap` mapping file and Unreal Engine 5.8 from the Epic launcher. No custom toolchain needed.
+	</Card>
+</CardGrid>
+
+## Where to go
+
+<CardGrid>
+	<LinkCard title="Tools you need" href="/start/tools/" description="FModel, Unreal 5.8, the mapping file, and image and audio tools." />
+	<LinkCard title="Retexturing" href="/tutorials/retexturing/" description="Find a model's textures, export them and get your own into the game." />
+	<LinkCard title="Replacing sounds" href="/tutorials/sounds/" description="Swap the siren, horn or any other sound." />
+	<LinkCard title="Troubleshooting" href="/start/troubleshooting/" description="Common problems and how to fix them." />
+</CardGrid>
