@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://rescueopsmodding.vercel.app',
 	integrations: [
 		starlight({
 			title: 'Rescue Ops Modding',
