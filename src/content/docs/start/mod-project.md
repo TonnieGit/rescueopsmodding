@@ -6,6 +6,7 @@ description: Create the blank Unreal 5.8 project that every mod is built from, a
 :::note[In this guide you will]
 - Create the Unreal project you'll build every mod in
 - Set the packaging options so your mods come out as separate files
+- Copy the game's rendering settings, so new materials work in-game
 :::
 
 You only do this once. Every mod (textures, sounds, models) is built from this one project.
@@ -56,6 +57,36 @@ The game's content lives under the project name `Wildfire`. A project with any o
 ## Step 3: Create the base folder
 
 In the **Content Browser**, right-click `Content` → **New Folder** → name it `Wildfire`. Every mod's files go inside it, in the same folders as the game uses.
+
+## Step 4: Match the game's rendering settings
+
+Your project must compile materials for the **same rendering settings as the game**. Texture and sound mods work without this step, but any mod with its **own material** (e.g. a [new 3D model](/tutorials/models/) with its own textures) renders black in-game without it. Do it once, now, so you never hit the problem.
+
+1. **Close Unreal completely.** It may overwrite the file below when it exits.
+
+2. Extract the game's settings file. In PowerShell (change the game path if your Steam library is elsewhere):
+
+   ```powershell
+   & "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealPak.exe" "C:\Program Files (x86)\Steam\steamapps\common\Rescue Ops Demo\Wildfire\Content\Paks\Wildfire-Windows.pak" -Extract "$env:USERPROFILE\Documents\WildfireGameConfig" -Filter="*Wildfire/Config/*"
+   ```
+
+   This only reads the game's pak. It writes the game's config files to `Documents\WildfireGameConfig\Wildfire\Config\`.
+
+3. Make a backup copy of your project's `Config\DefaultEngine.ini` (e.g. `DefaultEngine.ini.bak`).
+
+4. Open the game's `DefaultEngine.ini` (from step 2) in a text editor and copy its whole **`[/Script/Engine.RendererSettings]`** section: from that line down to the line before the next `[...]` heading.
+
+5. Open your project's `Config\DefaultEngine.ini`, find its `[/Script/Engine.RendererSettings]` section and **replace the whole section** with the one you copied. Leave everything else in the file alone. Save.
+
+6. Open the project. Unreal recompiles its shaders, and the next **package takes a long time** (much longer than usual). Later packages are quick again.
+
+:::danger[Gotcha: my new material is black with coloured speckles in-game]
+**Cause:** a new Unreal 5.8 project has different rendering settings from the game (e.g. `r.VelocityOutputPass`, `r.Substrate.ProjectGBufferFormat`, `r.VirtualTextures`, `r.Nanite.Tessellation`). Materials are compiled for those settings, so in-game they write garbage, even though they look right in the editor.
+
+**Fix:** this step. After changing the settings, open your material, click **Apply**, save and package again.
+
+**How we found it:** turning texture streaming off made no difference, so we extracted the game's `DefaultEngine.ini` from its pak and compared it with the mod project's.
+:::
 
 ## Good habits
 

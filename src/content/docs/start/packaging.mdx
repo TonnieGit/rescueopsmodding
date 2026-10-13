@@ -79,6 +79,8 @@ A PrimaryAssetLabel copied from another folder keeps its old Chunk ID. Open ever
 
    `z_` makes it load after the game's files, and `_P` marks it as a patch that overrides them. The middle part can be anything, but should be unique to your mod.
 
+   **Mods with their own material** (new 3D models) are named differently: keep the `pakchunk<ID>` start, e.g. `pakchunk1003-MyHelmet-Windows_P`. See [Replacing 3D models](/tutorials/models/#step-9-name-and-install).
+
 3. Close the game. In Steam, right-click the game → **Manage → Browse local files**, then open `Wildfire\Content\Paks\`.
 
 4. Copy the three renamed files in, next to `Wildfire-Windows.pak`.
@@ -93,7 +95,7 @@ The `.pak` is almost empty (the data is in the `.utoc` and `.ucas`), but the gam
 
 ## Uninstall
 
-Delete the three `z_<YourMod>_P` files from `Paks`. That's it: no game files were changed.
+Delete your mod's three files from `Paks`. That's it: no game files were changed.
 
 Steam's **Verify integrity of game files** does **not** remove mod files. It only repairs changed or missing game files, and these are extra files.
 

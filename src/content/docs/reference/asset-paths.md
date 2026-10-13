@@ -15,7 +15,8 @@ All paths are under `/Game/Wildfire/` (on disk in your mod project: `Content/Wil
 | Head | `Textures/Characters/Firefighter/Head/T_FirefighterHead_D/_N/_R` | 2048² |
 | Eyes | `Textures/Characters/Common/Eyes/T_Eye_D/_N/_Mask` | 512² |
 | Body material | `Materials/Characters/Firefighter/MI_FirefighterCloth` | No texture parameters |
-| Helmet mesh | `StaticMeshes/Props/FirefighterEquipment/S_FirefighterHelmet` | Slot 0 `MI_FirefighterCloth`, slot 1 `MI_FS_Glass` (visor) |
+| Helmet mesh | `StaticMeshes/Props/FirefighterEquipment/S_FirefighterHelmet` | Slot `Cloth` → `MI_FirefighterCloth`, slot `Material__77` → `MI_FS_Glass` (visor). Socket `Flashlight` (helmet torch). No Nanite, 1 LOD |
+| Helmet attachment | `Blueprints/Core/Characters/Firefighters/BP_Teammate` | Component `Helmet`, attached to the character's `HelmetSocket`, no offset |
 | Visor glass | `Materials/Environment/Buildings/FireStation/MI_FS_Glass` | Parameters only (tint, opacity 0.5) |
 
 ## CCF fire truck

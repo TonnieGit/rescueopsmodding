@@ -23,7 +23,7 @@ No game file is ever edited. Uninstalling means deleting the three files.
 |---|---|---|
 | Textures (diffuse, normal, roughness/metallic) | ✅ Works, including 4K | [Retexturing](/tutorials/retexturing/) |
 | Sounds (SoundWave behind a MetaSound) | ✅ Works | [Replacing sounds](/tutorials/sounds/) |
-| Static mesh swap | 🧪 Method written, not yet confirmed in-game | [Replacing 3D models](/tutorials/models/) |
+| Static mesh swap, with its own material and textures | ✅ Works, including LODs, sockets and the game's own materials | [Replacing 3D models](/tutorials/models/) |
 | Lua / runtime scripting (UE4SS) | ❌ Crashes on map load. Only useful for generating the `.usmap` | [Generate the .usmap](/start/usmap/) |
 
 ## Where to start

@@ -1,30 +1,34 @@
 ---
 title: QLD RFS Uniforms
-description: 'Gold bushfire gear with RURAL FIRE BRIGADE on the back and a white helmet for Rescue Ops: Wildfire. 4K textures.'
+description: 'Gold bushfire gear with RURAL FIRE BRIGADE on the back and a yellow BR9-style bushfire helmet for Rescue Ops: Wildfire. 4K textures.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
+import helmetRear from '../../../assets/screenshots/helmet-rear.jpg';
 import wildfire from '../../../assets/screenshots/uniform-wildfire.jpg';
 import rear from '../../../assets/screenshots/uniform-truck-rear.jpg';
 
-<Badge text="v1 · 4K" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" />
+<Badge text="v1.1 · 4K" variant="danger" /> <Badge text="Demo 0.8.4 · UE 5.8.1" variant="note" />
 
-Changes the firefighter suit and helmet to **gold bushfire gear** with "RURAL FIRE BRIGADE" on the back, reflective tape and a **white helmet**.
+Changes the firefighter suit to **gold bushfire gear** with "RURAL FIRE BRIGADE" on the back and reflective tape, and replaces the helmet with the yellow **[BR9 – Bushfire Helmet Yellow](/mods/br9-bushfire-helmet-yellow/)**.
 
-<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/QLD_RFS_Uniforms.zip" icon="download">Download QLD_RFS_Uniforms.zip (16 MB)</LinkButton>
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/QLD_RFS_Uniforms.zip" icon="download">Download QLD_RFS_Uniforms.zip (22 MB)</LinkButton>
 
-<Image src={wildfire} alt="Firefighter in gold QLD RFS gear with a white helmet, spraying a hose at a bushfire" />
+<Image src={helmetRear} alt="Rear view of the gold uniform with RURAL FIRE BRIGADE patch and the yellow BR9-style helmet" />
 
-<Image src={rear} alt="Rear view of the gold uniform with RURAL FIRE BRIGADE patch, standing beside the yellow truck" />
+<Image src={wildfire} alt="Firefighter in gold QLD RFS gear spraying a hose at a bushfire (v1, with the game's original helmet painted white)" />
+
+<Image src={rear} alt="Rear view of the gold uniform beside the yellow truck (v1, original helmet painted white)" />
 
 ## What it changes
 
 | | |
 |---|---|
-| Files | `z_FirefighterTex_P.pak` / `.utoc` / `.ucas` (chunk 1000) |
-| Replaces | `T_FirefighterBody_D`, `_N`, `_RM` at 4096² |
-| Affects | The firefighter suit **and** helmet (they share one texture set) |
+| Uniform | `z_FirefighterTex_P.pak` / `.utoc` / `.ucas` (chunk 1000): `T_FirefighterBody_D`, `_N`, `_RM` at 4096² |
+| Helmet | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.*` (chunk 1003), the same files as the standalone [helmet mod](/mods/br9-bushfire-helmet-yellow/) |
+
+Without the helmet files, the game's original helmet comes back, painted white by the uniform texture (as in v1).
 
 [How to install](/mods/installing/). Set **Texture Quality to Epic** for sharp logos.
 
@@ -34,11 +38,14 @@ Changes the firefighter suit and helmet to **gold bushfire gear** with "RURAL FI
 z_FirefighterTex_P.pak   DE1E705FBFA6976CF054406CA3D9050EC5E9B1B99B8F4BDA4384D5179F109DD1
 z_FirefighterTex_P.utoc  6D8E8545A793ADE6E07C566A0696FF44611FC5CA9FEDCDD0C0D189AF37D17494
 z_FirefighterTex_P.ucas  92DCBAB8EF984C885723F05C19C54AA3DBE058D304BD4BC1B95293530352F5F9
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.pak   D6AEF57B674B5FB84315D977B62340E7F4E885E5A3A187CEC8267E4FB177F40A
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.utoc  28440761591C05173088E310E479D52B4842DC50B5A2452466C907BB46A1628F
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.ucas  199F921F705208380B9C01680329A9140CBBC5CC684A6B8BBC916871077F82DF
 ```
 
 ## How it was made
 
-See [Retexturing](/tutorials/retexturing/).
+See [Retexturing](/tutorials/retexturing/) (uniform) and [Replacing 3D models](/tutorials/models/) (helmet).
 
 ## Credits
 

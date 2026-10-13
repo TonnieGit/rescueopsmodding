@@ -1,0 +1,48 @@
+---
+title: BR9 – Bushfire Helmet Yellow
+description: 'A yellow BR9-style bushfire helmet with brim, reflective strips, neck flap and a clear face shield for Rescue Ops: Wildfire.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import front from '../../../assets/screenshots/helmet-front.jpg';
+import rear from '../../../assets/screenshots/helmet-rear.jpg';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo 0.8.4 · UE 5.8.1" variant="note" />
+
+Replaces the firefighters' French-style helmet with a **yellow BR9-style bushfire helmet**: brim, reflective strips, neck flap and a **clear face shield**. The helmet torch still works and mounts on the side.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/BR9_Bushfire_Helmet_Yellow.zip" icon="download">Download BR9_Bushfire_Helmet_Yellow.zip (6 MB)</LinkButton>
+
+<Image src={front} alt="Firefighter in the fire station bay wearing the yellow BR9-style helmet with the clear face shield down and the helmet torch on" />
+
+<Image src={rear} alt="Rear view of the yellow helmet with its neck flap, worn with the gold RURAL FIRE BRIGADE uniform" />
+
+## What it changes
+
+| | |
+|---|---|
+| Files | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.pak` / `.utoc` / `.ucas` (chunk 1003) |
+| Replaces | `S_FirefighterHelmet` (the helmet every firefighter wears) |
+| Adds | Its own material and 2K textures. The visor uses the game's own glass |
+| Detail | 12,000 triangles with 3 LODs (the switch isn't noticeable) |
+
+Works on its own or with the other mods. The [QLD RFS Uniforms](/mods/qld-rfs-uniforms/) package already includes it.
+
+[How to install](/mods/installing/). **Keep the file names exactly as they are.**
+
+## File check (SHA-256)
+
+```text
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.pak   D6AEF57B674B5FB84315D977B62340E7F4E885E5A3A187CEC8267E4FB177F40A
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.utoc  28440761591C05173088E310E479D52B4842DC50B5A2452466C907BB46A1628F
+pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.ucas  199F921F705208380B9C01680329A9140CBBC5CC684A6B8BBC916871077F82DF
+```
+
+## How it was made
+
+See [Replacing 3D models](/tutorials/models/).
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

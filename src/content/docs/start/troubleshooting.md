@@ -25,6 +25,17 @@ description: 'Common problems when modding Rescue Ops: Wildfire, and how to fix 
 | Old detail still visible after repainting | Roughness or normal still differ there. See [Painting tips](#painting-tips) below. |
 | Something else changed colour too | That texture or colour block is shared by other meshes. |
 
+## Model problems
+
+| Symptom | Likely cause |
+|---|---|
+| New material is **black with coloured speckles** in-game, fine in the editor | Mod project's rendering settings differ from the game's. [Copy them](/start/mod-project/#step-4-match-the-games-rendering-settings), then Apply, save and package again |
+| A part is untextured or uses the wrong material | Slot names don't match the original's `MaterialSlotName` (e.g. `Cloth`, not `MI_FirefighterCloth`) |
+| Fire station windows (or other props) look wrong after installing | A placeholder material was packed into your mod. Its label needs Chunk ID 0, Priority 10 |
+| Helmet torch (or other attached item) floats or sits inside the model | Move the mesh's socket to where the item should mount |
+| Model sits too high, low or backwards | Origin or facing differs from the original: front along +X, Z up, origin at the attachment point |
+| Decimate barely reduces the model | It's made of loose pieces. Merge by Distance first |
+
 ## Sound problems
 
 | Symptom | Likely cause |

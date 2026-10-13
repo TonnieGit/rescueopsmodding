@@ -54,6 +54,7 @@ export default defineConfig({
 						{ label: 'All mods', slug: 'mods' },
 						{ label: 'Installing mods', slug: 'mods/installing' },
 						{ label: 'QLD RFS Uniforms', slug: 'mods/qld-rfs-uniforms' },
+						{ label: 'BR9 – Bushfire Helmet Yellow', slug: 'mods/br9-bushfire-helmet-yellow' },
 						{ label: 'QLD RFS Truck Reskin', slug: 'mods/qld-rfs-truck-reskin' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },
 					],
