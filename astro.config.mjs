@@ -5,6 +5,9 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://rescueopsmodding.vercel.app',
+	redirects: {
+		'/start/introduction': '/',
+	},
 	integrations: [
 		starlight({
 			title: 'Rescue Ops Modding',
@@ -12,6 +15,15 @@ export default defineConfig({
 				'Tutorials, mods and reference for modding Rescue Ops: Wildfire (Unreal Engine 5.8).',
 			logo: { src: './src/assets/logo.svg' },
 			favicon: '/favicon.svg',
+			head: [
+				// Vercel Web Analytics (enable it in the Vercel project's Analytics tab)
+				{
+					tag: 'script',
+					content:
+						'window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };',
+				},
+				{ tag: 'script', attrs: { defer: true, src: '/_vercel/insights/script.js' } },
+			],
 			customCss: [
 				'@fontsource/bebas-neue/400.css',
 				'@fontsource-variable/rubik',
@@ -29,9 +41,10 @@ export default defineConfig({
 				{
 					label: 'Getting started',
 					items: [
-						{ label: 'Introduction', slug: 'start/introduction' },
+						{ label: 'Introduction', link: '/' },
 						{ label: 'Tools you need', slug: 'start/tools' },
-						{ label: 'Generate the .usmap', slug: 'start/usmap' },
+						{ label: 'Set up FModel', slug: 'start/fmodel' },
+						{ label: 'Get the .usmap', slug: 'start/usmap' },
 						{ label: 'Set up the mod project', slug: 'start/mod-project' },
 						{ label: 'Package and install your mod', slug: 'start/packaging' },
 					],

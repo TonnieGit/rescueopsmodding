@@ -68,9 +68,9 @@
 
 /* ---------- Header: dark bar with red/white hazard stripe ---------- */
 
+/* Starlight keeps the header fixed; don't override its position. */
 header.header {
 	border-bottom: none !important;
-	position: relative;
 }
 
 header.header::after {
@@ -117,7 +117,6 @@ header.header::after {
 
 h1,
 .sl-markdown-content h2,
-.hero h1,
 .card .title {
 	font-family: var(--ro-font-display);
 	font-weight: 400;
@@ -195,40 +194,6 @@ h1#_top {
 
 .card .icon {
 	color: var(--ro-red) !important;
-}
-
-/* ---------- Splash hero ---------- */
-
-[data-has-hero] .main-frame {
-	background:
-		radial-gradient(ellipse 80% 60% at 70% 0%, rgba(233, 33, 37, 0.22), transparent 70%),
-		var(--sl-color-black);
-}
-
-.hero h1 {
-	font-size: clamp(3rem, 8vw, 5.5rem) !important;
-	line-height: 0.95;
-	color: #fff;
-}
-
-:root[data-theme='light'] .hero h1 {
-	color: var(--sl-color-white);
-}
-
-.hero h1::after {
-	content: '';
-	display: block;
-	width: 5rem;
-	height: 5px;
-	margin-top: 1rem;
-	background: repeating-linear-gradient(-45deg, var(--ro-red) 0 8px, #fff 8px 16px);
-}
-
-.hero img {
-	border-radius: 0.75rem;
-	box-shadow:
-		0 0 0 1px rgba(255, 255, 255, 0.08),
-		0 20px 60px -10px rgba(233, 33, 37, 0.45);
 }
 
 /* ---------- Asides ---------- */

@@ -13,7 +13,7 @@ import { Steps } from '@astrojs/starlight/components';
 :::
 
 :::tip[Before you start]
-You need the [tools](/start/tools/) installed, FModel loaded with the [`.usmap`](/start/usmap/), and the [mod project](/start/mod-project/) set up.
+You need the [tools](/start/tools/) installed, [FModel set up](/start/fmodel/) with the `.usmap`, and the [mod project](/start/mod-project/) set up.
 :::
 
 ## How retexturing works
@@ -53,7 +53,7 @@ The examples below use the CCF fire truck, but the steps are the same for any mo
 :::caution[Gotcha: FModel shows the files but won't open anything]
 **Cause:** the mapping file isn't loaded. The game uses unversioned properties, so FModel can list files but not read them.
 
-**Fix:** *Settings → General* → set UE version to `GAME_UE5_8`, tick **Local Mapping File** and select your `.usmap` ([how to make one](/start/usmap/)). Restart FModel.
+**Fix:** *Settings → General* → set UE version to `GAME_UE5_8`, tick **Local Mapping File** and select your `.usmap` ([how](/start/fmodel/#step-3-load-the-mapping-file)). Restart FModel.
 :::
 
 ## Step 2: Find the textures it uses
@@ -121,11 +121,11 @@ To paint directly on the model in Substance Painter or Blender, also export the 
 :::caution[Gotcha: the exported model is an empty 160-byte file]
 **Cause:** vehicles and many props use **Nanite**, and FModel's default exports only the Nanite data, which is empty in a `.glb`.
 
-**Fix:** *Settings → Models → Nanite Mesh Export Format* → pick the fallback / normal LOD option, then export again. We found this when every truck part came out at exactly 160 bytes.
+**Fix:** *Settings → Export → Nanite Format* → `Only Normal LODs`, then export again. We found this when every truck part came out at exactly 160 bytes.
 :::
 
 :::caution[Gotcha: I can't find my exports]
-FModel saves to its own `Output\Exports\` folder (inside the FModel folder) even if you change the output folder setting. Copy the files from there into a folder of your own, and keep the originals untouched so you can always go back.
+FModel saves exports to the output folders you set in [Set up FModel → Step 4](/start/fmodel/#step-4-set-the-export-folders-and-formats). Copy the files from there into a folder of your own, and keep the originals untouched so you can always go back.
 :::
 
 ## Step 4: Make your new texture

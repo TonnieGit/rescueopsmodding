@@ -13,7 +13,7 @@ The CCF is the main fire truck: a French forest tanker (*camion-citerne feux de 
 | `SK_CCF` | SkeletalMesh (chassis, wheels, tyres) | LightPrecise, VariousTiling |
 | `Doors/*` (8) | StaticMesh, Nanite | LightPrecise, TrimSheet, VariousTiling (+ MetalTread / Ribbing on some) |
 
-41 meshes in total, including the command panel, glass, light meshes and joints. Exporting them needs FModel's Nanite export setting changed (see [Tools](/start/tools/#fmodel-setup)).
+41 meshes in total, including the command panel, glass, light meshes and joints. Exporting them needs FModel's Nanite export setting changed (see [Set up FModel → Step 4](/start/fmodel/#step-4-set-the-export-folders-and-formats)).
 
 ## Materials
 

@@ -1,7 +1,9 @@
 ---
 title: Introduction
-description: 'What can be modded in Rescue Ops: Wildfire, how it works, and the ground rules.'
+description: 'Tutorials, mods and reference for modding Rescue Ops: Wildfire (Unreal Engine 5.8). What can be modded, how it works, and the ground rules.'
 ---
+
+![Firefighter in gold QLD RFS bushfire gear beside the golden-yellow reskinned fire truck](../../assets/screenshots/truck-side.jpg)
 
 **Rescue Ops: Wildfire** is built on **Unreal Engine 5.8.1**. As far as we know these are the first published mods for it. This site is the result of many hours of testing: it skips the dead ends and shows you only what works. Every method here is confirmed in-game on the Steam demo build (October 2026).
 
@@ -24,13 +26,15 @@ No game file is ever edited. Uninstalling means deleting the three files.
 | Textures (diffuse, normal, roughness/metallic) | ✅ Works, including 4K | [Retexturing](/tutorials/retexturing/) |
 | Sounds (SoundWave behind a MetaSound) | ✅ Works | [Replacing sounds](/tutorials/sounds/) |
 | Static mesh swap, with its own material and textures | ✅ Works, including LODs, sockets and the game's own materials | [Replacing 3D models](/tutorials/models/) |
-| Lua / runtime scripting (UE4SS) | ❌ Crashes on map load. Only useful for generating the `.usmap` | [Generate the .usmap](/start/usmap/) |
+| Lua / runtime scripting (UE4SS) | ❌ Crashes on map load. Not needed: download the `.usmap` instead | [Get the .usmap](/start/usmap/) |
 
 ## Where to start
 
-1. Install the [tools](/start/tools/) and [generate the `.usmap`](/start/usmap/).
+1. Install the [tools](/start/tools/) and [set up FModel](/start/fmodel/) with the `.usmap`.
 2. [Set up the mod project](/start/mod-project/) once.
 3. Follow [Retexturing](/tutorials/retexturing/) or [Replacing sounds](/tutorials/sounds/), then [package and install](/start/packaging/).
+
+Just want to play with mods? [Browse the mods](/mods/) and see [Installing mods](/mods/installing/).
 
 :::caution[Only ever add files]
 Never modify, delete or repack the game's own `.pak`/`.utoc`/`.ucas` files. Mods are separate `z_*_P` files that you can remove at any time.

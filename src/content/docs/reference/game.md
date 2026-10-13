@@ -15,7 +15,7 @@ Checked on the Steam demo, October 2026.
 | Encryption | **None** (no AES key needed) |
 | Pak signing | **None** (no `.sig` files) |
 | Anti-cheat | None found (no EasyAntiCheat) |
-| Properties | **Unversioned**, so you need a `.usmap` ([generate one](/start/usmap/)) |
+| Properties | **Unversioned**, so you need a `.usmap` ([download it](/start/usmap/)) |
 | Audio | Native Unreal audio (**MetaSounds**). No Wwise or FMOD. Waves are Bink Audio (`BINKA`). |
 | Online | Redpoint EOS + Steam |
 | Game files | About 9,800 |

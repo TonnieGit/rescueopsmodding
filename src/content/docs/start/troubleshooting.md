@@ -50,8 +50,8 @@ description: 'Common problems when modding Rescue Ops: Wildfire, and how to fix 
 | Problem | Fix |
 |---|---|
 | FModel shows files but won't preview or export | Load the `.usmap`, engine `GAME_UE5_8` |
-| Nanite meshes export as 160-byte `.glb` | FModel → Settings → Models → Nanite export format: not "Nanite only" |
-| Exports go to the wrong folder | FModel writes to `Output\Exports\` regardless. Copy them from there. |
+| Nanite meshes export as 160-byte `.glb` | FModel → *Settings → Export → Nanite Format* → `Only Normal LODs` ([how](/start/fmodel/#step-4-set-the-export-folders-and-formats)) |
+| Exports go to the wrong folder | Models use the *Output Directory* on *Settings → Export*, everything else the one on *Settings → General*. Set both ([how](/start/fmodel/#step-4-set-the-export-folders-and-formats)). |
 | UE4SS crashes about 15 s in | Expected on lobby load. Dump the `.usmap` on the splash screen ([how](/start/usmap/)), then remove UE4SS. |
 | Messy AO bake in Substance on the truck | Overlapping or tiling UVs (mirrored doors, shared lights, tiling sets). This is expected, not a broken mesh. |
 

@@ -6,7 +6,7 @@ description: 'Step by step: replace a static mesh in Rescue Ops: Wildfire, such 
 import { Steps } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
 import blackVsFixed from '../../../assets/screenshots/helmet-black-vs-fixed.jpg';
-import helmetFront from '../../../assets/screenshots/helmet-front.jpg';
+import helmetFront from '../../../assets/screenshots/helmet-front-crop.jpg';
 
 :::note[In this tutorial you will learn]
 - What a replacement model has to match to load in place of the original
@@ -45,7 +45,7 @@ The example below is the [BR9 – Bushfire Helmet Yellow](/mods/br9-bushfire-hel
 
 <Steps>
 
-1. In FModel, browse to the mesh, right-click → **Save Model** (`.glb`) and **Save Properties (.json)**. If the `.glb` is empty, change the Nanite export setting ([see Retexturing](/tutorials/retexturing/#step-3-export-the-original-textures)).
+1. In FModel, browse to the mesh, right-click → **Save Model** (`.glb`) and **Save Properties (.json)**. If the `.glb` is empty, set *Settings → Export → Nanite Format* to `Only Normal LODs` ([see Set up FModel](/start/fmodel/#step-4-set-the-export-folders-and-formats)).
 
 2. In the `.json`, find the `StaticMesh` entry and note:
 
