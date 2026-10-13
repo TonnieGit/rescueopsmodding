@@ -4,6 +4,7 @@ description: 'Step by step: find the textures a model uses, export them, and get
 ---
 
 import { Steps } from '@astrojs/starlight/components';
+import Clip from '../../../components/Clip.astro';
 
 :::note[In this tutorial you will learn]
 - How to find which textures a model (a vehicle, character or prop) uses
@@ -30,11 +31,17 @@ The examples below use the CCF fire truck, but the steps are the same for any mo
 
 ## Step 1: Find the model in FModel
 
+<Clip
+	src="/media/tutorials/retexturing/step1.mp4"
+	poster="/media/tutorials/retexturing/step1.jpg"
+	caption="Load the archive, double-click your way to Vehicles/CCF and open S_CCF in the 3D viewer."
+/>
+
 <Steps>
 
-1. Open FModel. In the **Archives** tab, select `Wildfire-Windows.utoc` and click **Load**.
+1. Open FModel. In the **Archives** tab, select `Wildfire-Windows.utoc` and click **Load**. FModel switches to the **Folders** tab: the folder tree is on the left, and the open folder's contents show as tiles on the right.
 
-2. Switch to the **Folders** tab and expand `Wildfire` → `Content` → `Wildfire`. The useful folders are:
+2. Double-click the `Content` tile, then `Wildfire`. The useful folders are:
 
    | Folder | Contains |
    |---|---|
@@ -44,9 +51,11 @@ The examples below use the CCF fire truck, but the steps are the same for any mo
    | `Materials/` | Materials (`M_`) and material instances (`MI_`) |
    | `Textures/` | Textures, in folders that mirror the ones above |
 
-3. Double-click a folder to list its contents in the **Packages** tab. Mesh names start with `S_` (static) or `SK_` (skeletal, i.e. animated).
+   The path above the tiles shows where you are. Click any part of it to go back up.
 
-4. Double-click a mesh to open the 3D viewer and make sure it's the one you want.
+3. Double-click your way to the model's folder, e.g. `Vehicles` → `CCF`. Mesh names start with `S_` (static) or `SK_` (skeletal, i.e. animated), and each tile shows its type under the name.
+
+4. Double-click a mesh to open the **3D viewer** and make sure it's the one you want. Close the viewer with its **X** button.
 
 </Steps>
 
@@ -56,11 +65,27 @@ The examples below use the CCF fire truck, but the steps are the same for any mo
 **Fix:** *Settings → General* → set UE version to `GAME_UE5_8`, tick **Local Mapping File** and select your `.usmap` ([how](/start/fmodel/#step-3-load-the-mapping-file)). Restart FModel.
 :::
 
+:::caution[Gotcha: FModel stopped opening folders after I used the 3D viewer]
+**Cause:** pressing **Esc** hides the 3D viewer but doesn't close it, so FModel stays busy (the status bar stays orange on *Loading…* or *Stopping*) and ignores double-clicks.
+
+**Fix:** close the viewer with its **X** button. If FModel is already stuck, restart it.
+:::
+
+:::tip[Getting the tiles back]
+Opening an asset shows its properties on the right and switches the left panel to the **Packages** list. To browse again, click the **Folders** tab, then the folder icon in the bottom-right corner of the right-hand panel.
+:::
+
 ## Step 2: Find the textures it uses
 
 <Steps>
 
-1. Right-click the mesh in the Packages list → **Save Properties (.json)**.
+1. Right-click the mesh's tile → **Export** → **Properties (.json)**.
+
+   <Clip
+   	src="/media/tutorials/retexturing/step2a.mp4"
+   	poster="/media/tutorials/retexturing/step2a.jpg"
+   	caption="Right-click S_CCF, then Export, then Properties (.json)."
+   />
 
 2. Open the saved `.json` in a text editor (Notepad, VS Code). Search for `StaticMaterials` (static mesh) or `SkeletalMaterials` (skeletal mesh). Each material slot looks like this:
 
@@ -73,19 +98,35 @@ The examples below use the CCF fire truck, but the steps are the same for any mo
 
    The `ObjectPath` is the material on that part of the model.
 
-3. In FModel, browse to that material (here `Materials/Vehicles/CCF/MI_CCF_VariousTiling`), right-click it → **Save Properties (.json)**.
+   ![S_CCF.json in Notepad: StaticMaterials, with the first slot's ObjectPath highlighted](../../../assets/screenshots/retexturing/step2-mesh-json.jpg)
 
-4. Open that `.json` and find the `Textures` section. It lists every texture the material uses, by full path:
+3. In FModel, browse to that material (here `Materials/Vehicles/CCF/MI_CCF_VariousTiling`), right-click it → **Export** → **Properties (.json)**.
+
+   <Clip
+   	src="/media/tutorials/retexturing/step2c.mp4"
+   	poster="/media/tutorials/retexturing/step2c.jpg"
+   	caption="Browse to Materials/Vehicles/CCF and export MI_CCF_VariousTiling's properties."
+   />
+
+4. Open that `.json` and find `TextureParameterValues`. It lists every texture the material uses: each entry has the texture's job (`Name`) and its full path (`ObjectPath`):
 
    ```json
-   "Textures": {
-     "Albedo": { "ObjectPath": "/Game/Wildfire/Textures/Vehicles/CCF/VariousTiling/T_CCF_VariousTiling_D.0" },
-     "Normal": { "ObjectPath": "/Game/Wildfire/Textures/Vehicles/CCF/VariousTiling/T_CCF_VariousTiling_N.0" },
-     "RM":     { "ObjectPath": "/Game/Wildfire/Textures/Vehicles/CCF/VariousTiling/T_CCF_VariousTiling_ERM.0" }
-   }
+   "TextureParameterValues": [
+     {
+       "ParameterInfo": { "Name": "Albedo", ... },
+       "ParameterValue": {
+         "ObjectName": "Texture2D'T_CCF_VariousTiling_D'",
+         "ObjectPath": "/Game/Wildfire/Textures/Vehicles/CCF/VariousTiling/T_CCF_VariousTiling_D.0"
+       }
+     },
+     ...
    ```
 
-   Ignore anything under `Textures/FXs/`, `Textures/Firefront/` or `/Engine/`. Those are shared effects such as rain and burn marks, not the model's paint.
+   Here that's `Albedo` (colour, `_D`), `Normal` (`_N`) and `RM` (masks, `_ERM`).
+
+   ![MI_CCF_VariousTiling.json in Notepad: TextureParameterValues and the three texture paths highlighted](../../../assets/screenshots/retexturing/step2-material-json.jpg)
+
+   Further down, `ReferencedDefaultTextures` also lists textures under `Textures/FXs/`, `Textures/Firefront/` or `/Engine/`. Ignore those: they're shared effects such as rain and burn marks, not the model's paint.
 
 5. Repeat for each material slot you want to change.
 
@@ -104,19 +145,33 @@ For **each** texture you want to change:
 
 1. Browse to it in FModel (e.g. `Textures/Vehicles/CCF/VariousTiling/`).
 
-2. Right-click → **Save Texture**. This saves a PNG to paint on.
+2. Right-click → **Export** → **Texture**. FModel adds the texture to its export queue: click **Queued Items** at the bottom right of the status bar, then **Export**, then **OK**. This saves a PNG to paint on.
 
-3. Right-click → **Save Properties (.json)**. This records the settings you'll copy into Unreal.
+   <Clip
+   	src="/media/tutorials/retexturing/step3a.mp4"
+   	poster="/media/tutorials/retexturing/step3a.jpg"
+   	caption="Export the texture: right-click, Export, Texture, then run the export queue."
+   />
+
+3. Click the folder icon at the bottom right of the preview to get the tiles back, then right-click the texture → **Export** → **Properties (.json)**. This records the settings you'll copy into Unreal.
+
+   <Clip
+   	src="/media/tutorials/retexturing/step3b.mp4"
+   	poster="/media/tutorials/retexturing/step3b.jpg"
+   	caption="Back to the tiles, then export the texture's properties."
+   />
 
 4. Open the texture's `.json` and note:
    - `SRGB`: if it's **missing**, it's on (true)
    - `CompressionSettings`: if it's **missing**, it's Default
    - `LODGroup`: if it's **missing**, it's World
-   - the texture's size
+   - the texture's size (`SizeX`, `SizeY`)
+
+   ![T_CCF_VariousTiling_D.json in Notepad: no SRGB, CompressionSettings or LODGroup in Properties, and the 2048 by 2048 size](../../../assets/screenshots/retexturing/step3-texture-json.jpg)
 
 </Steps>
 
-To paint directly on the model in Substance Painter or Blender, also export the mesh: right-click it → **Save Model**. That gives a `.glb` with UVs.
+To paint directly on the model in Substance Painter or Blender, also export the mesh: right-click it → **Export** → **Model**. That gives a `.glb` with UVs.
 
 :::caution[Gotcha: the exported model is an empty 160-byte file]
 **Cause:** vehicles and many props use **Nanite**, and FModel's default exports only the Nanite data, which is empty in a `.glb`.
@@ -158,9 +213,15 @@ Open the PNG in your texturing software of choice: Photoshop, GIMP, Krita, Subst
 
 1. Open your `Wildfire` mod project. In the **Content Browser**, create the same folders as the game path. For `/Game/Wildfire/Textures/Vehicles/CCF/VariousTiling/` you create `Wildfire` → `Textures` → `Vehicles` → `CCF` → `VariousTiling` inside `Content`. Right-click → **New Folder** for each level.
 
-2. Drag your PNG from Windows Explorer into that folder. Check the new asset's name matches the game texture **exactly**.
+2. Click **Import** in the Content Browser and pick your PNG (or drag it from Windows Explorer into the folder). Check the new asset's name matches the game texture **exactly**. If a texture with that name is already in the folder, Unreal asks whether to convert the import to a re-import: click **Yes**.
 
 3. **Double-click** the texture. The **Texture Editor** opens with a preview on the left and the **Details** panel on the right.
+
+   <Clip
+   	src="/media/tutorials/retexturing/step5a.mp4"
+   	poster="/media/tutorials/retexturing/step5a.jpg"
+   	caption="Open the VariousTiling folder, import the PNG (re-importing over the existing texture) and open the Texture Editor."
+   />
 
 4. In the Details panel, set the following. Typing the setting name into the **search box** at the top of the Details panel is the quickest way to find each one:
 
@@ -172,7 +233,11 @@ Open the PNG in your texturing software of choice: Photoshop, GIMP, Krita, Subst
 
    Leave everything else at its default.
 
+   ![Texture Editor Details panel: search box, Texture Group World, Compression Settings Default and sRGB ticked](../../../assets/screenshots/retexturing/step5-settings.jpg)
+
 5. Click **Save** in the Texture Editor's toolbar (or Ctrl + S), then close it.
+
+   ![The Save button at the left of the Texture Editor toolbar](../../../assets/screenshots/retexturing/step5-save.jpg)
 
 </Steps>
 
@@ -190,9 +255,15 @@ A **PrimaryAssetLabel** tells Unreal which files belong to your mod.
 
 <Steps>
 
-1. In the same folder, right-click empty space in the Content Browser → **Miscellaneous** → **Data Asset**.
+1. In the same folder, right-click empty space in the Content Browser → **Data** → **Data Asset**.
 
-2. In the class picker, search for and select **PrimaryAssetLabel**. Name it after your mod, e.g. `PAL_MyTruck`.
+2. In the class picker, search for **PrimaryAssetLabel**, select it and click **Select**. Name it after your mod, e.g. `PAL_MyTruck`.
+
+   <Clip
+   	src="/media/tutorials/retexturing/step6.mp4"
+   	poster="/media/tutorials/retexturing/step6.jpg"
+   	caption="Right-click, Data, Data Asset, pick Primary Asset Label, then open it."
+   />
 
 3. Double-click it and set:
 
@@ -203,6 +274,8 @@ A **PrimaryAssetLabel** tells Unreal which files belong to your mod.
    | Cook Rule | **Always Cook** |
    | Label Assets in My Directory | ✔ ticked |
    | Apply Recursively | ✘ unticked |
+
+   ![PAL_MyTruck's settings: Priority 1, Chunk ID 1010, Apply Recursively off, Cook Rule Always Cook, Label Assets in My Directory ticked](../../../assets/screenshots/retexturing/step6-label.jpg)
 
 4. Save it.
 

@@ -4,6 +4,7 @@ description: 'Step by step: replace a sound in Rescue Ops: Wildfire, such as the
 ---
 
 import { Steps } from '@astrojs/starlight/components';
+import Clip from '../../../components/Clip.astro';
 
 :::note[In this tutorial you will learn]
 - How the game plays sounds, and which file you actually replace
@@ -38,9 +39,15 @@ If you replace only the SoundWave, the game's MetaSound keeps doing its job: the
 
 <Steps>
 
-1. In FModel, browse to `Wildfire` → `Content` → `Wildfire` → `Audio`. Vehicle sounds are in **`Audio/Vehicules/`** (French spelling), with a folder for each sound (`Siren`, `Horn`, …).
+1. In FModel's **Folders** tab, double-click the tiles `Content` → `Wildfire` → `Audio`. Vehicle sounds are in **`Audio/Vehicules/`** (French spelling), with a folder for each sound (`Siren`, `Horn`, …).
 
 2. Each folder holds the MetaSound (`MSS_…`) and the wave (`A_…`). Double-click the wave to hear it in FModel's audio player and make sure it's the right one.
+
+   <Clip
+   	src="/media/tutorials/sounds/step1.mp4"
+   	poster="/media/tutorials/sounds/step1.jpg"
+   	caption="Content, Wildfire, Audio, Vehicules, Siren, then double-click the wave to hear it."
+   />
 
 </Steps>
 
@@ -48,9 +55,15 @@ If you replace only the SoundWave, the game's MetaSound keeps doing its job: the
 
 <Steps>
 
-1. Right-click the **wave** (`A_…`) → **Save Properties (.json)**.
+1. Right-click the **wave** (`A_…`) → **Export** → **Properties (.json)**.
 
-2. Right-click the **MetaSound** (`MSS_…`) → **Save Properties (.json)**.
+2. Click the folder icon at the bottom right to get the tiles back, then right-click the **MetaSound** (`MSS_…`) → **Export** → **Properties (.json)**.
+
+   <Clip
+   	src="/media/tutorials/sounds/step2.mp4"
+   	poster="/media/tutorials/sounds/step2.jpg"
+   	caption="Export the wave's properties, back to the tiles, then the MetaSound's."
+   />
 
 3. Optional: double-click the wave and use the audio player's save button to keep a decoded `.wav` of the original for comparison.
 
@@ -59,7 +72,13 @@ If you replace only the SoundWave, the game's MetaSound keeps doing its job: the
    - `bLooping`
    - `SampleRate` and `Duration`
 
-5. In the **MetaSound's** `.json`, find the **Wave Player** node and its inputs. The important one is **`Loop Start`**.
+   ![A_Firetruck_siren_loop_mono.json in Notepad: bLooping, NumChannels, SampleRate and Duration, and AudioFormat BINKA](../../../assets/screenshots/sounds/wave-json.jpg)
+
+5. In the **MetaSound's** `.json`, find the **Wave Player** node. The important input is **`Loop Start`**. Its value isn't next to its name: note the input's `VertexID` in the node's `Inputs` list, then search the file for that `VertexID` again. The entry under `InputLiterals` holds the value (`AsFloat`).
+
+   ![MSS_Siren_CCFM.json: the Wave Player node and its Loop Start input with its VertexID](../../../assets/screenshots/sounds/mss-inputs.jpg)
+
+   ![MSS_Siren_CCFM.json: InputLiterals, the same VertexID and its value 0.05](../../../assets/screenshots/sounds/mss-literals.jpg)
 
 </Steps>
 
@@ -111,7 +130,7 @@ Only release audio you recorded yourself or have the rights to use.
 
 1. In the Content Browser, create the same folders as the game path under `Content`. For the siren that's `Wildfire` → `Audio` → `Vehicules` → `Siren`. Note the French spelling.
 
-2. Drag your WAV into that folder. Check the asset name matches the game's exactly.
+2. Click **Import** in the Content Browser and pick your WAV (or drag it from Windows Explorer into the folder). Check the asset name matches the game's exactly. If the sound is already in your project, Unreal asks to overwrite it (**Yes**) and then whether to overwrite its settings too: **No** keeps the settings you set before.
 
 3. **Double-click** the new SoundWave to open it. Settings are in the **Details** panel. Use its search box to find each one:
 
@@ -124,6 +143,16 @@ Only release audio you recorded yourself or have the rights to use.
    | **Concurrency** | leave **empty** |
 
    Leave everything else at default and **Save**.
+
+   <Clip
+   	src="/media/tutorials/sounds/step4.mp4"
+   	poster="/media/tutorials/sounds/step4.jpg"
+   	caption="Open Audio/Vehicules/Siren, import the WAV over the existing sound and open the SoundWave."
+   />
+
+   ![SoundWave Details: Looping ticked, Sound Class and Attenuation Settings empty, Concurrency Set with 0 elements](../../../assets/screenshots/sounds/wave-settings.jpg)
+
+   ![Searching the Details panel for compression: Sound Asset Compression Type set to Bink Audio](../../../assets/screenshots/sounds/wave-compression.jpg)
 
 4. Add a **PrimaryAssetLabel** to the folder exactly as in [Retexturing, Step 6](/tutorials/retexturing/#step-6-add-the-texture-to-your-mod): Priority 1, your Chunk ID, Always Cook, Label Assets in My Directory ✔.
 

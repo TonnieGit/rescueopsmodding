@@ -45,7 +45,7 @@ The example below is the [BR9 – Bushfire Helmet Yellow](/mods/br9-bushfire-hel
 
 <Steps>
 
-1. In FModel, browse to the mesh, right-click → **Save Model** (`.glb`) and **Save Properties (.json)**. If the `.glb` is empty, set *Settings → Export → Nanite Format* to `Only Normal LODs` ([see Set up FModel](/start/fmodel/#step-4-set-the-export-folders-and-formats)).
+1. In FModel, browse to the mesh, right-click its tile → **Export** → **Model** (`.glb`), then **Export** → **Properties (.json)**. If the `.glb` is empty, set *Settings → Export → Nanite Format* to `Only Normal LODs` ([see Set up FModel](/start/fmodel/#step-4-set-the-export-folders-and-formats)).
 
 2. In the `.json`, find the `StaticMesh` entry and note:
 
@@ -133,11 +133,13 @@ For every slot that should keep a **game** material, create an empty stand-in at
 
 2. Right-click → **Material → Material Instance**. Name it exactly like the game's, e.g. `MI_FS_Glass`. Leave **Parent** empty and save.
 
-3. In the same folder, right-click → **Miscellaneous → Data Asset → PrimaryAssetLabel**, name it e.g. `PAL_Placeholder_FS_Glass`, and set:
+3. In the same folder, right-click → **Data → Data Asset → PrimaryAssetLabel**, name it e.g. `PAL_Placeholder_FS_Glass`, and set:
    - **Priority `10`**
    - **Chunk ID `0`**
    - **Cook Rule `Always Cook`**
    - **Label Assets in My Directory** ✔, **Apply Recursively** ✘
+
+   ![PAL_Placeholder_FS_Glass: Priority 10, Chunk ID 0, Apply Recursively off, Cook Rule Always Cook](../../../assets/screenshots/models/placeholder-label.jpg)
 
 </Steps>
 
@@ -169,6 +171,8 @@ Skip this step if every slot uses a game material.
    - `_MR` **G** → **Roughness**, **B** → **Metallic** (glTF packing; check your own maps)
 
    Tick **Two Sided** in the material's Details if your model has single-sheet parts (flaps, straps). Click **Apply**, then save.
+
+   ![M_QLD_Helmet's material graph: the colour texture's RGB to Base Color, the normal map's RGB to Normal, and the MR texture's G to Roughness and B to Metallic](../../../assets/screenshots/models/material.jpg)
 
 4. Add a **PrimaryAssetLabel** to this folder, e.g. `PAL_QLD_Helmet_Mat`: **Priority `1`**, your mod's **Chunk ID** (e.g. `1003`), **Always Cook**, **Label Assets in My Directory** ✔.
 
@@ -212,7 +216,11 @@ Double-click the mesh to open the **Static Mesh Editor**.
    - `Cloth` → your `M_QLD_Helmet`
    - `Material__77` → the `MI_FS_Glass` placeholder
 
+   ![Static Mesh Editor Details: slot Cloth with M_QLD_Helmet, slot Material__77 with MI_FS_Glass, and Number of LODs 3 with Auto Compute LOD Distances ticked](../../../assets/screenshots/models/slots-lods.jpg)
+
 2. **Sockets:** **Window → Socket Manager** → **Create Socket**. Use the exact **Socket Name** from Step 1 (`Flashlight`, case matters) and start from the original's location and rotation. The game attaches its object to the socket, so **move the socket to where that object should mount on your model**: on the helmet, the torch sits exactly at the socket. Look at it in the viewport and adjust until it sits on the mount.
+
+   ![Socket Manager with the Flashlight socket selected: its gizmo sits on the helmet's torch mount, with its location and rotation](../../../assets/screenshots/models/socket.jpg)
 
 3. **Collision:** toolbar **Show → Simple Collision**. If anything shows up and the original had none, **Collision → Remove Collision**.
 

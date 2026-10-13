@@ -4,6 +4,7 @@ description: 'Install FModel, add Rescue Ops: Wildfire, load the mapping file an
 ---
 
 import { LinkButton, Steps } from '@astrojs/starlight/components';
+import Clip from '../../../components/Clip.astro';
 
 :::note[In this tutorial you will learn]
 - How to install FModel and add the game to it
@@ -67,6 +68,8 @@ FModel doesn't detect Rescue Ops: Wildfire automatically, so you add it by hand.
 
 4. Set **UE Versions** to `GAME_UE5_8`.
 
+   ![FModel's Directory Selector: Detected Game Wildfire, UE Versions GAME_UE5_8 and the drag and drop area](../../../assets/screenshots/fmodel/dirsel.jpg)
+
 5. Click **OK**. FModel reloads with the game.
 
 </Steps>
@@ -91,6 +94,8 @@ The game is cooked with unversioned properties, so FModel can list its files but
 
 5. Check **UE Versions** on this tab also says `GAME_UE5_8`.
 
+   ![Settings, General tab: Output Directory, UE Versions GAME_UE5_8, Keep Directory Structure on, Local Mapping File on with the mapping file path](../../../assets/screenshots/fmodel/settings-general.jpg)
+
 6. Don't close Settings yet. Carry on with Step 4.
 
 </Steps>
@@ -101,19 +106,21 @@ The mapping was made from the October 2026 demo build. See [Get the .usmap](/sta
 
 <Steps>
 
-1. Still on **Settings → General**, set **Output Directory** to a folder you'll remember, for example `Documents\FModel\Output`. Textures, properties (`.json`) and audio are saved in an `Exports` folder inside it.
+1. Still on **Settings → General**, set **Output Directory** to a folder you'll remember, for example `Documents\FModel\Output`. Properties (`.json`) and audio are saved in an `Exports` folder inside it.
 
 2. Leave **Keep Directory Structure** ticked. Exports are then saved under the game's own folder paths, so you always know where a file came from.
 
 3. Click the **Export** tab.
 
-4. Set this tab's **Output Directory** to the same folder. Models use this one instead of the folder on the General tab.
+4. Set this tab's **Output Directory** to the same folder. Models, and textures you export with **Export → Texture**, use this one instead of the folder on the General tab.
 
 5. Set **Mesh Format** to `glTF 2.0 (binary)`. Models then export as `.glb` files that Blender imports with no add-ons.
 
 6. Set **Nanite Format** to `Only Normal LODs`.
 
 7. Leave **Texture Format** on `PNG`.
+
+   ![Settings, Export tab: Output Directory, Mesh Format glTF 2.0 binary, Nanite Format Only Normal LODs, Texture Format PNG](../../../assets/screenshots/fmodel/settings-export.jpg)
 
 8. Click **OK**, then close and reopen FModel so the mapping file loads.
 
@@ -128,7 +135,7 @@ The mapping was made from the October 2026 demo build. See [Get the .usmap](/sta
 :::
 
 :::caution[Gotcha: models and textures end up in different folders]
-**Cause:** models use the **Output Directory** on the **Export** tab. Everything else uses the one on the **General** tab. Changing one doesn't change the other.
+**Cause:** models and textures (**Export → Model**, **Export → Texture**) use the **Output Directory** on the **Export** tab. Properties (`.json`) use the one on the **General** tab. Changing one doesn't change the other.
 
 **Fix:** set both to the same folder (Step 4).
 :::
@@ -143,6 +150,8 @@ The mapping was made from the October 2026 demo build. See [Get the .usmap](/sta
 
 3. Select `Wildfire-Windows.utoc` in the list and click **Load**.
 
+   ![Archives tab: Loading Mode Multiple, Load, and Wildfire-Windows.utoc selected](../../../assets/screenshots/fmodel/archives.jpg)
+
 </Steps>
 
 FModel remembers this. Each time you open it, select `Wildfire-Windows.utoc` and click **Load**. The tutorials on this site start from that point.
@@ -151,9 +160,15 @@ FModel remembers this. Each time you open it, select `Wildfire-Windows.utoc` and
 
 <Steps>
 
-1. Switch to the **Folders** tab and expand `Wildfire` → `Content` → `Wildfire` → `Textures` → `Vehicles` → `CCF`.
+1. After **Load**, FModel shows the **Folders** tab, with the open folder's contents as tiles on the right. Double-click the tiles `Content` → `Wildfire` → `Textures` → `Vehicles` → `CCF` → `VariousTiling`.
 
-2. Double-click the `VariousTiling` folder, then double-click `T_CCF_VariousTiling_D` in the **Packages** tab.
+2. Double-click the `T_CCF_VariousTiling_D` tile.
+
+   <Clip
+   	src="/media/tutorials/fmodel/step6.mp4"
+   	poster="/media/tutorials/fmodel/step6.jpg"
+   	caption="Double-click your way to Textures/Vehicles/CCF/VariousTiling and open the colour texture."
+   />
 
 3. You should see the fire truck's colour texture (a grid of colour blocks with red along the bottom half). If you get an error instead, the mapping file isn't loaded: go back to Step 3.
 
