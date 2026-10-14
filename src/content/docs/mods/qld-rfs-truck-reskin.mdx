@@ -1,6 +1,6 @@
 ---
 title: QLD RFS Truck Reskin
-description: 'The CCF fire truck in QLD RFS golden yellow with RFS and QFD logos, red and white chevrons, Hazard 1000 tones and red beacons.'
+description: 'The CCF fire truck in QLD RFS golden yellow with RFS and QFD logos, red and white chevrons, Hazard 1000 tones and red and blue beacons.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
@@ -8,9 +8,9 @@ import { Image } from 'astro:assets';
 import side from '../../../assets/screenshots/truck-side.jpg';
 import driving from '../../../assets/screenshots/truck-driving.jpg';
 
-<Badge text="v1.2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Includes Hazard 1000 Tones + Red Beacons" variant="caution" />
+<Badge text="v1.3" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Includes Hazard 1000 Tones + Red + Blue Beacons" variant="caution" />
 
-Repaints the main fire truck (the CCF) in **QLD RFS golden yellow** with the Rural Fire Service and Queensland Fire Department logos and **red and white rear chevrons**. It also removes the French lettering as far as the 3D model allows, and the number plates. It swaps the siren and horn for Australian **Hazard 1000** tones, and (new in v1.2) turns all the emergency lights **red and much brighter** with the [Red Beacons](/mods/red-beacons/) mod.
+Repaints the main fire truck (the CCF) in **QLD RFS golden yellow** with the Rural Fire Service and Queensland Fire Department logos and **red and white rear chevrons**. It also removes the French lettering as far as the 3D model allows, and the number plates. It swaps the siren and horn for Australian **Hazard 1000** tones, and (new in v1.3) gives it **red and blue** emergency lights, much brighter, with the [Red + Blue Beacons](/mods/red-blue-beacons/) mod: red roof beacons on the left and blue on the right, and alternating red and blue lightheads.
 
 <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/QLD_RFS_Truck_Reskin.zip" icon="download">Download QLD_RFS_Truck_Reskin.zip (7 MB)</LinkButton>
 
@@ -22,7 +22,7 @@ Repaints the main fire truck (the CCF) in **QLD RFS golden yellow** with the Rur
 
 | | |
 |---|---|
-| Files | `z_QLD_Truck_P.*` (truck paint, chunk 1002) + `z_Hazard_1000_Sounds_P.*` (siren + horn, chunk 1001) + `pakchunk1004-Red_Beacons-Windows_P.*` (red beacons, chunk 1004) |
+| Files | `z_QLD_Truck_P.*` (truck paint, chunk 1002) + `z_Hazard_1000_Sounds_P.*` (siren + horn, chunk 1001) + `pakchunk1004-Red_Blue_Beacons-Windows_P.*` (red + blue beacons, chunk 1004) |
 | Replaces | `T_CCF_Precise_D/ERM/N`, `T_CCF_VariousTiling_D`, `T_CCF_StripedMarking_D`, `T_CCF_TrimSheet_D`, the siren and horn sounds, and the four beacon meshes |
 
 ## Known limitations
@@ -30,7 +30,11 @@ Repaints the main fire truck (the CCF) in **QLD RFS golden yellow** with the Rur
 - The truck's paint uses **shared colour blocks**, so some small parts turn yellow along with the body.
 - The old side lettering is **part of the 3D model**. It's painted and finished to match the body, but can still be faintly visible in some lighting. New lettering can't be painted there ([why](/reference/ccf-truck/#painting-tips)).
 
-[How to install](/mods/installing/). Want the truck paint without the tones or the red lights? Delete the three `z_Hazard_1000_Sounds_P` or `pakchunk1004-Red_Beacons-Windows_P` files after installing.
+[How to install](/mods/installing/). Want the truck paint without the tones or the beacons? Delete the three `z_Hazard_1000_Sounds_P` or `pakchunk1004-Red_Blue_Beacons-Windows_P` files after installing.
+
+:::caution[Updating from v1.2]
+v1.2 came with all-red beacons. Delete the three `pakchunk1004-Red_Beacons-Windows_P` files from `Wildfire\Content\Paks` before installing, because they replace the same lights. Prefer all-red lights? Keep those and delete the `pakchunk1004-Red_Blue_Beacons-Windows_P` files instead.
+:::
 
 ## File check (SHA-256)
 
@@ -41,14 +45,14 @@ z_QLD_Truck_P.ucas           13D6A62D5EC84BEAE4BE7F019E05ABDB3177BFE73C8F2772D94
 z_Hazard_1000_Sounds_P.pak   BD1B959014663CAF07C955560AE0654AB1C67817515628376D8ED44EB120BCB3
 z_Hazard_1000_Sounds_P.utoc  58EE79F2ABE0604F2C21356F97A5AFDD66EA894FD3D4AAE14451A70B720C957B
 z_Hazard_1000_Sounds_P.ucas  EC14CD0109E4584D10A580F33512D83BA7D708477628EFFCAE9B42FC5C82D03D
-pakchunk1004-Red_Beacons-Windows_P.pak   ABA834CFDF097090D9C317D1AEFFA65B2900C7054D0464DC8EB6323EFBA7D945
-pakchunk1004-Red_Beacons-Windows_P.utoc  BFE2CF47A9FBB49BFFA9171A7915271726CD77084AD91E1577AC9A7EDDFD5ABD
-pakchunk1004-Red_Beacons-Windows_P.ucas  5DE6A3F807B3A1152602780CBAF1B01C2EBF3FD1DBFB077E1A14BBEC69A7845E
+pakchunk1004-Red_Blue_Beacons-Windows_P.pak   2E4402DC88E9C027A9BD9E51F7AA1CDE8D9B83F197818F4FC1141EB528DDC7C4
+pakchunk1004-Red_Blue_Beacons-Windows_P.utoc  292D455AFD39F802DA708AEAAF6C15A4A9EBAAC2168385FB01C5BC3DB141372D
+pakchunk1004-Red_Blue_Beacons-Windows_P.ucas  F3B8DB99660E36DA326B2C9EA9766EB3D552F5A010428759C3D28F2E8FCE3D59
 ```
 
 ## How it was made
 
-See [Retexturing](/tutorials/retexturing/), [Emergency lights](/tutorials/emergency-lights/) and the [CCF truck reference](/reference/ccf-truck/).
+See [Retexturing](/tutorials/retexturing/), [Emergency lights](/tutorials/emergency-lights/), [Red and blue beacons](/tutorials/red-blue-beacons/) and the [CCF truck reference](/reference/ccf-truck/).
 
 ## Credits
 

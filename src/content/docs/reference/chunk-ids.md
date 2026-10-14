@@ -13,7 +13,8 @@ Every mod is packaged into its own chunk (set by the PrimaryAssetLabel's **Chunk
 | 1001 | `z_Hazard_1000_Sounds_P` | [Hazard 1000 Tones](/mods/hazard-1000-tones/) (also in Truck Reskin) | Tonnie |
 | 1002 | `z_QLD_Truck_P` | [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/) | Tonnie |
 | 1003 | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P` | [BR9 – Bushfire Helmet Yellow](/mods/br9-bushfire-helmet-yellow/) (also in QLD RFS Uniforms) | Tonnie |
-| 1004 | `pakchunk1004-Red_Beacons-Windows_P` | [Red Beacons](/mods/red-beacons/) (also in QLD RFS Truck Reskin) | Tonnie |
+| 1004 | `pakchunk1004-Red_Beacons-Windows_P` | [Red Beacons](/mods/red-beacons/) (also in QLD RFS Truck Reskin v1.2) | Tonnie |
+| 1004 | `pakchunk1004-Red_Blue_Beacons-Windows_P` | [Red + Blue Beacons](/mods/red-blue-beacons/) (also in QLD RFS Truck Reskin v1.3). Same lights as Red Beacons: install one or the other | Tonnie |
 
 ## Conventions
 

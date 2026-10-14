@@ -1,0 +1,73 @@
+---
+title: Red + Blue Beacons
+description: 'Red and blue emergency lights for the CCF fire truck: red and blue roof beacons, alternating red and blue lightheads, much brighter, with asynchronous flash patterns and a soft glow.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import Clip from '../../../components/Clip.astro';
+import rearLit from '../../../assets/screenshots/red-blue/result-rear-lit.jpg';
+import front from '../../../assets/screenshots/red-blue/result-front-lit.jpg';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Included in QLD RFS Truck Reskin v1.3" variant="caution" />
+
+Gives the main fire truck (the CCF) **red and blue** emergency lights, much brighter than the originals. Left and right are as seen from the driver's seat:
+
+- **Roof beacons:** red on the left, blue on the right, front and rear, shining through coloured domes.
+- **Front grille lightheads:** blue on the left, red on the right.
+- **Rear lightheads:** alternating red, blue, red, blue.
+- Every lighthead flashes on **its own pattern**, with a soft glow that you see from the front.
+- **Switched off:** the lenses are muted red or muted blue.
+
+The lights key (**J**) works as normal.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Red_Blue_Beacons.zip" icon="download">Download Red_Blue_Beacons.zip (0.2 MB)</LinkButton>
+
+<Clip src="/media/red-blue-beacons/final.mp4" poster="/media/red-blue-beacons/final.jpg" caption="The red and blue beacons on the road, at a fire and from the front." />
+
+<Image src={rearLit} alt="The CCF at a fire, rear view: blue roof beacon and lighthead on the right, red lights on the left" />
+
+<Image src={front} alt="The CCF from the front with the lights on: red roof beacon on the truck's left, blue on its right, and a flashing grille lighthead" />
+
+## Red Beacons or Red + Blue: pick one
+
+This mod replaces the same lights as [Red Beacons](/mods/red-beacons/), so install **one or the other**. Before installing, delete these from `Wildfire\Content\Paks` if you have them. Version 1.2 of the [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/) installed them too:
+
+```text
+pakchunk1004-Red_Beacons-Windows_P.pak
+pakchunk1004-Red_Beacons-Windows_P.utoc
+pakchunk1004-Red_Beacons-Windows_P.ucas
+```
+
+The [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/) v1.3 already includes this mod, so you don't need both downloads.
+
+## What it changes
+
+| | |
+|---|---|
+| Files | `pakchunk1004-Red_Blue_Beacons-Windows_P.*` (chunk 1004) |
+| Replaces | `S_CCF_FlashingLight_01`, `S_CCF_FlashingLightRotatingMesh_01`, `S_CCF_BeaconLightx2_01`, `S_CCF_BeaconLightx4_01` |
+| Adds | Materials `M_TonnieBeacon`, `M_TonnieBeaconGlow`, `M_TonnieLens`, the function `MF_TonnieSocketColor` and six instances |
+
+## Known limitations
+
+- The beacons **glow but don't light up** the ground or walls around the truck. The game gives them no real light sources.
+- The four roof beacons **spin in step**. The game spins them all at the same speed.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1004-Red_Blue_Beacons-Windows_P.pak   2E4402DC88E9C027A9BD9E51F7AA1CDE8D9B83F197818F4FC1141EB528DDC7C4
+pakchunk1004-Red_Blue_Beacons-Windows_P.utoc  292D455AFD39F802DA708AEAAF6C15A4A9EBAAC2168385FB01C5BC3DB141372D
+pakchunk1004-Red_Blue_Beacons-Windows_P.ucas  F3B8DB99660E36DA326B2C9EA9766EB3D552F5A010428759C3D28F2E8FCE3D59
+```
+
+## How it was made
+
+See [Red and blue beacons](/tutorials/red-blue-beacons/), which builds on [Emergency lights](/tutorials/emergency-lights/).
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

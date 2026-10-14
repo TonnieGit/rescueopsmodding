@@ -1,0 +1,282 @@
+---
+title: Red and blue beacons
+description: 'Step by step: give each emergency light on the CCF fire truck its own colour in Rescue Ops: Wildfire, with red and blue lightheads and red and blue roof beacons, using materials only.'
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import Clip from '../../../components/Clip.astro';
+import mfGraph from '../../../assets/screenshots/red-blue/mf-graph.jpg';
+import s1Beacon from '../../../assets/screenshots/red-blue/s1-beacon.jpg';
+import instanceX4 from '../../../assets/screenshots/red-blue/instance-x4.jpg';
+import resultGrille from '../../../assets/screenshots/red-blue/result-grille.jpg';
+import resultRearRow from '../../../assets/screenshots/red-blue/result-rear-row.jpg';
+import resultRearLit from '../../../assets/screenshots/red-blue/result-rear-lit.jpg';
+import spinnerOutside from '../../../assets/screenshots/red-blue/spinner-outside.jpg';
+
+:::note[In this tutorial you will learn]
+- How a material can work out **which corner of the truck** its light sits on
+- How to give each lighthead its own colour from one shared material
+- Why the spinning roof beacons can't do the same, and how a **coloured lens** solves it
+- How to shrink a mesh inside its material with **World Position Offset**
+:::
+
+:::tip[Before you start]
+This tutorial builds on [Emergency lights](/tutorials/emergency-lights/). You need its core steps **and** both optional parts (asynchronous flashing and the glow), because you'll change `M_TonnieBeacon`, `M_TonnieBeaconGlow` and their instances. Everything here happens in the material editor: no Blueprint, no Blender.
+:::
+
+**The goal:** red and blue emergency lights on the CCF truck, with every light keeping its asynchronous flashing and glow. "Left" and "right" are as seen from the driver's seat:
+
+| Lights | Left | Right |
+|---|---|---|
+| Roof beacons, front and rear | **red** | **blue** |
+| Front grille lightheads (x4) | **blue** | **red** |
+| Rear lightheads, left to right: x2, x4, x4, x2 | **red**, **blue** | **red**, **blue** |
+
+The finished [Red + Blue Beacons](/mods/red-blue-beacons/) mod:
+
+<Clip src="/media/red-blue-beacons/final.mp4" poster="/media/red-blue-beacons/final.jpg" caption="Red and blue beacons on the road, at a fire and from the front." />
+
+## How it works
+
+Each light needs to know which side of the truck it's on. A material can find out by looking at **where the truck's centre is from the light's point of view**. The front-left lighthead sees the centre behind it and to its right; the rear-right one sees it in front and to its left. That turns into a "plus" or "minus" side, and each material instance picks a colour for each side.
+
+That works for every light that **stays still**. The roof beacons are different. Each one is two parts on the same socket:
+
+| Part | Stays still? | Gets the game's on/off signal? |
+|---|---|---|
+| Dome (`S_CCF_FlashingLight_01`) | yes, so it knows its side | no, it never lights up |
+| Spinning strip (`S_CCF_FlashingLightRotatingMesh_01`) | no, it spins | yes, it's the part that glows |
+
+The spinning strip's view of the truck changes every frame, so it can't tell left from right, and the dome can't tell when the lights are on. So they split the job, like a real beacon: the strip glows **white**, and the dome becomes a **coloured lens** that tints whatever shines through it.
+
+## Step 1: Build the side function
+
+A **Material Function** holds the side logic once, so all three materials can use it.
+
+:::tip[Node numbers]
+As in [Emergency lights](/tutorials/emergency-lights/), type each node's number into its **Desc** field. This tutorial uses letters so they don't clash with that tutorial's numbers: **F** for the function, **S1** and **L1** for where it's used, and **W** for the spinner shrink.
+:::
+
+<Steps>
+
+1. In `Mods/Beacons`, right-click → **Material** → **Material Function**, name it **`MF_TonnieSocketColor`** and open it.
+
+2. Delete the default **Output Result** node; you'll add two named outputs instead.
+
+3. Add the nodes below.
+
+</Steps>
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| F1 | Actor Position | | → F2 |
+| F2 | Transform Position | Source **Absolute World Space**, Destination **Local Space** | → F3 **and** → F4 |
+| F3 | Component Mask | **G** only | → F7 A |
+| F4 | Component Mask | **B** only | → F6 A |
+| F5 | ScalarParameter `FrontRearZ` | Default **-210** | → F6 B |
+| F6 | Subtract | | → F7 B |
+| F7 | Multiply | | → F8 A |
+| F8 | Multiply | Const B **1000** | → F9 |
+| F9 | Saturate | This is the side: **1** or **0** | → F12 Alpha **and** → F16 Alpha |
+| F10 | VectorParameter `ColorNeg` | R 1, G 0, B 0 | → F12 A |
+| F11 | VectorParameter `ColorPos` | R 1, G 0, B 0 | → F12 B |
+| F12 | Lerp | | → F13 |
+| F13 | Function Output | Output Name **`Color`**, Sort Priority 0 | |
+| F14 | VectorParameter `OffColorNeg` | Hex sRGB **6E1E1E** | → F16 A |
+| F15 | VectorParameter `OffColorPos` | Hex sRGB **6E1E1E** | → F16 B |
+| F16 | Lerp | | → F17 |
+| F17 | Function Output | Output Name **`OffColor`**, Sort Priority 1 | |
+
+Click **Apply**, then **Save**.
+
+<Image src={mfGraph} alt="MF_TonnieSocketColor's graph, nodes F1 to F17: Actor Position and Transform Position feed two masks, Subtract, Multiply, Multiply and Saturate; the result drives two Lerps between ColorNeg/ColorPos and OffColorNeg/OffColorPos into the Color and OffColor outputs" />
+
+The whole function at a glance. Use the table above for the settings.
+
+**What the nodes do:** F1–F2 give the truck's centre as seen from the light. F3 is how far it is to the side, F4–F6 whether the light is high and at the front or low and at the rear, and F7–F9 combine them into a clean side value. `FrontRearZ` separates the front grille lightheads from the rear ones (they use the same mesh but face opposite ways).
+
+Every colour defaults to red, so any light whose instance you don't change stays red.
+
+## Step 2: Use it in the light materials
+
+<Steps>
+
+1. Open **`M_TonnieBeacon`**. Note where the **`Color`** parameter's wire goes (the Multiply with `Intensity`), then delete **`Color`** and **`OffColor`**.
+
+2. Drag `MF_TonnieSocketColor` from the Content Browser into the graph and set its Desc to **S1**. Wire **S1 Color** → the pin `Color` fed, and **S1 OffColor** → **Base Color**. **Apply**, **Save**.
+
+   <Image src={s1Beacon} alt="M_TonnieBeacon with S1, the MF_TonnieSocketColor node: OffColor goes to Base Color, Color goes to the Multiply that also takes Intensity" />
+
+3. Open **`M_TonnieBeaconGlow`** and do the same for **`Color`** only: delete it, add `MF_TonnieSocketColor` as **S1**, wire **S1 Color** → that pin. The glow is Unlit, so it has no off colour. **Apply**, **Save**.
+
+</Steps>
+
+## Step 3: Colour the lightheads
+
+The grille and rear lightheads use the same mesh, but the small rear x2 lightheads need the opposite colours to the x4 ones. So the x2 gets its own instances.
+
+Which side is which:
+
+| Mesh | `ColorPos` / `OffColorPos` | `ColorNeg` / `OffColorNeg` |
+|---|---|---|
+| x4 and x2 lightheads | left | right |
+| Roof dome (Step 5) | right | left |
+
+<Steps>
+
+1. Open **`MI_TonnieBeacon_Red_Flash`** (the x4 lenses) and tick and set:
+
+   | Parameter | Value |
+   |---|---|
+   | ColorPos | R **0**, G **0.1**, B **1** (blue) |
+   | ColorNeg | R **1**, G **0**, B **0** (red) |
+   | OffColorPos | Hex sRGB **394D73** (the game's original blue lens) |
+   | OffColorNeg | Hex sRGB **6E1E1E** (muted red) |
+
+   <Image src={instanceX4} alt="MI_TonnieBeacon_Red_Flash parameters: FlashFrequency 1, Intensity 3750, MustFlash on, ColorNeg red, ColorPos blue, OffColorNeg muted red, OffColorPos blue-grey" />
+
+2. Open **`MI_TonnieBeaconGlow_Red_Flash`**: **ColorPos** blue, **ColorNeg** red, the same values. Save.
+
+3. Right-click `MI_TonnieBeacon_Red_Flash` → **Duplicate** → **`MI_TonnieBeacon_x2_Flash`**. Swap the colours: **ColorPos** red, **ColorNeg** blue, **OffColorPos** `6E1E1E`, **OffColorNeg** `394D73`. Save.
+
+4. Duplicate `MI_TonnieBeaconGlow_Red_Flash` → **`MI_TonnieBeaconGlow_x2_Flash`**: **ColorPos** red, **ColorNeg** blue. Save.
+
+5. Open **`S_CCF_BeaconLightx2_01`** and set **Element 0** → `MI_TonnieBeacon_x2_Flash` and **Element 1** (`Glow`) → `MI_TonnieBeaconGlow_x2_Flash`. Save.
+
+</Steps>
+
+The preview spheres stay red: there's no truck in the preview, so the function can't work out a side. The colours sort themselves out in-game.
+
+:::tip[Your own layout]
+Want a different pattern? Swap **ColorPos** and **ColorNeg** in an instance to flip that pair. For the off look, swap the two **OffColor** values as well.
+:::
+
+<Image src={resultGrille} alt="The CCF from the front with the lights on: the grille lightheads are blue on the truck's left and red on its right" />
+
+<Image src={resultRearRow} alt="The rear of the CCF with the lights on: the rear lightheads alternate red, blue, red, blue" />
+
+## Step 4: Make the spinning strip white
+
+The strip's colour has to be the same on every side, because it spins. Its off colour is grey, so it reads as muted red or blue through the lens.
+
+<Steps>
+
+1. Open **`MI_TonnieBeacon_Red`** (the roof beacons).
+
+2. Tick and set **ColorPos** and **ColorNeg** both to R **1**, G **1**, B **1**, and **OffColorPos** and **OffColorNeg** both to Hex sRGB **808080**. Leave **Intensity** as it is. Save.
+
+</Steps>
+
+## Step 5: The coloured lens
+
+<Steps>
+
+1. In `Mods/Beacons`, right-click → **Material** → **`M_TonnieLens`**, and open it.
+
+2. Click empty graph space and set **Blend Mode** = **ColoredTransmittanceOnly** and **Shading Model** = **Unlit**. This blend mode multiplies whatever is behind the material by its colour, which is how a coloured lens works.
+
+3. Add `MF_TonnieSocketColor` with Desc **L1**, and wire **L1 Color** → **Emissive Color**. **Apply**, **Save**.
+
+4. Right-click `M_TonnieLens` → **Create Material Instance** → **`MI_TonnieLens`**. Tick and set **ColorNeg** = R **1**, G **0**, B **0** (left: red) and **ColorPos** = R **0**, G **0.1**, B **1** (right: blue). Save.
+
+5. Open **`S_CCF_FlashingLight_01`** (the dome) and set **Element 0** → **`MI_TonnieLens`**, the instance, not the material. Save.
+
+</Steps>
+
+Keep the lens colours **pure**. Red is 1, 0, 0, not 1, 0.03, 0.03: the strip is extremely bright, so even a few percent of green and blue gets through as white.
+
+## Step 6: Keep the strip inside the dome
+
+The game's spinning strip reaches slightly past the dome's surface, about 6.2 cm from the centre against the dome's 6.1 cm. With the game's opaque dome nobody notices. With a lens, the part that pokes out isn't tinted and shows as a white sliver. This step shrinks the strip toward its own centre inside the material.
+
+Open **`M_TonnieBeacon`** and add:
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| W1 | Object Position | | → W3 A |
+| W2 | World Position (shows as Absolute World Position) | **World Position Shader Offset** = **Excluding Material Shader Offsets** | → W3 B |
+| W3 | Subtract | | → W6 A |
+| W4 | ScalarParameter `SpinnerScale` | Default **1** (no change) | → W5 |
+| W5 | OneMinus | | → W6 B |
+| W6 | Multiply | | → **World Position Offset** |
+
+**Apply**, **Save**. Then open **`MI_TonnieBeacon_Red`**, tick **SpinnerScale** and set it to **0.8**. Save.
+
+W1–W6 move every point of the mesh part of the way to the mesh's centre: at 1 nothing moves, and at 0.8 the strip is 80 % of its size. The default of 1 means the lightheads, which share this material, aren't affected.
+
+## Step 7: Package, check and install
+
+<Steps>
+
+1. **File → Save All**, then package ([Package and install](/start/packaging/)).
+
+2. Check `<project>\Saved\Cooked\Windows\Wildfire\Metadata\ChunkManifest\pakchunk1004.txt`. On top of the [Emergency lights](/tutorials/emergency-lights/) assets it must list **`MF_TonnieSocketColor`**, **`MI_TonnieBeacon_x2_Flash`**, **`MI_TonnieBeaconGlow_x2_Flash`**, **`M_TonnieLens`** and **`MI_TonnieLens`**: 14 assets in all, plus the shader files. The folder labels from Emergency lights pick up the new assets automatically, as long as they're directly in `Mods/Beacons`.
+
+3. This replaces the same meshes as Red Beacons, so give it its own name and **remove the red version** from the game's `Paks` folder:
+
+   ```text
+   pakchunk1004-Red_Blue_Beacons-Windows_P.pak
+   pakchunk1004-Red_Blue_Beacons-Windows_P.utoc
+   pakchunk1004-Red_Blue_Beacons-Windows_P.ucas
+   ```
+
+4. Copy them into `Wildfire\Content\Paks\` and start the game.
+
+</Steps>
+
+Check with the lights on (**J**) and off:
+
+- off: roof domes muted red on the left and muted blue on the right; the lightheads' off colours match their colour,
+- on: red roof beams on the left and blue on the right, grille blue/red, and the rear row alternating red, blue, red, blue.
+
+<Image src={resultRearLit} alt="The CCF at a fire, rear view: blue roof beacon and blue rear lighthead on the right, red lights on the left" />
+
+## Gotchas
+
+:::caution[Gotcha: there's no Modulate blend mode]
+**Cause:** the mod project has **Substrate** turned on (you can see a Substrate tab in the material editor), and Substrate renames the blend modes.
+
+**Fix:** use **ColoredTransmittanceOnly**. It does what the classic **Modulate** does.
+
+**How we found it:** the Blend Mode list offers Opaque, Masked, TranslucentGreyTransmittance, Additive, ColoredTransmittanceOnly and others, but no Modulate.
+:::
+
+:::caution[Gotcha: all the domes are the same colour]
+**Cause:** the dome's slot is set to the material **`M_TonnieLens`** instead of the instance **`MI_TonnieLens`**. The two sit next to each other in the dropdown. The material only has the function's default colour (red), so every dome comes out red.
+
+**Fix:** set `S_CCF_FlashingLight_01` Element 0 to **`MI_TonnieLens`**.
+
+**How we found it:** both sides came out red in-game, while the instance's colours were correct.
+:::
+
+:::caution[Gotcha: a white sliver on the roof beacons]
+**Cause:** the spinning strip pokes out through the dome, so that part isn't tinted.
+
+**Fix:** Step 6. If a sliver is still visible, lower **SpinnerScale** to 0.7.
+
+<Image src={spinnerOutside} alt="Close-up of two roof beacons before the fix: blue and red domes, each with a white strip showing on top" />
+
+**How we found it:** close up, the white strip sat on the outside of the coloured domes.
+:::
+
+:::caution[Gotcha: a pair of lights is the wrong way round]
+**Cause:** the plus and minus sides are the other way round for that mesh.
+
+**Fix:** swap **ColorPos** and **ColorNeg** (and the two **OffColor** values) in that instance.
+
+**How we found it:** this is how the x2 lightheads ended up with their own instances: they need the opposite colours to the x4 ones.
+:::
+
+## What this can't do
+
+These need the truck's Blueprint, which this mod doesn't change:
+
+- **Roof beacons at different speeds.** The game spins all four together, and the strip can't tell left from right, so a material can't give them different speeds.
+- **Light on the surroundings.** The beacons still have no real light sources.
+
+## See also
+
+- [Red + Blue Beacons](/mods/red-blue-beacons/): the mod built in this tutorial
+- [Emergency lights](/tutorials/emergency-lights/): the red version this builds on
+- [CCF truck](/reference/ccf-truck/): the truck's meshes and sockets

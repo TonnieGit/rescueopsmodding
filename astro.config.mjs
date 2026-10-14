@@ -56,6 +56,7 @@ export default defineConfig({
 						{ label: 'Replacing sounds', slug: 'tutorials/sounds' },
 						{ label: 'Replacing 3D models', slug: 'tutorials/models' },
 						{ label: 'Emergency lights', slug: 'tutorials/emergency-lights' },
+						{ label: 'Red and blue beacons', slug: 'tutorials/red-blue-beacons' },
 					],
 				},
 				{
@@ -71,6 +72,7 @@ export default defineConfig({
 						{ label: 'BR9 – Bushfire Helmet Yellow', slug: 'mods/br9-bushfire-helmet-yellow' },
 						{ label: 'QLD RFS Truck Reskin', slug: 'mods/qld-rfs-truck-reskin' },
 						{ label: 'Red Beacons', slug: 'mods/red-beacons' },
+						{ label: 'Red + Blue Beacons', slug: 'mods/red-blue-beacons' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },
 					],
 				},
