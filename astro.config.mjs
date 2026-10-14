@@ -55,6 +55,7 @@ export default defineConfig({
 						{ label: 'Retexturing', slug: 'tutorials/retexturing' },
 						{ label: 'Replacing sounds', slug: 'tutorials/sounds' },
 						{ label: 'Replacing 3D models', slug: 'tutorials/models' },
+						{ label: 'Emergency lights', slug: 'tutorials/emergency-lights' },
 					],
 				},
 				{
@@ -69,6 +70,7 @@ export default defineConfig({
 						{ label: 'QLD RFS Uniforms', slug: 'mods/qld-rfs-uniforms' },
 						{ label: 'BR9 – Bushfire Helmet Yellow', slug: 'mods/br9-bushfire-helmet-yellow' },
 						{ label: 'QLD RFS Truck Reskin', slug: 'mods/qld-rfs-truck-reskin' },
+						{ label: 'Red Beacons', slug: 'mods/red-beacons' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },
 					],
 				},

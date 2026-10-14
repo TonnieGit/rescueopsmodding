@@ -1,0 +1,389 @@
+---
+title: Emergency lights
+description: 'Step by step: make the CCF fire truck''s emergency lights red and much brighter in Rescue Ops: Wildfire, then optionally add asynchronous flash patterns and a soft glow.'
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import Clip from '../../../components/Clip.astro';
+import coreGraph from '../../../assets/screenshots/beacons/core-graph.jpg';
+import instanceFlash from '../../../assets/screenshots/beacons/instance-flash.jpg';
+import folder from '../../../assets/screenshots/beacons/lightmeshes-folder.jpg';
+import meshSlot from '../../../assets/screenshots/beacons/mesh-slot.jpg';
+import coreFront from '../../../assets/screenshots/beacons/core-day-front.jpg';
+import coreNight from '../../../assets/screenshots/beacons/core-night-rear.jpg';
+import randomGraph from '../../../assets/screenshots/beacons/random-graph.jpg';
+import glowFront from '../../../assets/screenshots/beacons/beacons-front.jpg';
+import glowRear from '../../../assets/screenshots/beacons/beacons-rear-glow.jpg';
+import shellExplained from '../../../assets/screenshots/beacons/glow-shell-explained.jpg';
+
+:::note[In this tutorial you will learn]
+- How the game draws its vehicle lights, and how it switches them on and off
+- How to build a light material that reads the game's on/off signal, with your own colour and brightness
+- How to swap the light meshes so they use your material
+- **Optional:** how to make the flashers asynchronous, each with its own flash pattern
+- **Optional:** how to add a soft glow that shows from the front only
+:::
+
+:::tip[Before you start]
+You need [Replacing 3D models](/tutorials/models/) working, plus **Blender** (only for importing and exporting; no modelling in the core steps). This mod ships its **own material**, so your mod project must use the game's rendering settings: [Set up the mod project, Step 4](/start/mod-project/#step-4-match-the-games-rendering-settings).
+:::
+
+**The goal:** turn every emergency light on the CCF truck **red** and make them **much brighter**, keeping the game's lights key (**J**) working. That's the core of this tutorial (Steps 1–7). Two optional extras build on it:
+
+| Part | Result | Needs |
+|---|---|---|
+| **Core** (Steps 1–7) | All lights red and much brighter; muted red when off | Material editor, Blender import/export |
+| **Optional A**: asynchronous flashing | Each flasher flashes on its own rhythm instead of all flashing together | 10 more material nodes |
+| **Optional B**: glow | A soft red halo in front of each flasher | A Blender script that adds a glow shell to the model, plus a second material |
+
+The finished [Red Beacons](/mods/red-beacons/) mod has all three:
+
+<Clip src="/media/red-beacons/final.mp4" poster="/media/red-beacons/final.jpg" caption="The finished mod with both extras: red roof beacons and flashing lightheads on the CCF, front and rear." />
+
+## How the truck's emergency lights work
+
+The truck's Blueprint (`BP_CCFM`) attaches small light meshes to **sockets** on the truck body. The glowing parts are a game component, `WFLightStaticMeshComponent`, which does three things:
+
+- When you press **J**, it sends the mesh an **on/off value** in **Custom Primitive Data, slot 0**. The game's light material multiplies its glow by that value.
+- On the roof beacons, it **spins** the glowing part.
+- The game's material decides whether a light **flashes** (a switch called `MustFlash`).
+
+| Light | Mesh | Material slot | Sockets |
+|---|---|---|---|
+| Roof beacon dome (doesn't glow) | `S_CCF_FlashingLight_01` | `M_LPs_Precis23` | `FlashingLight_FL/FR/BL/BR` |
+| Roof beacon glowing strip (spins) | `S_CCF_FlashingLightRotatingMesh_01` | `M_LPs_Precis24` | same sockets |
+| Small lightheads, rear | `S_CCF_BeaconLightx2_01` | `M_LPs_Precis25` | `S_BeaconLightx2_BL/BR` |
+| Wide lightheads, grille and rear | `S_CCF_BeaconLightx4_01` | `M_LPs_Precis26` | `S_BeaconLightx4_FL/FR/BL/BR` |
+
+All four meshes live in `/Game/Wildfire/Vehicles/CCF/LightMeshes/`. Their colour comes from one blue swatch in the truck texture, and they have **no real light sources**: they glow, but don't light up anything around them.
+
+**The plan:** replace the four meshes at the same paths and point them at a new material, `M_TonnieBeacon`. The Blueprint isn't touched, so the lights key, the spinning and everything else keep working.
+
+## Step 1: Export the light meshes
+
+<Steps>
+
+1. In FModel, browse to `Wildfire/Vehicles/CCF/LightMeshes/`.
+
+2. For each of the four meshes in the table above, right-click its tile → **Export** → **Model** (`.glb`).
+
+</Steps>
+
+## Step 2: Tidy the meshes in Blender
+
+The meshes stay exactly as they are. Only their extra UV maps and material names need tidying. Do this for **all four**:
+
+<Steps>
+
+1. **File → Import → glTF 2.0** and open the `.glb`.
+
+2. Delete everything that isn't the mesh (empties, cameras).
+
+3. **Properties → Object Data → UV Maps:** keep the first one and remove the rest (FModel adds empty extras).
+
+4. **Properties → Material:** rename the material to the mesh's slot name from the table (`M_LPs_Precis23` to `26`).
+
+5. **File → Export → FBX:** **Object Types: Mesh** only, **Geometry → Smoothing: Face**, **Add Leaf Bones** ✘. Name the file after the mesh, e.g. `S_CCF_FlashingLight_01.fbx`.
+
+</Steps>
+
+## Step 3: Build the light material
+
+:::tip[Number your nodes]
+Every node has a **Desc** field (Details → Material Expression). Type the node's number from the tables into it, and it shows above the node. It makes "node 12 → node 17 B" easy to follow, and the optional parts refer back to these numbers.
+:::
+
+<Steps>
+
+1. In the Content Browser, create `Content/Wildfire/Mods/Beacons/`. Right-click → **Material** → name it **`M_TonnieBeacon`** and open it. Leave **Blend Mode = Opaque** and **Shading Model = Default Lit**.
+
+2. Add the nodes below. To add one, right-click empty graph space and type its name. For parameters, set the name in **Parameter Name**.
+
+</Steps>
+
+**Off colour and surface**
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 1 | VectorParameter `OffColor` | Default Value: Hex sRGB **`6E1E1E`** (muted red) | → **Base Color** |
+| 2 | ScalarParameter `Roughness` | Default **0.2** | → **Roughness** |
+
+**On/off from the game**
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 3 | ScalarParameter `LightOn` | Default 0. **Use Custom Primitive Data** ✔, **Primitive Data Index 0** | → 4 A |
+| 4 | Multiply | Const B **1000** | → 5 |
+| 5 | Saturate | | → 16 B |
+
+Nodes 3–5 turn the game's on/off value into a clean 0 or 1, so your **Intensity** setting is the actual brightness.
+
+**Flash**
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 6 | ScalarParameter `FlashFrequency` | Default **1** (flashes per second) | → 8 B |
+| 7 | Time | | → 8 A |
+| 8 | Multiply | | → 9 |
+| 9 | Frac | | → 10 |
+| 10 | Round | | → 12 True |
+| 11 | Constant | Value **1** | → 12 False |
+| 12 | StaticSwitchParameter `MustFlash` | Default ✘ | → 17 B |
+
+With `MustFlash` on, the light is on for half of each flash and off for the other half. With it off, it stays on.
+
+**Colour and brightness**
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 13 | VectorParameter `Color` | **R 1, G 0, B 0** | → 15 A |
+| 14 | ScalarParameter `Intensity` | Default **200** (set per instance in Step 4) | → 15 B |
+| 15 | Multiply | | → 16 A |
+| 16 | Multiply | (B from node 5) | → 17 A |
+| 17 | Multiply | (B from node 12) | → **Emissive Color** |
+
+Click **Apply**, then **Save**. The preview sphere shows no glow: `LightOn` is 0 until the game switches the light on.
+
+<Image src={coreGraph} alt="M_TonnieBeacon's core graph: OffColor and Roughness to Base Color and Roughness; Color times Intensity times the LightOn chain times the MustFlash switch into Emissive Color" />
+
+The finished core graph. The swatches here are early test values: use `6E1E1E` for **OffColor**, and set **Intensity** in the instances.
+
+## Step 4: Material instances
+
+In `Mods/Beacons`, right-click `M_TonnieBeacon` → **Create Material Instance**, twice. Open each one and tick the parameters you change:
+
+| Instance | Used by | MustFlash | FlashFrequency | Intensity |
+|---|---|---|---|---|
+| `MI_TonnieBeacon_Red` | Roof beacon dome and strip | ✘ (the strip spins instead) | – | **1875** |
+| `MI_TonnieBeacon_Red_Flash` | Grille and rear lightheads | ✔ | **1** | **3750** |
+
+The lightheads get twice the roof beacons' intensity because their lenses are tiny and only lit half the time. Save both.
+
+<Image src={instanceFlash} alt="MI_TonnieBeacon_Red_Flash Details: MustFlash ticked under Global Static Switch Parameter Values, with FlashFrequency, Intensity and Roughness listed above" />
+
+**MustFlash** ticked and set to true in `MI_TonnieBeacon_Red_Flash`. Tick **FlashFrequency** and **Intensity** the same way and enter the values from the table.
+
+:::tip[Another colour]
+For blue lights, make copies of the instances and change **Color** (e.g. R 0, G 0.1, B 1) and **OffColor**. Everything else stays the same.
+:::
+
+## Step 5: Import the meshes
+
+<Steps>
+
+1. Create `Content/Wildfire/Vehicles/CCF/LightMeshes/` and open it.
+
+2. **Import** the four FBX files: **Static Mesh**, **Build Nanite** ✘, **Generate Missing Collision / Import Collision** ✘, **Do Not Create Material** (Import Materials ✘), **Import Textures** ✘. Check the names match the game's exactly.
+
+   <Image src={folder} alt="Content Browser at Content > Wildfire > Vehicles > CCF > LightMeshes showing the imported beacon meshes" />
+
+3. Open each mesh and set its material slot:
+
+   | Mesh | Slot 0 |
+   |---|---|
+   | `S_CCF_FlashingLight_01` | `MI_TonnieBeacon_Red` |
+   | `S_CCF_FlashingLightRotatingMesh_01` | `MI_TonnieBeacon_Red` |
+   | `S_CCF_BeaconLightx2_01` | `MI_TonnieBeacon_Red_Flash` |
+   | `S_CCF_BeaconLightx4_01` | `MI_TonnieBeacon_Red_Flash` |
+
+   <Image src={meshSlot} alt="Static Mesh Editor Material Slots: Element 0 set to MI_TonnieBeacon_Red, slot name M_LPs_Pr..." />
+
+   The dome never gets an "on" value from the game, so it only ever shows the muted red off colour.
+
+4. Save each mesh.
+
+</Steps>
+
+## Step 6: Labels
+
+Add a **PrimaryAssetLabel** (right-click → **Data → Data Asset → PrimaryAssetLabel**) to **both** folders:
+
+| Label | Folder | Priority | Chunk ID | Cook Rule | Label Assets in My Directory | Apply Recursively |
+|---|---|---|---|---|---|---|
+| `PAL_Beacons_Mat` | `Mods/Beacons` | 1 | **1004** | Always Cook | ✔ | ✘ |
+| `PAL_Beacons_Mesh` | `Vehicles/CCF/LightMeshes` | 1 | **1004** | Always Cook | ✔ | ✘ |
+
+Pick your own free ID from the [Chunk ID registry](/reference/chunk-ids/) if you're making a different mod. If you copy a label instead of making a new one, check the copy's Chunk ID.
+
+## Step 7: Package, check and install
+
+<Steps>
+
+1. **File → Save All**, then package ([Package and install](/start/packaging/)).
+
+2. Open `<project>\Saved\Cooked\Windows\Wildfire\Metadata\ChunkManifest\pakchunk1004.txt`. It must list the **4 meshes**, **`M_TonnieBeacon`**, the **2 instances** (plus anything from the optional parts), and `ShaderArchive-` / `ShaderTypeInfo-Wildfire_Chunk1004-…` files.
+
+3. This mod has its own material, so keep the chunk number in the name ([why](/tutorials/models/#step-9-name-and-install)):
+
+   ```text
+   pakchunk1004-Red_Beacons-Windows_P.pak
+   pakchunk1004-Red_Beacons-Windows_P.utoc
+   pakchunk1004-Red_Beacons-Windows_P.ucas
+   ```
+
+4. Copy them into the game's `Wildfire\Content\Paks\` and start the game.
+
+</Steps>
+
+Check in-game, with the lights on (**J**) and off:
+
+- off: all lenses and domes are muted red,
+- on: the roof beacons sweep bright red, and the grille and rear lightheads flash red.
+
+<Image src={coreFront} alt="The CCF from the front in daylight with the core mod: bright red roof beacons and red grille lightheads" />
+
+<Image src={coreNight} alt="The CCF at night with the core mod: red roof beacons and rear lights glowing" />
+
+That's the core mod done. The two parts below are optional and independent of each other: do one, both or neither.
+
+## Optional A: Asynchronous flash patterns
+
+In the core material every flasher uses the same clock, so they all flash together, as if they were synchronised. If you want them asynchronous instead, this part gives each light its own speed and starting point, so they drift in and out of step like real independent lights.
+
+It works out the truck's centre as seen from each light. That's a fixed offset that's different for every light, and the nodes below turn it into a steady random number between 0 and 1 for each light.
+
+Open `M_TonnieBeacon` and add (numbers carry on from Step 3):
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 18 | Actor Position | | → 19 |
+| 19 | TransformPosition | Source **Absolute World Space**, Destination **Local Space** | → 21 A |
+| 20 | Constant3Vector | **12.9898, 78.233, 37.719** | → 21 B |
+| 21 | Dot | | → 22 |
+| 22 | Sine | | → 23 A |
+| 23 | Multiply | Const B **43758.5453** | → 24 |
+| 24 | Frac | This is the light's random number | → 25 Alpha **and** → 27 B |
+| 25 | LinearInterpolate (Lerp) | Const A **0.8**, Const B **1.2** | → 26 B |
+| 26 | Multiply | A from node 6 | → 8 B |
+| 27 | Add | A from node 8 | → 9 |
+
+Two wires change:
+
+- **Node 8 B** now comes from node 26 instead of node 6. Each light runs up to 20 % faster or slower than `FlashFrequency`.
+- **Node 9** now gets its input from node 27 instead of node 8. Each light starts its flash at a different point.
+
+So the flash line reads: **Time (7) × (FlashFrequency (6) × Lerp (25)) → Add random (27) → Frac (9) → Round (10) → MustFlash (12)**.
+
+<Image src={randomGraph} alt="M_TonnieBeacon's flash section with the random number chain: Multiply 43758.546875 into Frac, feeding the Lerp's Alpha and the Add before Frac, Round and MustFlash" />
+
+The flash section with Optional A added. Unreal shows 43758.5453 as `43758.546875`; that's fine.
+
+Click **Apply**, **Save**, and package again. In the editor preview the flashers still flash together, because there's no truck there. In-game each one flashes on its own rhythm.
+
+## Optional B: Glow on the lightheads
+
+The grille and rear lightheads are tiny, so even very bright, they don't read as strong lights from a distance. This part adds a **glow shell**: a flattened bubble in front of each lens with a see-through material that adds red light on top of whatever is behind it. It fades out towards its edges and is only visible from the front.
+
+<Image src={shellExplained} alt="Three renders of the wide lighthead: 1, the original four red LED lenses; 2, the same lenses inside a flattened wireframe bubble, the glow shell; 3, the shell with the glow material, a soft red halo around the lenses that fades out before the bubble's edge" />
+
+1. The game's lighthead: four small lenses and nothing else.
+2. The glow shell that the script in B1 adds: a flattened bubble sitting over the front of the lenses. It's a second material slot on the same mesh, so the game switches and flashes it together with the lens.
+3. With the glow material from B2: brightest over the lenses and fading to nothing before the bubble's edge, so you never see its outline.
+
+:::note[If you also did Optional A]
+The glow material starts as a copy of `M_TonnieBeacon`. Do Optional A first, so the glow copies the asynchronous flashing and stays in step with its lens.
+:::
+
+### B1: Add the glow shell to the lightheads
+
+Use the script [beacon_glow_shell.py](/files/beacon_glow_shell.py) on the two lightheads' `.glb` files from Step 1. It does the same tidy-up as Step 2, then adds the bubble as a second material slot named `Glow`, reaching 6 cm past the lens edges. It also stores a fade value in the bubble's UV map: **1** over the lens, **0** at its outer edge.
+
+Open a command prompt in the folder with the `.glb` files and run (one line each):
+
+```text
+"C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" -b --factory-startup --python beacon_glow_shell.py -- S_CCF_BeaconLightx2_01.glb S_CCF_BeaconLightx2_01.fbx M_LPs_Precis25
+"C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" -b --factory-startup --python beacon_glow_shell.py -- S_CCF_BeaconLightx4_01.glb S_CCF_BeaconLightx4_01.fbx M_LPs_Precis26
+```
+
+Each one prints `Wrote … with slots ['M_LPs_Precis2x', 'Glow']`. These new FBX files replace the two lightheads from Step 2.
+
+### B2: Build the glow material
+
+<Steps>
+
+1. Right-click **`M_TonnieBeacon`** → **Duplicate** → name it **`M_TonnieBeaconGlow`** and open it.
+
+2. Click empty graph space and set **Blend Mode = Additive** and **Shading Model = Unlit**. Base Color and Roughness grey out. That's expected.
+
+3. Add the nodes below. Node 17's output now goes to node 37 instead of straight to Emissive Color.
+
+</Steps>
+
+**Fade with distance from the lens** (reads the fade value from B1)
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 28 | TextureCoordinate | | → 29 |
+| 29 | ComponentMask | **R** only | → 30 Base |
+| 30 | Power | Const Exponent **4** | → 36 A |
+
+**Fade with viewing angle** (full from the front, none from behind)
+
+| # | Node | Settings | Connect |
+|---|---|---|---|
+| 31 | Constant3Vector | **1, 0, 0** (the lens faces +X) | → 32 |
+| 32 | Transform (shows as TransformVector) | Source **Local Space**, Destination **World Space** | → 34 A |
+| 33 | CameraVectorWS (search "Camera Vector") | | → 34 B |
+| 34 | Dot | | → 35 |
+| 35 | Saturate | | → 36 B |
+| 36 | Multiply | | → 37 B |
+| 37 | Multiply | A from node 17 | → **Emissive Color** |
+
+Click **Apply**, then **Save**.
+
+### B3: Glow instance and meshes
+
+<Steps>
+
+1. Right-click **`M_TonnieBeaconGlow`** → **Create Material Instance** → **`MI_TonnieBeaconGlow_Red_Flash`**. Tick **MustFlash = true**, **FlashFrequency = 1** and **Intensity = 15**, then save.
+
+2. In `Vehicles/CCF/LightMeshes`, **Import** the two new FBX files from B1 with the same settings as Step 5, and choose **Yes to All** to replace the existing meshes.
+
+3. Open each lighthead. It now has two slots:
+
+   | Mesh | Slot 0 | Slot 1 `Glow` |
+   |---|---|---|
+   | `S_CCF_BeaconLightx2_01` | `MI_TonnieBeacon_Red_Flash` | `MI_TonnieBeaconGlow_Red_Flash` |
+   | `S_CCF_BeaconLightx4_01` | `MI_TonnieBeacon_Red_Flash` | `MI_TonnieBeaconGlow_Red_Flash` |
+
+4. Save, then package again.
+
+</Steps>
+
+In-game, each lighthead has a soft red halo from the front, and nothing from behind or side-on.
+
+<Image src={glowFront} alt="Front of the CCF in the fire station with the lights on: red roof beacons and a red grille lighthead with a soft glow" />
+
+<Image src={glowRear} alt="Close-up of the rear lightheads glowing red with soft halos, and a red roof beacon" />
+
+## Gotchas
+
+:::caution[Gotcha: the lights are black or speckled in-game]
+**Cause:** the mod project compiles your materials' shaders with different rendering settings from the game's.
+
+**Fix:** [Set up the mod project, Step 4](/start/mod-project/#step-4-match-the-games-rendering-settings), then open each material, **Apply**, save and package again.
+
+**How we found it:** the same thing happened to the helmet's new material in [Replacing 3D models](/tutorials/models/).
+:::
+
+:::caution[Gotcha: the lights glow all the time, or never]
+**Cause:** `LightOn` (node 3) isn't reading the game's signal: **Use Custom Primitive Data** is unticked, or the index isn't **0**.
+
+**Fix:** select node 3, tick **Use Custom Primitive Data**, set **Primitive Data Index = 0**, then **Apply**.
+
+**How we found it:** the game's own light material (`M_Light`) reads its `LightIntensity` from Custom Primitive Data slot 0.
+:::
+
+## What this can't do
+
+Two things need the truck's Blueprint, which this mod doesn't change:
+
+- **Light on the surroundings.** The beacons have no real light sources, so the ground, walls and smoke around the truck stay unlit.
+- **Out-of-sync roof beacons.** The game spins all four at the same speed, from the same moment.
+
+## See also
+
+- [Red Beacons](/mods/red-beacons/): the mod built in this tutorial
+- [CCF truck](/reference/ccf-truck/): the truck's meshes and texture sets
+- [Replacing 3D models](/tutorials/models/): static mesh swaps in more detail

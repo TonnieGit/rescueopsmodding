@@ -1,0 +1,61 @@
+---
+title: Red Beacons
+description: 'All the emergency lights on the CCF fire truck in red and much brighter, with asynchronous flash patterns and a soft glow.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import Clip from '../../../components/Clip.astro';
+import front from '../../../assets/screenshots/beacons/beacons-front.jpg';
+import rearGlow from '../../../assets/screenshots/beacons/beacons-rear-glow.jpg';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Included in QLD RFS Truck Reskin" variant="caution" />
+
+Turns every emergency light on the main fire truck (the CCF) **red** and makes them **much brighter**:
+
+- **Roof beacons:** bright red rotators.
+- **Grille and rear lightheads:** red, each flashing on **its own pattern**, with a soft glow that you see from the front.
+- **Switched off:** the lenses are a muted red instead of blue.
+
+The lights key (**J**) works as normal.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Red_Beacons.zip" icon="download">Download Red_Beacons.zip (0.1 MB)</LinkButton>
+
+<Clip src="/media/red-beacons/final.mp4" poster="/media/red-beacons/final.jpg" caption="The red beacons from the front and rear in daylight." />
+
+<Image src={front} alt="Front of the CCF in the fire station with the lights on: red roof beacons and a red grille lighthead with a soft glow" />
+
+<Image src={rearGlow} alt="Close-up of the rear lightheads glowing red with soft halos, and a red roof beacon" />
+
+## What it changes
+
+| | |
+|---|---|
+| Files | `pakchunk1004-Red_Beacons-Windows_P.*` (chunk 1004) |
+| Replaces | `S_CCF_FlashingLight_01`, `S_CCF_FlashingLightRotatingMesh_01`, `S_CCF_BeaconLightx2_01`, `S_CCF_BeaconLightx4_01` |
+| Adds | Materials `M_TonnieBeacon`, `M_TonnieBeaconGlow` and three instances |
+
+Works on its own or with the [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/), which already includes it.
+
+## Known limitations
+
+- The beacons **glow but don't light up** the ground or walls around the truck. The game gives them no real light sources.
+- The four roof beacons **spin in step**. The game spins them all at the same speed.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1004-Red_Beacons-Windows_P.pak   ABA834CFDF097090D9C317D1AEFFA65B2900C7054D0464DC8EB6323EFBA7D945
+pakchunk1004-Red_Beacons-Windows_P.utoc  BFE2CF47A9FBB49BFFA9171A7915271726CD77084AD91E1577AC9A7EDDFD5ABD
+pakchunk1004-Red_Beacons-Windows_P.ucas  5DE6A3F807B3A1152602780CBAF1B01C2EBF3FD1DBFB077E1A14BBEC69A7845E
+```
+
+## How it was made
+
+See [Emergency lights](/tutorials/emergency-lights/).
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

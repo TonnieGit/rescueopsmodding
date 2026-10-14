@@ -94,4 +94,4 @@ Your project must compile materials for the **same rendering settings as the gam
 - Use **File → Save All** before every package.
 - Give each mod its own **Chunk ID** so mods can be installed and removed separately.
 
-Next: pick a tutorial: [Retexturing](/tutorials/retexturing/), [Replacing sounds](/tutorials/sounds/) or [Replacing 3D models](/tutorials/models/).
+Next: pick a tutorial: [Retexturing](/tutorials/retexturing/), [Replacing sounds](/tutorials/sounds/), [Replacing 3D models](/tutorials/models/) or [Emergency lights](/tutorials/emergency-lights/).

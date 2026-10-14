@@ -26,6 +26,7 @@ No game file is ever edited. Uninstalling means deleting the three files.
 | Textures (diffuse, normal, roughness/metallic) | ✅ Works, including 4K | [Retexturing](/tutorials/retexturing/) |
 | Sounds (SoundWave behind a MetaSound) | ✅ Works | [Replacing sounds](/tutorials/sounds/) |
 | Static mesh swap, with its own material and textures | ✅ Works, including LODs, sockets and the game's own materials | [Replacing 3D models](/tutorials/models/) |
+| Materials driven by the game (light on/off signal, flashing, glow) | ✅ Works: new colour, brightness, random flash patterns, glow | [Emergency lights](/tutorials/emergency-lights/) |
 | Lua / runtime scripting (UE4SS) | ❌ Crashes on map load. Not needed: download the `.usmap` instead | [Get the .usmap](/start/usmap/) |
 
 ## Where to start
