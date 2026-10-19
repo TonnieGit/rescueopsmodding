@@ -1,13 +1,69 @@
 ---
 title: Installing mods
-description: 'How to install and uninstall Rescue Ops: Wildfire mods. You only copy files into one folder.'
+description: 'How to install and uninstall Rescue Ops: Wildfire mods: double-click Install.bat, or copy three files into one folder by hand.'
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 
-Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed.
+:::note[You don't need Unreal Engine to play mods]
+Unreal, FModel and the other tools are only for **making** mods. To play them, you only need the game and the mod's download.
+:::
 
-## Install
+Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed. There are two ways to install them. Both give the same result.
+
+## Option 1: Install.bat (easiest)
+
+Every download comes with an `Install.bat` that finds the game and copies the files in for you.
+
+<Steps>
+
+1. Close the game.
+
+2. Right-click the downloaded zip → **Extract All** → **Extract**.
+
+3. Open the extracted folder and double-click **`Install.bat`**.
+
+4. If Windows shows **"Windows protected your PC"**, click **More info** → **Run anyway**. It warns about every script downloaded from the internet that isn't signed.
+
+5. A window opens and installs the mod:
+
+   ```text
+    Installing into:
+      C:\Program Files (x86)\Steam\steamapps\common\Rescue Ops Demo\Wildfire\Content\Paks
+
+      Added   pakchunk1004-Red_Beacons-Windows_P.pak
+      Added   pakchunk1004-Red_Beacons-Windows_P.utoc
+      Added   pakchunk1004-Red_Beacons-Windows_P.ucas
+
+    Done. Start the game to use Red Beacons v1.
+   ```
+
+   Press any key to close it, then start the game.
+
+</Steps>
+
+What `Install.bat` does:
+
+- It finds the game in every Steam library on the PC, including other drives. If it can't, it asks you to drag the game folder onto its window (see [Install by hand](#option-2-install-by-hand), step 2, for how to find it).
+- It waits for you to close the game if it's still running.
+- It only **adds** the mod's files to `Wildfire\Content\Paks`. It never changes or deletes the game's own files.
+- If you have a mod that changes the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it asks before removing the old one. Answer **N** and nothing is changed.
+
+It's a plain text file. Right-click it → **Edit** (or open it in Notepad) to read exactly what it does before you run it.
+
+:::caution[Gotcha: "Can't find the mod files next to this installer"]
+**Cause:** you ran `Install.bat` from inside the zip. Windows only unpacks the `.bat` itself, not the mod's files.
+
+**Fix:** close the window, right-click the zip → **Extract All**, and run `Install.bat` from the extracted folder.
+:::
+
+:::caution[Gotcha: "Windows blocked the install"]
+**Cause:** the game was still open, or your Steam library is in a folder your Windows account can't write to.
+
+**Fix:** close the game. If it still fails, right-click `Install.bat` → **Run as administrator**.
+:::
+
+## Option 2: Install by hand
 
 <Steps>
 
@@ -31,13 +87,15 @@ Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you a
 
 </Steps>
 
+Installing [Red Beacons](/mods/red-beacons/) or [Red + Blue Beacons](/mods/red-blue-beacons/) by hand? Delete the other one's three files first. They change the same lights.
+
 :::tip[Set Texture Quality to Epic]
 On Medium the game shows textures at a quarter of their size, so logos and lettering look blurry. In the graphics settings, set **Texture Quality** as high as it goes.
 :::
 
 ## Uninstall
 
-Delete the mod's three files from `Wildfire\Content\Paks`.
+Delete the mod's three files from `Wildfire\Content\Paks`. `Install.bat` lists them, and so does each mod's `INSTALL.txt`.
 
 Steam's **Verify integrity of game files** will **not** remove them. It only repairs changed or missing files, and mod files are extra files.
 
