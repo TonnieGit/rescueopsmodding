@@ -1,19 +1,67 @@
 ---
 title: Installing mods
-description: 'How to install and uninstall Rescue Ops: Wildfire mods: double-click Install.bat, or copy three files into one folder by hand.'
+description: 'How to install, update and uninstall Rescue Ops: Wildfire mods: with the Mod Manager, with Install.bat, or by copying three files into one folder by hand.'
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, LinkButton } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import manager from '../../../assets/screenshots/mod-manager.jpg';
 
 :::note[You don't need Unreal Engine to play mods]
 Unreal, FModel and the other tools are only for **making** mods. To play them, you only need the game and the mod's download.
 :::
 
-Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed. There are two ways to install them. Both give the same result.
+Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed. There are three ways to install them. All give the same result.
 
-## Option 1: Install.bat (easiest)
+## Option 1: Mod Manager (easiest)
 
-Every download comes with an `Install.bat` that finds the game and copies the files in for you.
+The Mod Manager is a small app that installs, updates and uninstalls every mod on this site. It always shows the latest versions, so you never need to come back here to check for updates.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/RescueOpsModManager.exe" icon="download">Download RescueOpsModManager.exe (0.1 MB)</LinkButton>
+
+<Steps>
+
+1. Close the game.
+
+2. Double-click the downloaded **`RescueOpsModManager.exe`**. There's nothing to install: it's a single file you can keep anywhere, for example on your desktop.
+
+3. If Windows shows **"Windows protected your PC"**, click **More info** → **Run anyway**. It warns about every app downloaded from the internet that isn't signed.
+
+4. The Mod Manager finds the game through Steam and lists every mod:
+
+   <Image src={manager} alt="The Rescue Ops Mod Manager: a list of six mods with checkboxes and Installed, Latest and Status columns, showing Installed, Update available and Not installed, with Install / update ticked, Uninstall ticked, Uninstall all mods and Open mods folder buttons" />
+
+   - **Installed:** you have the latest version.
+   - **Update available:** you have an older version. Tick it and click **Install / update ticked**.
+   - **Not installed:** tick it to install it.
+
+5. Tick the mods you want and click **Install / update ticked**. It downloads them, checks every file, and copies them into the game.
+
+6. Start the game.
+
+</Steps>
+
+To remove mods, tick them and click **Uninstall ticked**, or click **Uninstall all mods**. **Open mods folder** shows the game's `Paks` folder.
+
+What the Mod Manager does:
+
+- It finds the game in every Steam library on the PC. If it can't, click **Browse...** and pick the game folder (see [Install by hand](#option-3-install-by-hand), step 2, for how to find it).
+- It checks every downloaded file against the list of mods before copying it. If anything doesn't match, nothing is installed.
+- It only adds or removes the mod files it knows about. It never changes or deletes the game's own files.
+- If you tick two mods that change the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it tells you to pick one. If one is already installed, it asks before swapping it.
+- It waits for you to close the game before changing anything.
+
+Its source code is [on GitHub](https://github.com/TonnieGit/rescueopsmodding/tree/main/manager) if you'd like to read exactly what it does.
+
+:::caution[Gotcha: "Couldn't load the list of mods"]
+**Cause:** the Mod Manager reads the list of mods from GitHub, so it needs an internet connection.
+
+**Fix:** check your connection and open it again. To install without internet, use [Install.bat](#option-2-installbat) or [install by hand](#option-3-install-by-hand) from a zip you've already downloaded.
+:::
+
+## Option 2: Install.bat
+
+Every mod download also comes with an `Install.bat` that finds the game and copies that mod's files in for you.
 
 <Steps>
 
@@ -44,7 +92,7 @@ Every download comes with an `Install.bat` that finds the game and copies the fi
 
 What `Install.bat` does:
 
-- It finds the game in every Steam library on the PC, including other drives. If it can't, it asks you to drag the game folder onto its window (see [Install by hand](#option-2-install-by-hand), step 2, for how to find it).
+- It finds the game in every Steam library on the PC, including other drives. If it can't, it asks you to drag the game folder onto its window (see [Install by hand](#option-3-install-by-hand), step 2, for how to find it).
 - It waits for you to close the game if it's still running.
 - It only **adds** the mod's files to `Wildfire\Content\Paks`. It never changes or deletes the game's own files.
 - If you have a mod that changes the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it asks before removing the old one. Answer **N** and nothing is changed.
@@ -63,7 +111,7 @@ It's a plain text file. Right-click it → **Edit** (or open it in Notepad) to r
 **Fix:** close the game. If it still fails, right-click `Install.bat` → **Run as administrator**.
 :::
 
-## Option 2: Install by hand
+## Option 3: Install by hand
 
 <Steps>
 
@@ -95,7 +143,9 @@ On Medium the game shows textures at a quarter of their size, so logos and lette
 
 ## Uninstall
 
-Delete the mod's three files from `Wildfire\Content\Paks`. `Install.bat` lists them, and so does each mod's `INSTALL.txt`.
+In the Mod Manager, tick the mod and click **Uninstall ticked**.
+
+By hand, delete the mod's three files from `Wildfire\Content\Paks`. `Install.bat` lists them, and so does each mod's `INSTALL.txt`.
 
 Steam's **Verify integrity of game files** will **not** remove them. It only repairs changed or missing files, and mod files are extra files.
 
