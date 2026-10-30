@@ -1,0 +1,55 @@
+---
+title: Free Camera
+description: 'A free camera for Rescue Ops: Wildfire: fly anywhere, hide the HUD and change the time of day, for screenshots and video.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import Clip from '../../../components/Clip.astro';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="New" variant="success" />
+
+A **free camera** for screenshots and video. Fly anywhere, hide the HUD and change the time of day, all from the keyboard. The camera glides rather than jerks, so slow passes look like a real camera move.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Free_Camera.zip" icon="download">Download Free_Camera.zip (15 KB)</LinkButton>
+
+<Clip src="/media/free-camera/final.mp4" poster="/media/free-camera/final.jpg" caption="Free Camera: an orbit in daylight, the day-to-night change at real speed, and shots with every beacon mod." />
+
+## Keys
+
+| Key | Does |
+|---|---|
+| **F8** | Free camera on/off. Your character, or the truck you're driving, stays put while it's on |
+| **W A S D** | Move |
+| **Q / E** | Down / up |
+| **Mouse** | Look |
+| **Scroll wheel** | Slower / faster |
+| Hold **Shift** | 3× speed |
+| Hold **Ctrl** | ¼ speed, for slow, clean passes |
+| **F9** | Hide / show the HUD |
+| Hold **]** / **[** | Time of day forward / back, about 1 game-hour a second. With **Ctrl**: slowly, for a smooth sunset. With **Shift**: fast |
+
+It only works on your own screen. In multiplayer, other players don't see it.
+
+:::note[Needs Tonnie Core]
+The camera starts through [Tonnie Core](/mods/tonnie-core/), a small shared file. The [Mod Manager](/mods/installing/#option-1-mod-manager-easiest) installs it for you, and the zip and its `Install.bat` include it too.
+:::
+
+## Known limitations
+
+- The camera appears once a **fire truck** has spawned, which is the case in the lobby and on every mission.
+- The time-of-day keys work best in single player or as the host. In someone else's game the host's time can win.
+- A game update can break [Tonnie Core](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1006-Free_Camera-Windows_P.pak   752BBFB5CAFA733151AED4B6997E8F05C6B5900547CA884E8E1D91640076551D
+pakchunk1006-Free_Camera-Windows_P.ucas  06BF893596C78D37E99068B530F0F2E2D8885738AF912F79E950968AE261B9BA
+pakchunk1006-Free_Camera-Windows_P.utoc  1DC45534A8F85C9C468127A09124B2A99283B637638D72E6D6275F74790E5002
+```
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

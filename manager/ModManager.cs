@@ -31,8 +31,8 @@ using Microsoft.Win32;
 [assembly: AssemblyDescription("Installs, updates and removes Tonnie's Rescue Ops: Wildfire mods")]
 [assembly: AssemblyCompany("Tonnie")]
 [assembly: AssemblyCopyright("Tonnie")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 
 namespace RescueOpsModManager
 {
@@ -61,6 +61,8 @@ namespace RescueOpsModManager
         public string description { get; set; }
         public List<string> includes { get; set; }
         public List<string> conflicts { get; set; }
+        public List<string> requires { get; set; }
+        public List<string> replaces { get; set; }
         public List<ModFile> files { get; set; }
     }
 
@@ -76,7 +78,7 @@ namespace RescueOpsModManager
 
     static class Program
     {
-        public const string AppVersion = "1.0.0";
+        public const string AppVersion = "1.1.0";
         public const string DefaultManifest = "https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/mods.json";
         public const string Patreon = "https://patreon.com/Tonnie001";
         public const string Website = "https://rescueopsmodding.vercel.app/mods/";
@@ -218,6 +220,8 @@ namespace RescueOpsModManager
             {
                 if (m.includes == null) m.includes = new List<string>();
                 if (m.conflicts == null) m.conflicts = new List<string>();
+                if (m.requires == null) m.requires = new List<string>();
+                if (m.replaces == null) m.replaces = new List<string>();
                 if (m.files == null) m.files = new List<ModFile>();
             }
             byId = manifest.mods.ToDictionary(m => m.id, StringComparer.OrdinalIgnoreCase);
@@ -240,6 +244,34 @@ namespace RescueOpsModManager
             var included = new HashSet<string>(Included(mod).SelectMany(m => m.files).Select(f => f.name), StringComparer.OrdinalIgnoreCase);
             List<ModFile> own = mod.files.Where(f => !included.Contains(f.name)).ToList();
             return own.Count > 0 ? own : mod.files;
+        }
+
+        // Every mod this one needs installed alongside it (its own requirements, those of the mods it
+        // includes, and theirs in turn). Doesn't contain the mod itself.
+        public List<ModInfo> Required(ModInfo mod)
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { mod.id };
+            var result = new List<ModInfo>();
+            var queue = new Queue<ModInfo>();
+            queue.Enqueue(mod);
+            while (queue.Count > 0)
+            {
+                ModInfo m = queue.Dequeue();
+                foreach (string id in m.requires.Concat(m.includes))
+                {
+                    ModInfo r = Get(id);
+                    if (r == null || !seen.Add(r.id)) continue;
+                    if (m.requires.Contains(id, StringComparer.OrdinalIgnoreCase)) result.Add(r);
+                    queue.Enqueue(r);
+                }
+            }
+            return result;
+        }
+
+        // Mods that need this one (directly or through what they include or require).
+        public List<ModInfo> Dependents(ModInfo mod)
+        {
+            return Manifest.mods.Where(m => !string.Equals(m.id, mod.id, StringComparison.OrdinalIgnoreCase) && Required(m).Any(r => string.Equals(r.id, mod.id, StringComparison.OrdinalIgnoreCase))).ToList();
         }
 
         // Mods that change the same thing as this one or one it includes. Works both ways.
@@ -283,7 +315,7 @@ namespace RescueOpsModManager
         // Every file name any mod in mods.json uses. These are the only files the manager deletes.
         public IEnumerable<string> AllFileNames()
         {
-            return Manifest.mods.SelectMany(m => m.files).Select(f => f.name).Distinct(StringComparer.OrdinalIgnoreCase);
+            return Manifest.mods.SelectMany(m => m.files.Select(f => f.name).Concat(m.replaces)).Distinct(StringComparer.OrdinalIgnoreCase);
         }
     }
 
@@ -466,7 +498,7 @@ namespace RescueOpsModManager
                 string json = await ReadText(manifestSource);
                 Manifest manifest = new JavaScriptSerializer().Deserialize<Manifest>(json);
                 if (manifest == null || manifest.mods == null || manifest.mods.Count == 0) throw new InvalidDataException("The mod list is empty.");
-                if (manifest.schema > 1) throw new InvalidDataException("This version of the mod manager is too old to read the mod list. Download the new one.");
+                if (manifest.schema > 2) throw new InvalidDataException("This version of the mod manager is too old to read the mod list. Download the new one.");
                 mods = new ModSet(manifest);
                 ShowManagerUpdate(manifest.manager);
                 RefreshList();
@@ -606,6 +638,8 @@ namespace RescueOpsModManager
             string text = mod.description;
             List<string> included = mods.Included(mod).Select(m => m.name).ToList();
             if (included.Count > 0) text += "  Includes " + string.Join(" and ", included) + ".";
+            List<string> needs = mods.Required(mod).Select(m => m.name).ToList();
+            if (needs.Count > 0) text += "  Needs " + string.Join(" and ", needs) + " (installed with it).";
             descriptionLabel.Text = text;
             pageLink.Visible = !string.IsNullOrEmpty(mod.page);
         }
@@ -666,6 +700,20 @@ namespace RescueOpsModManager
             var includedByTicked = new HashSet<string>(ticked.SelectMany(m => m.includes), StringComparer.OrdinalIgnoreCase);
             List<ModInfo> toInstall = ticked.Where(m => !includedByTicked.Contains(m.id)).ToList();
 
+            // Mods the ticked ones need that aren't installed (or are out of date) come along too.
+            var tickedIds = new HashSet<string>(toInstall.Select(m => m.id).Concat(includedByTicked), StringComparer.OrdinalIgnoreCase);
+            List<ModInfo> needed = toInstall.SelectMany(m => mods.Required(m))
+                .Where(r => !tickedIds.Contains(r.id) && mods.State(r, paks) != ModState.Installed)
+                .GroupBy(r => r.id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
+            if (needed.Count > 0)
+            {
+                string what = string.Join(" and ", needed.Select(m => m.name));
+                if (MessageBox.Show(this, "What you ticked needs " + what + ", so " + (needed.Count == 1 ? "it" : "they") + " will be installed too.",
+                        Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
+                    return;
+                toInstall.InsertRange(0, needed);
+            }
+
             // Installed mods that clash with what's being installed.
             var clashIds = new HashSet<string>(toInstall.SelectMany(m => mods.Conflicts(m)), StringComparer.OrdinalIgnoreCase);
             List<ModInfo> clashing = clashIds.Select(mods.Get).Where(m => m != null && mods.State(m, paks) != ModState.NotInstalled).ToList();
@@ -702,6 +750,10 @@ namespace RescueOpsModManager
                     foreach (ModFile f in clash.files) DeleteModFile(f.name);
                 }
 
+                // Old files that an installed mod supersedes (e.g. the v1 beacon paks) go first.
+                foreach (string old in toInstall.SelectMany(m => m.replaces).Distinct(StringComparer.OrdinalIgnoreCase))
+                    if (DeleteModFile(old)) SetStatus("Removed old " + old + "...");
+
                 foreach (Tuple<ModInfo, string> s in staged)
                 {
                     SetStatus("Installing " + s.Item1.name + "...");
@@ -725,6 +777,21 @@ namespace RescueOpsModManager
             List<ModInfo> ticked = Ticked();
             if (ticked.Count == 0) { Tell("Tick the mods you want to uninstall first."); return; }
 
+            // Installed mods that need something being removed go with it, or nothing happens.
+            var removingIds = new HashSet<string>(ticked.Select(m => m.id), StringComparer.OrdinalIgnoreCase);
+            List<ModInfo> dependents = ticked.SelectMany(m => mods.Dependents(m))
+                .Where(d => !removingIds.Contains(d.id) && mods.State(d, paks) != ModState.NotInstalled)
+                .GroupBy(d => d.id, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
+            if (dependents.Count > 0)
+            {
+                string deps = string.Join(" and ", dependents.Select(m => m.name));
+                if (MessageBox.Show(this, deps + (dependents.Count == 1 ? " needs " : " need ") + string.Join(" and ", ticked.Select(m => m.name)) + " to work.\n\nUninstall " + deps + " too?",
+                        Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+                ticked.AddRange(dependents);
+                foreach (ModInfo d in dependents) removingIds.Add(d.id);
+            }
+
             List<string> names = ticked.Select(m => m.name).ToList();
             List<string> alsoRemoved = ticked.SelectMany(m => mods.Included(m))
                 .Where(inc => !ticked.Contains(inc) && mods.State(inc, paks) != ModState.NotInstalled)
@@ -734,10 +801,14 @@ namespace RescueOpsModManager
             else if (alsoRemoved.Count > 1) message += "\n\nThis also removes " + string.Join(" and ", alsoRemoved) + ", which come with it. You can install them again on their own.";
             if (MessageBox.Show(this, message, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
+            // Files another installed mod still uses stay where they are.
+            var keep = new HashSet<string>(mods.Manifest.mods
+                .Where(m => !removingIds.Contains(m.id) && mods.State(m, paks) == ModState.Installed)
+                .SelectMany(m => mods.OwnFiles(m)).Select(f => f.name), StringComparer.OrdinalIgnoreCase);
             int removed = 0;
             foreach (ModInfo mod in ticked)
                 foreach (ModFile f in mod.files)
-                    if (DeleteModFile(f.name)) removed++;
+                    if (!keep.Contains(f.name) && DeleteModFile(f.name)) removed++;
 
             foreach (ListViewItem item in list.Items) item.Checked = false;
             SetStatus("Uninstalled " + string.Join(", ", names) + ".");

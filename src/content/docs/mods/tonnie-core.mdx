@@ -1,0 +1,48 @@
+---
+title: Tonnie Core and Beacon Base
+description: 'The two shared parts behind the beacon mods and the Free Camera, what they do and what to do after a game update.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
+
+Two small shared parts sit under the beacon mods and the Free Camera. You don't need to install them yourself: the [Mod Manager](/mods/installing/#option-1-mod-manager-easiest) adds them when a mod needs them, and every zip that needs them includes them.
+
+| Part | Used by | What it does |
+|---|---|---|
+| **Tonnie Core** | [Brighter](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/), [Free Camera](/mods/free-camera/), [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/) | When a fire truck appears, starts whichever of those mods you have installed. If a mod isn't installed, it's simply skipped |
+| **Beacon Base** | The three beacon colours and the Truck Reskin | The beacon materials and meshes, and a real light for each of the truck's 10 beacons. The colour comes from the beacon mod you install |
+
+## How it works
+
+Tonnie Core replaces one small game Blueprint, the truck's storage-box linker, with an identical copy whose storage logic matches the game's original one-to-one. The copy also starts the mods. It finds each mod by name, so a mod that isn't installed can't cause a crash.
+
+## After a game update
+
+The Core copies a game file, so a game update that changes that file can break it. If the game crashes while loading after an update:
+
+1. Remove the three `pakchunk1005-Tonnie_Core-Windows_P` files from `Wildfire\Content\Paks` (or untick **Tonnie Core** in the Mod Manager and uninstall it; it offers to remove what needs it).
+2. Your other mods (uniforms, helmet, truck paint, Hazard 1000 tones) keep working.
+3. Check back here, or the Mod Manager, for an updated Core.
+
+## Downloads
+
+You'll rarely need these on their own:
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Tonnie_Core.zip" icon="download" variant="secondary">Tonnie_Core.zip (8 KB)</LinkButton> <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Beacon_Base.zip" icon="download" variant="secondary">Beacon_Base.zip (0.2 MB)</LinkButton>
+
+## File check (SHA-256)
+
+```text
+pakchunk1004-Beacon_Base-Windows_P.pak   77CB2811D1B13753FCF400FB0B51D40839591A28E88484C8A55A7CDE9378EF4F
+pakchunk1004-Beacon_Base-Windows_P.ucas  B23FDFFE33F03C293C7FA5348415BE0CD35D18752A640DB5D400FB467BC66799
+pakchunk1004-Beacon_Base-Windows_P.utoc  971E2F25140EB470F939857971CAB61AABB45FC95A44B80A571514308870A2B4
+pakchunk1005-Tonnie_Core-Windows_P.pak   9E8841E0C22C79581B2CC240265E4DFAB55775901D38004227970CFFF320BF7A
+pakchunk1005-Tonnie_Core-Windows_P.ucas  83A9B5109FCF95C6B479742606629A96BE0B66B1026AA78C21D440CA99FADE55
+pakchunk1005-Tonnie_Core-Windows_P.utoc  0EA1EC58D37F408E53DC7CD8FF024BE0FA749EA597390BD6B2A04F1830329CBF
+```
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

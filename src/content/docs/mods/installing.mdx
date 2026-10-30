@@ -49,7 +49,13 @@ What the Mod Manager does:
 - It checks every downloaded file against the list of mods before copying it. If anything doesn't match, nothing is installed.
 - It only adds or removes the mod files it knows about. It never changes or deletes the game's own files.
 - If you tick two mods that change the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it tells you to pick one. If one is already installed, it asks before swapping it.
+- Some mods need a shared part ([Tonnie Core and Beacon Base](/mods/tonnie-core/)). It installs those for you, never removes a shared file another installed mod still uses, and asks before removing a mod that something else needs.
+- When a mod replaces an older version with different file names (like the v1 beacons), it removes the old files.
 - It waits for you to close the game before changing anything.
+
+:::caution[Have Mod Manager v1.0?]
+The beacon mods and the Free Camera need **Mod Manager v1.1** or newer. v1.0 shows "too old to read the mod list": download the new one with the button above.
+:::
 
 Its source code is [on GitHub](https://github.com/TonnieGit/rescueopsmodding/tree/main/manager) if you'd like to read exactly what it does.
 
