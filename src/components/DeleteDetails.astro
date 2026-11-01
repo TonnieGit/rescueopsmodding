@@ -1,0 +1,104 @@
+---
+// Form for /privacy/delete/: sends the email to /api/delete-details and shows the reply.
+---
+
+<form class="del-form not-content" id="del-form" novalidate>
+	<label for="del-email">Email address you gave in the launcher</label>
+	<div class="row">
+		<input id="del-email" name="email" type="email" required maxlength="120" autocomplete="email" placeholder="you@example.com" />
+		<button type="submit">Delete my details</button>
+	</div>
+	<p class="msg" id="del-msg" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+	const form = document.getElementById('del-form') as HTMLFormElement;
+	const input = document.getElementById('del-email') as HTMLInputElement;
+	const msg = document.getElementById('del-msg') as HTMLElement;
+	const button = form.querySelector('button') as HTMLButtonElement;
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const email = input.value.trim();
+		msg.className = 'msg';
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+			msg.textContent = 'Enter a valid email address.';
+			msg.classList.add('bad');
+			return;
+		}
+		button.disabled = true;
+		msg.textContent = 'Sending...';
+		try {
+			const r = await fetch('/api/delete-details', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email }),
+			});
+			const d = await r.json().catch(() => ({}));
+			if (r.ok) {
+				msg.textContent = d.message;
+				msg.classList.add('ok');
+				form.querySelector('.row')?.remove();
+				form.querySelector('label')?.remove();
+			} else {
+				msg.textContent = d.error || 'Something went wrong. Please try again later.';
+				msg.classList.add('bad');
+				button.disabled = false;
+			}
+		} catch {
+			msg.textContent = 'Couldn\'t reach the site. Check your connection and try again.';
+			msg.classList.add('bad');
+			button.disabled = false;
+		}
+	});
+</script>
+
+<style>
+	.del-form {
+		margin-block: 1.5rem;
+		display: grid;
+		gap: 0.5rem;
+		max-width: 34rem;
+	}
+	.del-form label {
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.row {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+	.del-form input {
+		flex: 1 1 16rem;
+		padding: 0.5rem 0.7rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 6px;
+		background: var(--sl-color-black);
+		color: var(--sl-color-white);
+		font: inherit;
+	}
+	.del-form button {
+		padding: 0.5rem 1rem;
+		border: 0;
+		border-radius: 6px;
+		background: var(--sl-color-accent);
+		color: var(--sl-color-black);
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.del-form button:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+	.msg {
+		margin: 0;
+		min-height: 1.5em;
+	}
+	.msg.ok {
+		color: var(--sl-color-white);
+	}
+	.msg.bad {
+		color: #ff6b62;
+	}
+</style>

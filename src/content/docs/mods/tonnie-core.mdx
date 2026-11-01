@@ -4,8 +4,11 @@ description: 'The two shared parts behind the beacon mods and the Free Camera, w
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
+import ModStats from '../../../components/ModStats.astro';
 
 <Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
+
+<ModStats id="Tonnie_Core" />
 
 Two small shared parts sit under the beacon mods and the Free Camera. You don't need to install them yourself: the [Mod Manager](/mods/installing/#option-1-mod-manager-easiest) adds them when a mod needs them, and every zip that needs them includes them.
 

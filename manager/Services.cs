@@ -23,16 +23,23 @@ namespace RescueOpsModLauncher
         public bool checkUpdates { get; set; }
         public bool smoothGraphics { get; set; }         // false = WebView2 without GPU, flat look
         public string startPage { get; set; }            // "dashboard" or "mods"
+        public string modsView { get; set; }             // "grid" or "list" (Mods page)
         public string lastBuildId { get; set; }          // game build when the launcher last saw it
         public bool gameUpdated { get; set; }            // the build changed since mods were last played
         public List<string> newsRead { get; set; }
         public Dictionary<string, string> knownMods { get; set; }   // id -> version, for "new mod" news
         public List<NewsItem> modNews { get; set; }
+        public List<Preset> presets { get; set; }
+        public string installId { get; set; }            // random, identifies this PC's launcher to the hub API
+        public string profileName { get; set; }          // given once before the first rating ("" = not yet)
+        public string profileEmail { get; set; }
+        public Dictionary<string, int> myRatings { get; set; }      // mod id -> stars this install gave
 
         public Settings()
         {
-            language = ""; gamePath = ""; afterStart = "minimise"; checkUpdates = true; smoothGraphics = true; startPage = "dashboard";
-            lastBuildId = ""; newsRead = new List<string>(); knownMods = new Dictionary<string, string>(); modNews = new List<NewsItem>();
+            language = ""; gamePath = ""; afterStart = "minimise"; checkUpdates = true; smoothGraphics = true; startPage = "dashboard"; modsView = "grid";
+            lastBuildId = ""; newsRead = new List<string>(); knownMods = new Dictionary<string, string>(); modNews = new List<NewsItem>(); presets = new List<Preset>();
+            installId = Guid.NewGuid().ToString("N"); profileName = ""; profileEmail = ""; myRatings = new Dictionary<string, int>();
         }
 
         static string FilePath { get { return Path.Combine(Program.DataDir, "state.json"); } }
@@ -49,8 +56,15 @@ namespace RescueOpsModLauncher
                         if (s.newsRead == null) s.newsRead = new List<string>();
                         if (s.knownMods == null) s.knownMods = new Dictionary<string, string>();
                         if (s.modNews == null) s.modNews = new List<NewsItem>();
+                        if (s.presets == null) s.presets = new List<Preset>();
+                        foreach (Preset p in s.presets) if (p.mods == null) p.mods = new List<string>();
+                        if (string.IsNullOrEmpty(s.installId)) s.installId = Guid.NewGuid().ToString("N");
+                        if (s.profileName == null) s.profileName = "";
+                        if (s.profileEmail == null) s.profileEmail = "";
+                        if (s.myRatings == null) s.myRatings = new Dictionary<string, int>();
                         if (string.IsNullOrEmpty(s.afterStart)) s.afterStart = "minimise";
                         if (string.IsNullOrEmpty(s.startPage)) s.startPage = "dashboard";
+                        if (string.IsNullOrEmpty(s.modsView)) s.modsView = "grid";
                         return s;
                     }
                 }
@@ -70,6 +84,54 @@ namespace RescueOpsModLauncher
                 File.Move(tmp, FilePath);
             }
             catch (Exception) { }
+        }
+    }
+
+    // An error reply from the hub API: { "error": "..." }.
+    public class ApiException : Exception
+    {
+        public readonly int Status;
+        public readonly string Code;
+        public ApiException(int status, string body) : base(ReadError(body)) { Status = status; Code = ReadError(body); }
+        static string ReadError(string body)
+        {
+            try { var d = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(body); if (d != null && d.ContainsKey("error")) return d["error"].ToString(); }
+            catch (Exception) { }
+            return "The modding hub didn't answer properly.";
+        }
+    }
+
+    // A saved set of mods: manifest ids and "local:<stem>" ids, exactly as they were loaded.
+    public class Preset
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public List<string> mods { get; set; }
+        public long lastPlayed { get; set; }             // Unix seconds, 0 = never
+    }
+
+    // ---- Log (%LOCALAPPDATA%\RescueOpsModLauncher\launcher.log), for Copy diagnostics ----------
+
+    public static class Log
+    {
+        static string FilePath { get { return Path.Combine(Program.DataDir, "launcher.log"); } }
+
+        public static void Write(string text)
+        {
+            try
+            {
+                Directory.CreateDirectory(Program.DataDir);
+                var info = new FileInfo(FilePath);
+                if (info.Exists && info.Length > 200 * 1024) File.WriteAllLines(FilePath, File.ReadAllLines(FilePath).Skip(1000));
+                File.AppendAllText(FilePath, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "  " + text.Replace("\r", " ").Replace("\n", " ") + Environment.NewLine);
+            }
+            catch (Exception) { }
+        }
+
+        public static List<string> Tail(int lines)
+        {
+            try { return File.Exists(FilePath) ? File.ReadAllLines(FilePath).Reverse().Take(lines).Reverse().ToList() : new List<string>(); }
+            catch (Exception) { return new List<string>(); }
         }
     }
 
@@ -94,6 +156,24 @@ namespace RescueOpsModLauncher
         {
             if (!IsWeb(source)) return File.ReadAllText(source, Encoding.UTF8);
             using (WebClient client = Client()) return await client.DownloadStringTaskAsync(source);
+        }
+
+        // POSTs JSON to the hub API. Returns the reply body; an error reply throws with the API's own message.
+        public static async Task<string> PostJson(string url, string body)
+        {
+            using (WebClient client = Client())
+            {
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                try { return await client.UploadStringTaskAsync(url, body); }
+                catch (WebException ex)
+                {
+                    var resp = ex.Response as HttpWebResponse;
+                    if (resp == null) throw;
+                    string text;
+                    using (var reader = new StreamReader(resp.GetResponseStream(), Encoding.UTF8)) text = reader.ReadToEnd();
+                    throw new ApiException((int)resp.StatusCode, text);
+                }
+            }
         }
 
         public static async Task Download(string source, string target, Action<int> progress)

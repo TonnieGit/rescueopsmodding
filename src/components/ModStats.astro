@@ -1,0 +1,46 @@
+---
+// Public download count and star rating for a mod, filled in from /api/stats in the browser.
+// Ratings are given in the Rescue Ops Mod Launcher. Shows nothing until the numbers arrive.
+interface Props {
+	id: string; // the mod's id in mods.json, e.g. QLD_RFS_Uniforms
+}
+const { id } = Astro.props;
+---
+
+<p class="mod-stats not-content" data-mod-stats={id} hidden></p>
+
+<script>
+	const els = document.querySelectorAll<HTMLElement>('[data-mod-stats]');
+	if (els.length)
+		fetch('/api/stats')
+			.then((r) => (r.ok ? r.json() : null))
+			.then((d) => {
+				if (!d) return;
+				els.forEach((el) => {
+					const s = d.mods[el.dataset.modStats!];
+					if (!s) return;
+					const n = (x: number) => x.toLocaleString('en-AU');
+					const rating = s.ratings
+						? `<span class="stars" aria-label="${s.rating} out of 5">${'★'.repeat(Math.round(s.rating))}<span class="off">${'★'.repeat(5 - Math.round(s.rating))}</span></span> ${s.rating} (${n(s.ratings)} ${s.ratings === 1 ? 'rating' : 'ratings'}) · `
+						: '';
+					el.innerHTML = `${rating}<strong>${n(s.downloads)}</strong> downloads`;
+					el.hidden = false;
+				});
+			})
+			.catch(() => {});
+</script>
+
+<style>
+	.mod-stats {
+		margin-block: 0.5rem 1rem;
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-sm);
+	}
+	.mod-stats :global(.stars) {
+		color: #e9a23b;
+		letter-spacing: 1px;
+	}
+	.mod-stats :global(.off) {
+		color: var(--sl-color-gray-5);
+	}
+</style>

@@ -54,6 +54,7 @@ namespace RescueOpsModLauncher
         public string category { get; set; }
         public string author { get; set; }
         public string thumb { get; set; }
+        public List<string> screenshots { get; set; }     // full-size images for the viewer; the thumb is used when empty
         public string replacedBy { get; set; }
         public string testedBuild { get; set; }
         public bool hidden { get; set; }
@@ -223,6 +224,9 @@ namespace RescueOpsModLauncher
             lock (cache) cache[key] = Tuple.Create(info.Length, info.LastWriteTimeUtc, hash);
             return hash;
         }
+
+        // Repair re-reads every file instead of trusting the cache.
+        public static void Clear() { lock (cache) cache.Clear(); }
 
         // A moved file keeps its contents, so carry the cached hash over to the new path.
         public static void Moved(string from, string to)
@@ -464,6 +468,23 @@ namespace RescueOpsModLauncher
                 if (File.Exists(InPaks(f.name))) File.Delete(InPaks(f.name));
                 if (File.Exists(InLib(f.name))) File.Delete(InLib(f.name));
             }
+        }
+
+        // Repair: a mod half in Paks and half in the library is put back together where it's loaded,
+        // and a file that's in both places loses its library copy if the Paks one is good. Returns what changed.
+        public List<string> Tidy(ModInfo mod)
+        {
+            var done = new List<string>();
+            foreach (ModFile f in mod.files)
+            {
+                if (!SafeName(f.name) || !File.Exists(InPaks(f.name)) || !File.Exists(InLib(f.name))) continue;
+                if (Matches(InPaks(f.name), f)) { File.Delete(InLib(f.name)); done.Add("duplicate " + f.name); }
+            }
+            // Own files only: a mod it includes (e.g. the tones inside the truck) can rightly be loaded on its own.
+            List<ModFile> own = Mods.OwnFiles(mod);
+            bool someIn = own.Any(f => File.Exists(InPaks(f.name))), someOut = own.Any(f => !File.Exists(InPaks(f.name)) && File.Exists(InLib(f.name)));
+            if (someIn && someOut) { Load(mod); done.Add("put back together"); }
+            return done;
         }
 
         // Old file names a mod supersedes (e.g. the v1 beacon paks) are deleted when it's installed.
