@@ -62,7 +62,10 @@ export default defineConfig({
 				},
 				{
 					label: 'Help',
-					items: [{ label: 'Troubleshooting', slug: 'start/troubleshooting' }],
+					items: [
+						{ label: 'Troubleshooting', slug: 'start/troubleshooting' },
+						{ label: 'Privacy', slug: 'privacy' },
+					],
 				},
 				{
 					label: 'Mods',

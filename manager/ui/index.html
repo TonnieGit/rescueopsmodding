@@ -46,6 +46,17 @@ a { color: inherit; }
   box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
 .play:hover { background: #ff2a2e; }
 .play:disabled { background: #3a3433; color: var(--muted); cursor: default; box-shadow: none; }
+.playrow { display: flex; }
+.playrow .play { flex: 1; border-radius: 10px 0 0 10px; }
+.playrow .drop { width: 40px; border: 0; border-left: 1px solid rgba(0,0,0,.3); border-radius: 0 10px 10px 0; background: var(--red); color: #fff; font-size: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+.playrow .drop:hover { background: #ff2a2e; }
+.playrow .drop:disabled { background: #3a3433; color: var(--muted); cursor: default; box-shadow: none; }
+.quick { position: fixed; left: 12px; width: 216px; bottom: 120px; z-index: 40; display: none; background: rgba(30,26,26,.92); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; overflow: hidden; backdrop-filter: blur(24px); box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+.quick.open { display: block; }
+.quick .h { padding: 7px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,.07); }
+.quick button { display: flex; width: 100%; justify-content: space-between; gap: 8px; padding: 8px 12px; background: none; border: 0; text-align: left; }
+.quick button:hover { background: rgba(255,255,255,.08); }
+.quick button span { color: var(--muted); font-size: 12px; white-space: nowrap; }
 
 /* main */
 .main { display: grid; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; }
@@ -78,6 +89,7 @@ tr.sel td { background: rgba(255,255,255,.09) !important; }
 tr.grp td { background: rgba(0,0,0,.18); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 5px 10px; }
 td.num { text-align: right; color: var(--muted); white-space: nowrap; }
 table.modt { table-layout: fixed; }
+table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cb { width: 15px; height: 15px; border: 1px solid rgba(255,255,255,.35); border-radius: 3px; display: inline-grid; place-items: center; vertical-align: middle; background: rgba(0,0,0,.25); cursor: pointer; }
 .cb.on { background: var(--ink); border-color: var(--ink); }
 .cb.on::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #121010; border-bottom: 2px solid #121010; transform: rotate(-45deg) translate(1px,-1px); }
@@ -91,16 +103,36 @@ table.modt { table-layout: fixed; }
 .kind.patch { color: var(--amber); border-color: rgba(233,162,59,.4); } .kind.official { color: var(--ink); border-color: rgba(255,255,255,.25); }
 
 /* dashboard */
-.band { position: relative; height: 120px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.09); margin-bottom: 12px; background: #1a1717 url("banner.jpg") center / cover; }
-.band .cap { position: absolute; left: 0; bottom: 0; background: rgba(12,10,10,.6); backdrop-filter: blur(12px); padding: 6px 12px; font-size: 12px; border-top-right-radius: 8px; }
-.dash { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; align-items: start; }
-.news td:first-child { width: 72px; color: var(--muted); white-space: nowrap; vertical-align: top; padding-top: 9px; }
-.news tr { cursor: pointer; }
-.news tr:hover td { background: rgba(255,255,255,.04); }
-.news b { font-weight: 500; }
-.news .src { color: var(--muted); font-size: 12px; }
+/* The key art is small (616 px), so it's shown whole on the right over a blurred copy of itself. */
+.hero { position: relative; height: 230px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.09); margin-bottom: 12px; background: #1a1717; display: flex; }
+.hero::before { content: ""; position: absolute; inset: -30px; background: url("hero.jpg") center / cover; filter: blur(26px) brightness(.45) saturate(1.2); }
+.hero .art { position: relative; margin-left: auto; height: 100%; aspect-ratio: 616 / 353; background: url("hero.jpg") center / cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%); mask-image: linear-gradient(90deg, transparent, #000 22%); }
+.hero .txt { position: absolute; left: 0; top: 0; bottom: 0; padding: 22px 24px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; max-width: 55%; }
+.hero h2 { font: 52px/.9 var(--display); letter-spacing: .03em; margin: 0; font-weight: normal; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+.hero .sub2 { color: #d6cfcc; font-size: 12px; }
+.hero .acts { margin-top: 4px; }
+.alertlist { border-color: rgba(233,162,59,.35); margin-bottom: 12px; }
+.alertlist .al { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.alertlist .al:last-child { border-bottom: 0; }
+.alertlist .al > div { flex: 1; min-width: 0; }
+.dash { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; }
+.tile { cursor: pointer; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); }
+.tile:hover { border-color: rgba(255,255,255,.22); }
+.tile .ti { aspect-ratio: 16 / 9; background: #211e1e; display: grid; place-items: center; color: var(--muted); font-size: 11px; }
+.tile .ti img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile .tn { padding: 6px 8px 7px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .tn small { display: block; color: var(--muted); font-size: 11px; }
+.tile .tn .tag { font-size: 11px; }
+.nitem { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; display: grid; gap: 3px; }
+.nitem:hover { background: rgba(255,255,255,.04); }
+.nitem .nm { display: flex; align-items: center; font-size: 11px; color: var(--muted); }
+.nitem .nt { font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nitem .ns { color: var(--muted); font-size: 12px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.nmore { display: block; padding: 8px 12px; color: var(--muted); font-size: 12px; text-decoration: none; }
+.nmore:hover { color: var(--ink); }
 .unread { display: inline-block; width: 7px; height: 7px; background: var(--amber); border-radius: 2px; margin-right: 6px; vertical-align: 1px; }
-.alerts td:last-child { text-align: right; white-space: nowrap; }
 
 /* mods */
 .searchrow { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -109,6 +141,28 @@ table.modt { table-layout: fixed; }
 .modsgrid { display: grid; grid-template-columns: 1fr 320px; gap: 12px; align-items: start; }
 .lockbanner { display: none; margin-bottom: 10px; padding: 7px 10px; border-radius: 8px; background: rgba(233,162,59,.1); border: 1px solid rgba(233,162,59,.35); color: var(--amber); }
 .locked .lockbanner { display: block; }
+.seg { display: inline-flex; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; overflow: hidden; }
+.seg button { background: rgba(255,255,255,.04); border: 0; padding: 4px 10px; color: var(--muted); }
+.seg button + button { border-left: 1px solid rgba(255,255,255,.1); }
+.seg button.on { background: rgba(255,255,255,.14); color: var(--ink); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; padding: 10px; }
+.cgrp { grid-column: 1 / -1; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px 2px 0; }
+.cgrp:not(:first-child) { padding-top: 10px; }
+.card { cursor: pointer; border-radius: 8px; overflow: hidden; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; }
+.card:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+.card.sel { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); }
+.card .ci { position: relative; aspect-ratio: 16 / 9; background: #211e1e; display: grid; place-items: center; color: var(--muted); font-size: 11px; }
+.card .ci img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .ci .cb { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; background: rgba(10,9,9,.6); border-color: rgba(255,255,255,.65); }
+.card .ci .cb.on { background: var(--ink); border-color: var(--ink); }
+.card .ci .sz { position: absolute; right: 6px; bottom: 6px; font-size: 11px; background: rgba(10,9,9,.7); padding: 1px 6px; border-radius: 4px; color: #d6cfcc; }
+.card .cbd { padding: 8px 10px 9px; display: grid; gap: 2px; }
+.card .cn { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .cm { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .cs { font-size: 12px; min-height: 17px; }
+.detail .shot { display: block; position: relative; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+.detail .shot .n { position: absolute; right: 8px; bottom: 8px; font-size: 11px; background: rgba(10,9,9,.7); padding: 2px 7px; border-radius: 4px; color: #d6cfcc; }
+.detail .shot:hover .n { color: #fff; }
 .detail img, .detail .noimg { width: 100%; height: 170px; object-fit: cover; display: block; border-bottom: 1px solid var(--line); background: #1a1717; }
 .detail .in { padding: 10px 12px 12px; display: grid; gap: 10px; }
 .detail h3 { font: 28px/1 var(--display); letter-spacing: .03em; margin: 0; font-weight: normal; }
@@ -116,6 +170,37 @@ table.modt { table-layout: fixed; }
 .detail dt { color: var(--muted); } .detail dd { margin: 0; }
 .detail ul { margin: 4px 0 0; padding-left: 16px; }
 .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.detail details summary { cursor: pointer; color: var(--muted); }
+.detail details summary:hover { color: var(--ink); }
+.detail .hist { margin-top: 6px; display: grid; gap: 6px; }
+
+.stars { color: var(--amber); letter-spacing: 1px; white-space: nowrap; }
+.stars .off { color: rgba(255,255,255,.2); }
+.pop { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.pop b { color: var(--ink); font-weight: 500; }
+.card .cr { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); }
+.myrate { display: inline-flex; gap: 2px; }
+.myrate button { background: none; border: 0; padding: 0 1px; font-size: 20px; line-height: 1; color: rgba(255,255,255,.22); }
+.myrate button.on, .myrate:hover button { color: var(--amber); }
+.myrate button:hover ~ button { color: rgba(255,255,255,.22); }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; font-size: 12px; }
+.linkbtn:hover { color: var(--ink); }
+#dlg-reg .in { white-space: normal; }
+#dlg-reg label.f { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+#dlg-reg .chk { align-items: flex-start; }
+#dlg-reg .chk .cb { flex: none; margin-top: 2px; }
+#reg-err { color: #ff6b62; }
+
+/* presets */
+.presets td { vertical-align: middle; }
+.presets td:nth-child(2) { color: var(--muted); }
+.presets td:last-child { text-align: right; white-space: nowrap; }
+.presets td:last-child .btn { margin-left: 4px; }
+.presets tr.cur td:first-child::after { content: attr(data-cur); color: var(--muted); margin-left: 6px; font-size: 12px; }
+.importrow { display: flex; gap: 8px; padding: 10px; flex-wrap: wrap; align-items: center; }
+.importrow input { flex: 1 1 260px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 5px 8px; font-family: Consolas, monospace; font-size: 12px; }
+.dlg input.inp { width: 100%; }
 
 /* options */
 .form { display: grid; grid-template-columns: 220px 1fr; }
@@ -147,6 +232,19 @@ table.modt { table-layout: fixed; }
 .note2 { text-align: center; color: var(--muted); font-size: 12px; }
 .toast { position: fixed; right: 14px; bottom: 38px; width: 360px; background: rgba(30,26,26,.85); border: 1px solid rgba(255,107,98,.5); border-radius: 12px; z-index: 60; display: none; backdrop-filter: blur(24px); }
 .toast.show { display: block; }
+.lb { background: rgba(6,5,5,.88); grid-template-rows: 1fr auto; gap: 12px; padding: 40px 70px 16px; }
+.lb.open { display: grid; }
+.lb .stage { min-height: 0; display: grid; place-items: center; }
+.lb .stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.lb .bar { display: flex; gap: 8px; justify-content: center; align-items: center; }
+.lb .bar img { width: 72px; height: 40px; object-fit: cover; border-radius: 4px; opacity: .5; cursor: pointer; border: 1px solid transparent; }
+.lb .bar img.on { opacity: 1; border-color: var(--ink); }
+.lb .cnt { color: var(--muted); font-size: 12px; margin-left: 8px; }
+.lb .lbn, .lb .lbx { position: absolute; border: 1px solid rgba(255,255,255,.15); background: rgba(30,26,26,.7); color: var(--ink); border-radius: 8px; font-size: 26px; line-height: 1; }
+.lb .lbn { top: 50%; width: 44px; height: 64px; margin-top: -32px; }
+.lb .lbn:hover, .lb .lbx:hover { background: rgba(60,54,54,.85); }
+.lb .prev { left: 14px; } .lb .next { right: 14px; }
+.lb .lbx { top: 10px; right: 14px; width: 36px; height: 36px; font-size: 22px; }
 .toast .in { padding: 10px 12px; display: grid; gap: 8px; overflow-wrap: anywhere; max-height: 40vh; overflow: auto; }
 </style>
 </head>
@@ -158,12 +256,13 @@ table.modt { table-layout: fixed; }
     <div class="navs">
       <button class="nav" data-screen="dashboard"><span data-t="nav.dashboard"></span></button>
       <button class="nav" data-screen="mods"><span data-t="nav.mods"></span><small id="nav-updates"></small></button>
+      <button class="nav" data-screen="presets"><span data-t="nav.presets"></span></button>
       <button class="nav" data-screen="options"><span data-t="nav.options"></span></button>
     </div>
     <div></div>
     <div class="playbox">
       <div class="info" id="play-summary"></div>
-      <button class="play" id="play" data-t="play"></button>
+      <div class="playrow"><button class="play" id="play" data-t="play"></button><button class="drop" id="play-drop" data-tt="quick.title">&#9662;</button></div>
       <div class="info" id="play-info"></div>
     </div>
   </nav>
@@ -172,13 +271,12 @@ table.modt { table-layout: fixed; }
     <div class="tabs glass-pane" id="tabs"></div>
 
     <section class="screen" id="screen-dashboard">
-      <div class="band"><div class="cap" id="band-cap"></div></div>
+      <div class="hero"><div class="art"></div><div class="txt"><h2 id="hero-title"></h2><div class="sub2" id="hero-sub"></div>
+        <div class="acts"><button class="btn red" data-screen="mods" data-t="dash.change"></button></div></div></div>
+      <div class="panel alertlist" id="alerts"></div>
       <div class="dash">
-        <div class="panel"><div class="ph"><span data-t="dash.news"></span><span class="r" id="news-count"></span></div><table class="news"><tbody id="news"></tbody></table></div>
-        <div>
-          <div class="panel"><div class="ph" data-t="dash.alerts"></div><table class="alerts"><tbody id="alerts"></tbody></table></div>
-          <div class="panel"><div class="ph"><span data-t="dash.loads"></span><span class="r" id="loads-size"></span></div><table><tbody id="loads"></tbody></table></div>
-        </div>
+        <div class="panel"><div class="ph"><span data-t="dash.loadedMods"></span><span class="r"><span id="loads-size"></span><button class="btn" data-screen="mods" data-t="dash.change"></button></span></div><div id="loads"></div></div>
+        <div class="panel"><div class="ph"><span data-t="dash.news"></span><span class="r" id="news-count"></span></div><div id="news"></div></div>
       </div>
     </section>
 
@@ -189,16 +287,29 @@ table.modt { table-layout: fixed; }
         <select id="f-cat"></select>
         <select id="f-author"></select>
         <select id="f-sort"></select>
+        <div class="seg"><button data-view="grid" data-t="view.grid"></button><button data-view="list" data-t="view.list"></button></div>
         <button class="btn" id="add-files" data-t="mods.add"></button>
       </div>
       <div class="modsgrid">
         <div>
-          <div class="sub on" id="mods-loaded"><div class="panel"><div class="ph"><span data-t="mods.loaded"></span><span class="r" id="loaded-sum"></span></div><table class="modt"><thead id="th1"></thead><tbody id="list-loaded"></tbody></table></div></div>
-          <div class="sub" id="mods-all"><div class="panel"><div class="ph"><span data-t="mods.all"></span><span class="r" id="all-sum"></span></div><table class="modt"><thead id="th2"></thead><tbody id="list-all"></tbody></table></div></div>
+          <div class="sub on" id="mods-loaded"><div class="panel"><div class="ph"><span data-t="mods.loaded"></span><span class="r" id="loaded-sum"></span></div><div id="list-loaded"></div></div></div>
+          <div class="sub" id="mods-all"><div class="panel"><div class="ph"><span data-t="mods.all"></span><span class="r" id="all-sum"></span></div><div id="list-all"></div></div></div>
           <div class="sub" id="mods-updates"><div class="panel"><div class="ph"><span data-t="mods.updates"></span><span class="r"><button class="btn red" id="update-all" data-t="mods.updateAll"></button></span></div><table><tbody id="list-updates"></tbody></table></div></div>
         </div>
         <aside class="panel detail" id="detail"></aside>
       </div>
+    </section>
+
+    <section class="screen" id="screen-presets">
+      <div class="panel"><div class="ph"><span data-t="pre.title"></span><span class="r" data-t="pre.hint"></span></div>
+        <table class="presets"><thead><tr><th data-t="pre.name"></th><th data-t="pre.mods"></th><th style="width:110px;white-space:nowrap" data-t="pre.played"></th><th></th></tr></thead><tbody id="preset-list"></tbody></table></div>
+      <div class="panel"><div class="ph" data-t="pre.importSave"></div>
+        <div class="importrow">
+          <input id="pre-code" type="text" data-tp="pre.codeHint" spellcheck="false">
+          <button class="btn red" id="pre-import" data-t="pre.import"></button>
+          <button class="btn" id="pre-save" data-t="pre.save"></button>
+          <span class="dim" style="flex-basis:100%" data-t="pre.importNote"></span>
+        </div></div>
     </section>
 
     <section class="screen" id="screen-options">
@@ -207,6 +318,7 @@ table.modt { table-layout: fixed; }
           <div data-t="opt.language"></div><div><select class="inp" id="o-language"><option value="en">English</option><option value="fr">Français</option></select></div>
           <div data-t="opt.after"></div><div><select class="inp" id="o-after"></select></div>
           <div data-t="opt.startPage"></div><div><select class="inp" id="o-start"></select></div>
+          <div data-t="opt.profile"></div><div><span id="o-profile"></span><button class="btn" id="o-profile-edit" data-t="opt.change"></button><a href="#" class="note" data-url="https://rescueopsmodding.vercel.app/privacy/delete/" data-t="opt.deleteDetails"></a></div>
           <div></div><div><label class="chk" id="o-updates"><span class="cb"></span><span data-t="opt.checkUpdates"></span></label></div>
         </div></div>
         <div class="panel"><div class="ph" data-t="opt.compat"></div><div class="form">
@@ -227,6 +339,7 @@ table.modt { table-layout: fixed; }
           <div data-t="opt.diag"></div><div><button class="btn" id="o-diag" data-t="opt.copy"></button><span class="note" data-t="opt.diagNote"></span></div>
           <div data-t="opt.logs"></div><div><button class="btn" data-folder="logs" data-t="opt.openFolder"></button></div>
           <div data-t="opt.refresh"></div><div><button class="btn" id="o-refresh" data-t="opt.checkNow"></button></div>
+          <div data-t="opt.repair"></div><div><button class="btn" id="o-repair" data-t="opt.repairBtn"></button><span class="note" data-t="opt.repairNote"></span></div>
         </div></div>
         <div class="panel"><div class="ph" data-t="opt.about"></div><div class="form">
           <div data-t="opt.version"></div><div id="o-version"></div>
@@ -248,6 +361,18 @@ table.modt { table-layout: fixed; }
     <button data-lang="fr"><svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg><b>FRANÇAIS</b></button>
   </div>
   <div class="note2">You can change this later in Options · Modifiable plus tard dans Options</div></div></div></div>
+<div class="scrim" id="dlg-prompt" role="dialog" aria-modal="true"><div class="dlg" style="width:min(420px,100%)"><div class="ph" id="prompt-title"></div><div class="in"><span id="prompt-text"></span><input class="inp" id="prompt-input" type="text" maxlength="60" spellcheck="false"></div>
+  <div class="foot"><button class="btn red" id="prompt-ok" data-t="ok"></button><button class="btn" id="prompt-cancel" data-t="cancel"></button></div></div></div>
+<div class="quick" id="quick"></div>
+<div class="scrim" id="dlg-reg" role="dialog" aria-modal="true"><div class="dlg" style="width:min(440px,100%)"><div class="ph" data-t="reg.title"></div><div class="in">
+  <span data-t="reg.text"></span>
+  <label class="f"><span data-t="reg.name"></span><input class="inp" id="reg-name" type="text" maxlength="40" autocomplete="nickname"></label>
+  <label class="f"><span data-t="reg.email"></span><input class="inp" id="reg-email" type="email" maxlength="120" autocomplete="email"></label>
+  <span class="chk" id="reg-ok"><span class="cb"></span><span><span data-t="reg.consent"></span> <a href="#" data-url="https://rescueopsmodding.vercel.app/privacy/" data-t="reg.privacy"></a></span></span>
+  <div id="reg-err"></div></div>
+  <div class="foot"><button class="btn red" id="reg-save" data-t="reg.save"></button><button class="btn" id="reg-cancel" data-t="cancel"></button></div></div></div>
+<div class="scrim lb" id="dlg-shots" role="dialog" aria-modal="true"><div class="stage" id="lb-stage"><img id="lb-img" alt=""></div><div class="bar" id="lb-bar"></div>
+  <button class="lbn prev" id="lb-prev" aria-label="Previous">&#8249;</button><button class="lbn next" id="lb-next" aria-label="Next">&#8250;</button><button class="lbx" id="lb-close" aria-label="Close">&#215;</button></div>
 <div class="toast" id="toast" role="alert"><div class="ph"><span data-t="error"></span><span class="r"><button class="btn" id="toast-close">×</button></span></div><div class="in" id="toast-text"></div></div>
 
 <script>
@@ -263,11 +388,43 @@ table.modt { table-layout: fixed; }
     'play.noGame': ['Game not found. Choose its folder in Options.', 'Jeu introuvable. Choisissez son dossier dans Options.'],
     'tab.dashboard': ['Dashboard', 'Accueil'], 'tab.loaded': ['Loaded', 'Chargés'], 'tab.all': ['All mods', 'Tous les mods'], 'tab.updates': ['Updates', 'Mises à jour'],
     'tab.launcher': ['Launcher', 'Launcher'], 'tab.game': ['Game', 'Jeu'], 'tab.help': ['Help', 'Aide'],
-    'dash.news': ['News', 'Actualités'], 'dash.alerts': ['Alerts', 'Alertes'], 'dash.loads': ['Loads with the game', 'Chargés avec le jeu'],
+    'dash.news': ['News', 'Actualités'], 'dash.loadedMods': ['Loaded mods', 'Mods chargés'], 'dash.change': ['Change mods', 'Changer les mods'],
     'dash.unread': ['{n} unread', '{n} non lues'], 'dash.noNews': ['No news yet. It appears here once the launcher is online.', 'Pas encore d\'actualités. Elles apparaissent ici une fois en ligne.'],
-    'dash.noAlerts': ['All good. Nothing needs your attention.', 'Tout va bien. Rien ne demande votre attention.'],
     'dash.noLoaded': ['No mods load. You\'re playing the base game.', 'Aucun mod chargé : vous jouez au jeu de base.'],
-    'dash.cap': ['{n} mods load with the game', '{n} mods chargés avec le jeu'],
+    'dash.hero': ['{n} MODS LOADED', '{n} MODS CHARGÉS'], 'dash.hero1': ['1 MOD LOADED', '1 MOD CHARGÉ'], 'dash.hero0': ['BASE GAME', 'JEU DE BASE'],
+    'dash.allNews': ['All news on Steam', 'Toutes les actualités sur Steam'],
+    'nav.presets': ['PRESETS', 'PRÉRÉGLAGES'], 'tab.presets': ['Presets', 'Préréglages'],
+    'pre.title': ['Presets', 'Préréglages'], 'pre.hint': ['A preset is a set of mods you can switch to in one click', 'Un préréglage est un ensemble de mods que vous activez en un clic'],
+    'pre.name': ['Name', 'Nom'], 'pre.mods': ['Mods', 'Mods'], 'pre.played': ['Last played', 'Dernière partie'], 'pre.never': ['Never', 'Jamais'],
+    'pre.base': ['Base game', 'Jeu de base'], 'pre.none': ['No mods', 'Aucun mod'], 'pre.current': ['(current)', '(actuel)'], 'pre.missing': ['{n} not available', '{n} indisponible(s)'],
+    'pre.load': ['Load', 'Charger'], 'pre.play': ['Play', 'Jouer'], 'pre.share': ['Share code', 'Code de partage'], 'pre.rename': ['Rename', 'Renommer'], 'pre.delete': ['Delete', 'Supprimer'],
+    'pre.empty': ['No presets yet. Load the mods you want, then save them as a preset below.', 'Aucun préréglage. Chargez les mods voulus, puis enregistrez-les ci-dessous.'],
+    'pre.importSave': ['Import or save', 'Importer ou enregistrer'], 'pre.codeHint': ['Paste a share code (ROMOD-...)', 'Collez un code de partage (ROMOD-...)'],
+    'pre.import': ['Import code', 'Importer le code'], 'pre.save': ['Save current mods as preset', 'Enregistrer les mods actuels'],
+    'pre.importNote': ['Mods in a preset that you don\'t have yet are downloaded when you load it.', 'Les mods d\'un préréglage que vous n\'avez pas encore sont téléchargés au chargement.'],
+    'pre.saveTitle': ['Save preset', 'Enregistrer le préréglage'], 'pre.saveText': ['Name for these {n} mods. Using an existing name updates that preset.', 'Nom pour ces {n} mods. Un nom existant met ce préréglage à jour.'],
+    'pre.renameTitle': ['Rename preset', 'Renommer le préréglage'], 'pre.importTitle': ['Import preset', 'Importer un préréglage'],
+    'pre.importText': ['{n} mods. Name it:', '{n} mods. Nommez-le :'], 'pre.badCode': ['That isn\'t a preset share code.', 'Ce n\'est pas un code de partage de préréglage.'],
+    'pre.copied': ['Share code copied. Paste it on Discord or anywhere.', 'Code copié. Collez-le sur Discord ou ailleurs.'],
+    'pre.delTitle': ['Delete preset', 'Supprimer le préréglage'], 'pre.delText': ['Delete the preset "{p}"? Your mods stay installed.', 'Supprimer le préréglage « {p} » ? Vos mods restent installés.'],
+    'quick.title': ['Play with preset', 'Jouer avec un préréglage'], 'quick.mods': ['{n} mods', '{n} mods'], 'quick.mods1': ['1 mod', '1 mod'],
+    'ok': ['OK', 'OK'], 'cancel': ['Cancel', 'Annuler'],
+    'opt.repair': ['Check and repair', 'Vérifier et réparer'], 'opt.repairBtn': ['Check all mods', 'Vérifier tous les mods'],
+    'opt.repairNote': ['Re-checks every mod file and downloads any that are damaged or missing.', 'Revérifie chaque fichier et retélécharge ceux qui sont abîmés ou manquants.'],
+    'd.history': ['Version history', 'Historique des versions'], 'd.tested': ['Checked on', 'Vérifié sur'], 'd.testedYes': ['This game build', 'Cette version du jeu'],
+    'd.testedNo': ['An older game build', 'Une version plus ancienne'], 'al.untested': ['Not checked on this build yet: {m}', 'Pas encore vérifiés sur cette version : {m}'],
+    'col.pop': ['Popularity', 'Popularité'], 'd.rating': ['Rating', 'Note'], 'd.downloads': ['Downloads', 'Téléchargements'], 'd.myRating': ['Your rating', 'Votre note'],
+    'd.noRatings': ['No ratings yet', 'Pas encore de note'], 'd.ratings': ['{n} ratings', '{n} notes'], 'd.ratings1': ['1 rating', '1 note'],
+    'd.rateNeedsDownload': ['Download it to rate it', 'Téléchargez-le pour le noter'], 'd.removeRating': ['Remove', 'Retirer'],
+    'reg.title': ['Before your first rating', 'Avant votre première note'],
+    'reg.text': ['Ratings need a name and email, once per PC. They stay private: only the average and the number of ratings are shown.', 'Les notes demandent un nom et un e-mail, une seule fois par PC. Ils restent privés : seuls la moyenne et le nombre de notes sont affichés.'],
+    'reg.name': ['Name or nickname', 'Nom ou pseudo'], 'reg.email': ['Email', 'E-mail'],
+    'reg.consent': ['The modding hub may store my name and email to run ratings and, later, mod uploads.', 'Le hub de modding peut conserver mon nom et mon e-mail pour les notes et, plus tard, l\'envoi de mods.'],
+    'reg.privacy': ['Privacy', 'Confidentialité'], 'reg.save': ['Save and rate', 'Enregistrer et noter'], 'reg.saveOnly': ['Save', 'Enregistrer'],
+    'reg.badName': ['Enter a name of 2 to 40 characters.', 'Entrez un nom de 2 à 40 caractères.'], 'reg.badEmail': ['Enter a valid email address.', 'Entrez une adresse e-mail valide.'],
+    'reg.needTick': ['Tick the box to continue.', 'Cochez la case pour continuer.'], 'reg.saving': ['Saving...', 'Enregistrement...'],
+    'opt.profile': ['Your details', 'Vos coordonnées'], 'opt.deleteDetails': ['Delete my details', 'Supprimer mes coordonnées'], 'opt.noProfile': ['Not given yet (asked before your first rating)', 'Pas encore données (demandées avant votre première note)'],
+    'view.grid': ['Grid', 'Grille'], 'view.list': ['List', 'Liste'], 'd.enlarge': ['Click to enlarge', 'Cliquez pour agrandir'], 'lb.count': ['{i} of {n}', '{i} sur {n}'],
     'src.steam': ['Steam · Rescue Ops developers', 'Steam · Développeurs de Rescue Ops'], 'src.hub': ['Modding hub', 'Hub de modding'], 'src.launcher': ['Mod launcher', 'Mod launcher'],
     'kind.patch': ['PATCH', 'PATCH'], 'kind.official': ['OFFICIAL', 'OFFICIEL'], 'kind.hub': ['HUB', 'HUB'], 'kind.mods': ['MODS', 'MODS'], 'kind.event': ['EVENT', 'ÉVÉNEMENT'],
     'al.updates': ['{n} updates available', '{n} mises à jour disponibles'], 'al.update1': ['1 update available', '1 mise à jour disponible'],
@@ -338,7 +495,7 @@ table.modt { table-layout: fixed; }
   function day(ts) { var d = new Date(ts * 1000); return d.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-AU', { day: 'numeric', month: 'short' }); }
 
   // ---------------------------------------------------------------- state
-  var S = { settings: {}, state: null, news: [], screen: 'dashboard', sub: {}, selected: null, busy: false, running: false };
+  var S = { stats: null, settings: {}, state: null, news: [], screen: 'dashboard', sub: {}, selected: null, busy: false, running: false };
 
   // ---------------------------------------------------------------- layout helpers
   function fit() {
@@ -353,8 +510,9 @@ table.modt { table-layout: fixed; }
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.dataset.t); });
     document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = t(el.dataset.tp); });
+    document.querySelectorAll('[data-tt]').forEach(function (el) { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
     var after = $('o-after'); after.innerHTML = ['minimise', 'close', 'none'].map(function (v) { return '<option value="' + v + '">' + esc(t('after.' + v)) + '</option>'; }).join('');
-    var start = $('o-start'); start.innerHTML = '<option value="dashboard">' + esc(t('tab.dashboard')) + '</option><option value="mods">' + esc(t('nav.mods').charAt(0) + t('nav.mods').slice(1).toLowerCase()) + '</option>';
+    var start = $('o-start'); start.innerHTML = '<option value="dashboard">' + esc(t('tab.dashboard')) + '</option><option value="mods">' + esc(t('nav.mods').charAt(0) + t('nav.mods').slice(1).toLowerCase()) + '</option><option value="presets">' + esc(t('tab.presets')) + '</option>';
     $('f-sort').innerHTML = ['category', 'name', 'author'].map(function (v) { return '<option value="' + v + '">' + esc(t('sort.' + v)) + '</option>'; }).join('');
     syncOptions();
   }
@@ -362,6 +520,7 @@ table.modt { table-layout: fixed; }
   var TABS = {
     dashboard: [['tab.dashboard', null]],
     mods: [['tab.loaded', 'mods-loaded'], ['tab.all', 'mods-all'], ['tab.updates', 'mods-updates']],
+    presets: [['tab.presets', null]],
     options: [['tab.launcher', 'opt-launcher'], ['tab.game', 'opt-game'], ['tab.help', 'opt-help']]
   };
   function go(screen, sub) {
@@ -399,24 +558,49 @@ table.modt { table-layout: fixed; }
     if (m.state === 'Available') parts.push('<span class="dim">' + esc(t('st.Available')) + '</span>');
     if (m.replacedBy) parts.push('<span class="tag">' + esc(t('st.replaced', { b: m.replacedBy })) + '</span>');
     if (!m.loaded && m.conflicts.some(function (c) { return loadedList().some(function (l) { return l.name === c; }); })) parts.push('<span class="tag bad">' + esc(t('st.clash')) + '</span>');
-    if (m.loaded && m.testedBuild && S.state.game.version && m.testedBuild !== S.state.game.version) parts.push('<span class="tag">' + esc(t('st.untested')) + '</span>');
+    if (m.loaded && m.tested === false) parts.push('<span class="tag">' + esc(t('st.untested')) + '</span>');
     return parts.join(' ');
   }
   function thumb(src) { return src ? '<img class="thumb" src="' + esc(src) + '" alt="" onerror="this.outerHTML=\'<div class=thumb>.pak</div>\'">' : '<div class="thumb">.pak</div>'; }
   function head() {
-    return '<tr><th style="width:34px"></th><th>' + esc(t('col.mod')) + '</th><th style="width:96px">' + esc(t('col.author')) + '</th><th style="width:64px">' + esc(t('col.version')) +
-      '</th><th style="width:170px">' + esc(t('col.status')) + '</th><th style="width:70px;text-align:right">' + esc(t('col.size')) + '</th></tr>';
+    return '<tr><th style="width:34px"></th><th>' + esc(t('col.mod')) + '</th><th style="width:80px">' + esc(t('col.author')) + '</th><th style="width:58px">' + esc(t('col.version')) +
+      '</th><th style="width:130px">' + esc(t('col.status')) + '</th><th style="width:92px">' + esc(t('col.pop')) + '</th><th style="width:66px;text-align:right">' + esc(t('col.size')) + '</th></tr>';
   }
   function row(m) {
     return '<tr class="m' + (S.selected === m.id ? ' sel' : '') + '" data-id="' + esc(m.id) + '"><td><span class="cb' + (m.loaded ? ' on' : '') + '" data-toggle="' + esc(m.id) + '"></span></td>' +
       '<td><div class="modname" title="' + esc(m.name) + '">' + thumb(m.thumb) + '<span>' + esc(m.name) + '</span></div></td><td class="dim">' + esc(m.author) + '</td><td>' + esc(m.version) +
-      '</td><td>' + statusHtml(m) + '</td><td class="num">' + esc(size(m.size)) + '</td></tr>';
+      '</td><td class="st" title="' + esc(statusHtml(m).replace(/<[^>]+>/g, '')) + '">' + statusHtml(m) + '</td><td class="pop">' + popHtml(m.id, true) + '</td><td class="num">' + esc(size(m.size)) + '</td></tr>';
   }
   function localRow(l) {
     var m = { id: l.id, name: l.name, author: t('local'), version: '', loaded: l.loaded, size: l.size, thumb: null };
     return '<tr class="m' + (S.selected === l.id ? ' sel' : '') + '" data-id="' + esc(l.id) + '"><td><span class="cb' + (l.loaded ? ' on' : '') + '" data-toggle="' + esc(l.id) + '"></span></td>' +
-      '<td><div class="modname" title="' + esc(l.name) + '">' + thumb(null) + '<span>' + esc(l.name) + '</span></div></td><td class="dim">' + esc(m.author) + '</td><td class="dim">&#8212;</td><td class="dim">' + esc(t('st.local')) + '</td><td class="num">' + esc(size(l.size)) + '</td></tr>';
+      '<td><div class="modname" title="' + esc(l.name) + '">' + thumb(null) + '<span>' + esc(l.name) + '</span></div></td><td class="dim">' + esc(m.author) + '</td><td class="dim">&#8212;</td><td class="dim">' + esc(t('st.local')) + '</td><td></td><td class="num">' + esc(size(l.size)) + '</td></tr>';
   }
+  function img(src) { return src ? '<img src="' + esc(src) + '" alt="" onerror="this.remove()">' : ''; }
+  function cardHtml(id, name, imgSrc, loaded, sz, meta, status) {
+    return '<div class="card m' + (S.selected === id ? ' sel' : '') + '" data-id="' + esc(id) + '" title="' + esc(name) + '"><div class="ci">.pak' + img(imgSrc) +
+      '<span class="cb' + (loaded ? ' on' : '') + '" data-toggle="' + esc(id) + '"></span>' + (sz ? '<span class="sz">' + esc(size(sz)) + '</span>' : '') + '</div>' +
+      '<div class="cbd"><div class="cn">' + esc(name) + '</div><div class="cm">' + esc(meta) + '</div><div class="cr"><span class="cs">' + status + '</span><span class="pop">' + popHtml(id) + '</span></div></div></div>';
+  }
+  function card(m) {
+    var st = statusHtml(m) || (m.loaded ? '<span class="dim">' + esc(t('d.loaded')) + '</span>' : '');
+    return cardHtml(m.id, m.name, m.thumb, m.loaded, m.size, m.author + (m.version ? ' · v' + m.version : ''), st);
+  }
+  function localCard(l) { return cardHtml(l.id, l.name, null, l.loaded, l.size, t('local'), '<span class="dim">' + esc(t('st.local')) + '</span>'); }
+  function stat(id) { return S.stats && S.stats[id] ? S.stats[id] : null; }
+  function num(n) { n = n || 0; var loc = lang === 'fr' ? 'fr-FR' : 'en-AU'; return n >= 10000 ? (Math.round(n / 100) / 10).toLocaleString(loc) + 'k' : n.toLocaleString(loc); }
+  function dec(x) { return String(x).replace('.', lang === 'fr' ? ',' : '.'); }
+  function starsHtml(avg) {
+    var full = Math.round(avg || 0), h = '';
+    for (var i = 1; i <= 5; i++) h += i <= full ? '&#9733;' : '<span class="off">&#9733;</span>';
+    return '<span class="stars">' + h + '</span>';
+  }
+  // Rating and downloads in one short line; blank until the hub answers.
+  function popHtml(id, compact) {
+    var s = stat(id); if (!s) return '';
+    return (s.ratings ? '<span class="stars">&#9733;</span> <b>' + esc(dec(s.rating)) + '</b>' + (compact ? '' : ' (' + esc(num(s.ratings)) + ')') + ' · ' : '') + esc(num(s.downloads)) + ' &#8595;';
+  }
+  function gallery(m) { var g = (m.screenshots || []).slice(); if (!g.length && m.thumb) g.push(m.thumb); return g; }
 
   // ---------------------------------------------------------------- render
   function render() {
@@ -434,9 +618,123 @@ table.modt { table-layout: fixed; }
     renderGameInfo();
     renderDashboard();
     renderMods();
+    renderPresets();
     renderOptionsData();
     renderTabs();
   }
+
+  // ---------------------------------------------------------------- presets
+  function presets() { return S.settings.presets || []; }
+  function currentIds() {
+    return loadedList().map(function (m) { return m.id; }).concat(S.state ? S.state.local.filter(function (l) { return l.loaded; }).map(function (l) { return l.id; }) : []);
+  }
+  function sameSet(a, b) {
+    var x = a.map(function (s) { return s.toLowerCase(); }).sort(), y = b.map(function (s) { return s.toLowerCase(); }).sort();
+    return x.length === y.length && x.every(function (v, i) { return v === y[i]; });
+  }
+  // What a preset shows: mod names, without the shared bases a player never picks by hand.
+  function presetNames(ids) {
+    var names = [], missing = 0;
+    ids.forEach(function (id) {
+      if (id.indexOf('local:') === 0) { if (S.state && S.state.local.some(function (l) { return l.id.toLowerCase() === id.toLowerCase(); })) names.push(id.slice(6)); else missing++; return; }
+      var m = modById(id);
+      if (!m) missing++; else if (!m.hidden) names.push(m.name);
+    });
+    return { names: names, missing: missing };
+  }
+  function presetSummary(ids) {
+    var p = presetNames(ids), shown = p.names.slice(0, 4).join(', ') + (p.names.length > 4 ? ', +' + (p.names.length - 4) : '');
+    return (shown || t('pre.none')) + (p.missing ? ' · ' + t('pre.missing', { n: p.missing }) : '');
+  }
+  function renderPresets() {
+    if (!S.state) return;
+    var cur = currentIds(), dis = S.busy || S.running ? ' disabled' : '';
+    var rows = [{ id: 'base', name: t('pre.base'), mods: [], lastPlayed: 0, base: true }].concat(presets().slice().sort(function (a, b) { return b.lastPlayed - a.lastPlayed || a.name.localeCompare(b.name); }));
+    $('preset-list').innerHTML = rows.map(function (p) {
+      var isCur = sameSet(p.mods, cur);
+      return '<tr class="' + (isCur ? 'cur' : '') + '"><td data-cur="' + esc(t('pre.current')) + '">' + esc(p.name) + '</td><td>' + esc(presetSummary(p.mods)) + '</td><td class="dim">' +
+        esc(p.base ? '' : p.lastPlayed ? day(p.lastPlayed) : t('pre.never')) + '</td><td>' +
+        (isCur ? '' : '<button class="btn" data-preset="load" data-pid="' + esc(p.id) + '"' + dis + '>' + esc(t('pre.load')) + '</button>') +
+        (p.base ? '' : '<button class="btn" data-preset="share" data-pid="' + esc(p.id) + '">' + esc(t('pre.share')) + '</button><button class="btn" data-preset="rename" data-pid="' + esc(p.id) + '">' + esc(t('pre.rename')) +
+          '</button><button class="btn" data-preset="delete" data-pid="' + esc(p.id) + '">' + esc(t('pre.delete')) + '</button>') +
+        '<button class="btn red" data-preset="play" data-pid="' + esc(p.id) + '"' + dis + '>' + esc(t('pre.play')) + '</button></td></tr>';
+    }).join('') + (presets().length ? '' : '<tr><td colspan="4" class="empty">' + esc(t('pre.empty')) + '</td></tr>');
+    $('play-drop').disabled = $('play').disabled;
+  }
+  function renderQuick() {
+    var cur = currentIds();
+    var list = [{ id: 'base', name: t('pre.base'), mods: [] }].concat(presets().slice().sort(function (a, b) { return b.lastPlayed - a.lastPlayed || a.name.localeCompare(b.name); }));
+    $('quick').innerHTML = '<div class="h">' + esc(t('quick.title')) + '</div>' + list.map(function (p) {
+      var n = presetNames(p.mods).names.length;
+      return '<button data-quick="' + esc(p.id) + '">' + esc(p.name) + '<span>' + esc(sameSet(p.mods, cur) ? t('pre.current').replace(/[()]/g, '') : n === 0 ? t('pre.none') : n === 1 ? t('quick.mods1') : t('quick.mods', { n: n })) + '</span></button>';
+    }).join('');
+  }
+  // Share codes: ROMOD- + base64url of {n: name, m: [ids]}. Local paks are left out (no one else has them).
+  function encodeCode(p) {
+    var json = JSON.stringify({ n: p.name, m: p.mods.filter(function (id) { return id.indexOf('local:') !== 0; }) });
+    return 'ROMOD-' + btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decodeCode(code) {
+    var m = /^\s*ROMOD-([A-Za-z0-9_-]+)\s*$/.exec(code || '');
+    if (!m) return null;
+    try {
+      var b = m[1].replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '=';
+      var d = JSON.parse(decodeURIComponent(escape(atob(b))));
+      if (typeof d.n !== 'string' || !Array.isArray(d.m)) return null;
+      return { name: d.n.slice(0, 60), mods: d.m.filter(function (x) { return typeof x === 'string' && /^[A-Za-z0-9_.-]{1,80}$/.test(x); }) };
+    } catch (e) { return null; }
+  }
+  function note(text) { $('status-text').textContent = text; clearTimeout(statusTimer); statusTimer = setTimeout(function () { $('status-text').textContent = ''; }, 8000); }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { note(t('pre.copied')); }, function () { fallbackCopy(text); });
+    else fallbackCopy(text);
+  }
+  function fallbackCopy(text) { var i = $('pre-code'); i.value = text; i.select(); try { document.execCommand('copy'); note(t('pre.copied')); } catch (e) { } }
+
+  // A one-line text question (preset names). cb gets the trimmed text, or nothing on cancel.
+  var promptCb = null;
+  function ask(title, text, value, cb) {
+    $('prompt-title').textContent = title; $('prompt-text').textContent = text;
+    var i = $('prompt-input'); i.value = value || ''; promptCb = cb;
+    $('dlg-prompt').classList.add('open'); i.focus(); i.select();
+  }
+  function closePrompt(ok) {
+    var cb = promptCb, v = $('prompt-input').value.trim(); promptCb = null;
+    $('dlg-prompt').classList.remove('open');
+    if (ok && cb && v) cb(v);
+  }
+  $('prompt-ok').addEventListener('click', function () { closePrompt(true); });
+  $('prompt-cancel').addEventListener('click', function () { closePrompt(false); });
+  $('prompt-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') closePrompt(true); else if (e.key === 'Escape') { e.stopPropagation(); closePrompt(false); } });
+
+  function presetAction(act, id) {
+    var p = presets().filter(function (x) { return x.id === id; })[0];
+    if (act === 'load') send('applyPreset', { id: id, play: false });
+    else if (act === 'play') send('applyPreset', { id: id, play: true });
+    else if (!p) return;
+    else if (act === 'share') { var code = encodeCode(p); $('pre-code').value = code; copyText(code); }
+    else if (act === 'rename') ask(t('pre.renameTitle'), '', p.name, function (v) { send('renamePreset', { id: id, name: v }); });
+    else if (act === 'delete') confirmDelete(p);
+  }
+  function confirmDelete(p) {
+    pendingDelete = p.id;
+    openAsk('deletePreset', t('pre.delTitle'), t('pre.delText', { p: p.name }), [t('pre.delete'), t('cancel')]);
+  }
+  var pendingDelete = null;
+  $('pre-save').addEventListener('click', function () {
+    ask(t('pre.saveTitle'), t('pre.saveText', { n: presetNames(currentIds()).names.length }), '', function (v) { send('savePreset', { name: v }); });
+  });
+  $('pre-import').addEventListener('click', function () {
+    var d = decodeCode($('pre-code').value);
+    if (!d) { showError(t('pre.badCode')); return; }
+    ask(t('pre.importTitle'), t('pre.importText', { n: presetNames(d.mods).names.length + presetNames(d.mods).missing }), d.name, function (v) { send('savePreset', { name: v, ids: d.mods }); $('pre-code').value = ''; });
+  });
+  $('play-drop').addEventListener('click', function (e) { e.stopPropagation(); renderQuick(); $('quick').classList.toggle('open'); });
+  $('quick').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-quick]'); if (!b) return;
+    $('quick').classList.remove('open'); send('applyPreset', { id: b.dataset.quick, play: true });
+  });
+  document.addEventListener('mousedown', function (e) { if (!e.target.closest('#quick,#play-drop')) $('quick').classList.remove('open'); });
 
   function renderGameInfo() {
     var st = S.state; if (!st) return;
@@ -450,15 +748,18 @@ table.modt { table-layout: fixed; }
   }
 
   function renderDashboard() {
-    var st = S.state;
-    $('band-cap').textContent = st ? t('dash.cap', { n: loadedCount() }) : '';
-    // news
+    var st = S.state, n = loadedCount();
+    $('hero-title').textContent = !st ? '' : n === 0 ? t('dash.hero0') : n === 1 ? t('dash.hero1') : t('dash.hero', { n: n });
+    $('hero-sub').textContent = $('game-info').textContent;
+    // news: a short feed; the full list is on Steam
     var unread = S.news.filter(function (x) { return x.unread; }).length;
     $('news-count').textContent = unread ? t('dash.unread', { n: unread }) : '';
-    $('news').innerHTML = S.news.length ? S.news.slice(0, 12).map(function (x) {
-      return '<tr data-news="' + esc(x.id) + '" data-url="' + esc(x.url || '') + '"><td>' + esc(day(x.date)) + '</td><td>' + (x.unread ? '<span class="unread"></span>' : '') +
-        '<span class="kind ' + esc(x.kind) + '">' + esc(t('kind.' + x.kind)) + '</span><b>' + esc(x.title) + '</b><div class="src">' + esc(x.summary ? x.summary : t('src.' + x.source)) + '</div></td></tr>';
-    }).join('') : '<tr><td colspan="2" class="empty">' + esc(t('dash.noNews')) + '</td></tr>';
+    $('news').innerHTML = S.news.length ? S.news.slice(0, 6).map(function (x) {
+      return '<div class="nitem" data-news="' + esc(x.id) + '" data-url="' + esc(x.url || '') + '"><div class="nm">' + (x.unread ? '<span class="unread"></span>' : '') +
+        '<span class="kind ' + esc(x.kind) + '">' + esc(t('kind.' + x.kind)) + '</span>' + esc(day(x.date)) + '</div><div class="nt">' + esc(x.title) + '</div>' +
+        (x.summary ? '<div class="ns">' + esc(x.summary) + '</div>' : '') + '</div>';
+    }).join('') + '<a class="nmore" href="#" data-url="https://store.steampowered.com/news/app/2915770">' + esc(t('dash.allNews')) + ' &#8250;</a>'
+      : '<div class="empty">' + esc(t('dash.noNews')) + '</div>';
     // alerts
     var a = [];
     if (st) {
@@ -468,22 +769,28 @@ table.modt { table-layout: fixed; }
       var u = countUpdates();
       if (u) a.push([u === 1 ? t('al.update1') : t('al.updates', { n: u }), mods().filter(function (m) { return m.state === 'UpdateAvailable'; }).map(function (m) { return m.name + ' ' + m.version; }).join(', '),
         '<button class="btn red" data-act="updateAll">' + esc(t('al.updateAll')) + '</button>']);
-      if (st.game.updated) a.push([t('al.gameUpdated') + (st.game.version ? ' (' + st.game.version + ')' : ''), t('al.gameUpdatedText'), '<button class="btn" data-act="dismissGame">' + esc(t('al.ok')) + '</button>', true]);
+      var untested = loadedList().filter(function (m) { return m.tested === false; }).map(function (m) { return m.name; });
+      if (st.game.updated) a.push([t('al.gameUpdated') + (st.game.version ? ' (' + st.game.version + ')' : ''), t('al.gameUpdatedText') + (untested.length ? ' ' + t('al.untested', { m: untested.join(', ') }) : ''), '<button class="btn" data-act="dismissGame">' + esc(t('al.ok')) + '</button>', true]);
       mods().filter(function (m) { return m.replacedBy && m.state !== 'NotDownloaded'; }).forEach(function (m) {
         a.push([t('al.replaced', { a: m.name, b: m.replacedBy }), '', '<button class="btn" data-act="switch" data-id="' + esc(m.id) + '">' + esc(t('al.switch')) + '</button>']);
       });
     }
-    $('alerts').innerHTML = a.length ? a.map(function (x) {
-      return '<tr><td>' + (x[3] ? '<span class="warn">' + esc(x[0]) + '</span>' : esc(x[0])) + (x[1] ? '<div class="dim">' + esc(x[1]) + '</div>' : '') + '</td><td>' + x[2] + '</td></tr>';
-    }).join('') : '<tr><td class="empty">' + esc(t('dash.noAlerts')) + '</td></tr>';
-    // loads
+    // alerts only show when something needs attention
+    $('alerts').style.display = a.length ? '' : 'none';
+    $('alerts').innerHTML = a.map(function (x) {
+      return '<div class="al"><div>' + (x[3] ? '<span class="warn">' + esc(x[0]) + '</span>' : esc(x[0])) + (x[1] ? '<div class="dim">' + esc(x[1]) + '</div>' : '') + '</div>' + x[2] + '</div>';
+    }).join('');
+    // loaded mods as thumbnails; a click opens the mod on the Mods page
     var loads = loadedList(), locals = st ? st.local.filter(function (l) { return l.loaded; }) : [], total = 0;
     loads.forEach(function (m) { total += m.size; }); locals.forEach(function (l) { total += l.size; });
     $('loads-size').textContent = total ? size(total) : '';
-    $('loads').innerHTML = loads.length + locals.length ? loads.map(function (m) {
-      return '<tr><td>' + esc(m.name) + (m.state === 'UpdateAvailable' ? ' <span class="tag">' + esc(t('st.UpdateAvailable', { v: m.version })) + '</span>' : '') + '</td><td class="num">' + esc(m.version) + '</td></tr>';
-    }).join('') + locals.map(function (l) { return '<tr><td>' + esc(l.name) + ' <span class="dim">· ' + esc(t('local')) + '</span></td><td class="num"></td></tr>'; }).join('')
-      : '<tr><td class="empty">' + esc(t('dash.noLoaded')) + '</td></tr>';
+    var tile = function (id, name, src, sub) {
+      return '<div class="tile" data-open="' + esc(id) + '" title="' + esc(name) + '"><div class="ti">' + (src ? '<img src="' + esc(src) + '" alt="" onerror="this.remove()">' : '.pak') + '</div><div class="tn">' + esc(name) + '<small>' + sub + '</small></div></div>';
+    };
+    $('loads').innerHTML = loads.length + locals.length ? '<div class="tiles">' + loads.map(function (m) {
+      return tile(m.id, m.name, m.thumb, m.state === 'UpdateAvailable' ? '<span class="tag">' + esc(t('st.UpdateAvailable', { v: m.version })) + '</span>' : esc('v' + m.version));
+    }).join('') + locals.map(function (l) { return tile(l.id, l.name, null, esc(t('local'))); }).join('') + '</div>'
+      : '<div class="empty">' + esc(t('dash.noLoaded')) + '</div>';
   }
 
   function filtered(list) {
@@ -494,21 +801,25 @@ table.modt { table-layout: fixed; }
       return !q || (m.name + ' ' + m.author + ' ' + (m.description || '')).toLowerCase().indexOf(q) >= 0;
     });
   }
-  function grouped(list, locals) {
+  // The same grouping drives both views; grid = cards under category headings, list = table rows under group rows.
+  function grouped(list, locals, emptyText) {
+    var grid = S.settings.modsView !== 'list';
+    var item = grid ? card : row, localItem = grid ? localCard : localRow;
+    var grp = function (label) { return grid ? '<div class="cgrp">' + esc(label) + '</div>' : '<tr class="grp"><td colspan="7">' + esc(label) + '</td></tr>'; };
     var sort = $('f-sort').value, html = '';
+    if (!list.length && !locals.length) return grid ? '<div class="empty">' + esc(emptyText) + '</div>'
+      : '<table class="modt"><thead>' + head() + '</thead><tbody><tr><td colspan="7" class="empty">' + esc(emptyText) + '</td></tr></tbody></table>';
     if (sort === 'name' || sort === 'author') {
       list = list.slice().sort(function (a, b) { return (sort === 'author' ? a.author.localeCompare(b.author) || 0 : 0) || a.name.localeCompare(b.name); });
-      html = list.map(row).join('');
+      html = list.map(item).join('');
     } else {
       var cats = [];
       list.forEach(function (m) { if (cats.indexOf(m.category) < 0) cats.push(m.category); });
       cats.sort(function (a, b) { return (a === 'Tools' || a === 'Other') - (b === 'Tools' || b === 'Other') || a.localeCompare(b); });
-      cats.forEach(function (c) {
-        html += '<tr class="grp"><td colspan="6">' + esc(catLabel(c)) + '</td></tr>' + list.filter(function (m) { return m.category === c; }).map(row).join('');
-      });
+      cats.forEach(function (c) { html += grp(catLabel(c)) + list.filter(function (m) { return m.category === c; }).map(item).join(''); });
     }
-    if (locals.length) html += '<tr class="grp"><td colspan="6">' + esc(catLabel('Added by you')) + '</td></tr>' + locals.map(localRow).join('');
-    return html;
+    if (locals.length) html += grp(catLabel('Added by you')) + locals.map(localItem).join('');
+    return grid ? '<div class="cards">' + html + '</div>' : '<table class="modt"><thead>' + head() + '</thead><tbody>' + html + '</tbody></table>';
   }
 
   function renderMods() {
@@ -520,16 +831,16 @@ table.modt { table-layout: fixed; }
     $('f-cat').innerHTML = '<option value="">' + esc(t('cat.all')) + '</option>' + cats.sort().map(function (c) { return '<option value="' + esc(c) + '">' + esc(catLabel(c)) + '</option>'; }).join('');
     $('f-author').innerHTML = '<option value="">' + esc(t('author.all')) + '</option>' + authors.sort().map(function (a) { return '<option value="' + esc(a) + '">' + esc(a) + '</option>'; }).join('');
     $('f-cat').value = cv; $('f-author').value = av;
-    $('th1').innerHTML = head(); $('th2').innerHTML = head();
+    document.querySelectorAll('[data-view]').forEach(function (b) { b.classList.toggle('on', b.dataset.view === (S.settings.modsView === 'list' ? 'list' : 'grid')); });
     var q = $('q').value.trim().toLowerCase();
     var localsAll = st.local.filter(function (l) { return !q || l.name.toLowerCase().indexOf(q) >= 0; });
     var loaded = filtered(loadedList()), localsLoaded = localsAll.filter(function (l) { return l.loaded; });
     var total = 0; loadedList().forEach(function (m) { total += m.size; }); st.local.forEach(function (l) { if (l.loaded) total += l.size; });
     $('loaded-sum').textContent = t('mods.loadedSum', { n: loadedCount(), s: size(total) || '0 KB' });
-    $('list-loaded').innerHTML = loaded.length + localsLoaded.length ? grouped(loaded, localsLoaded) : '<tr><td colspan="6" class="empty">' + esc(t('mods.noLoaded')) + '</td></tr>';
+    $('list-loaded').innerHTML = grouped(loaded, localsLoaded, t('mods.noLoaded'));
     var all = filtered(visibleMods());
     $('all-sum').textContent = t('mods.allSum', { n: visibleMods().length + st.local.length });
-    $('list-all').innerHTML = all.length + localsAll.length ? grouped(all, localsAll) : '<tr><td colspan="6" class="empty">' + esc(t('mods.noMatch')) + '</td></tr>';
+    $('list-all').innerHTML = grouped(all, localsAll, t('mods.noMatch'));
     var ups = mods().filter(function (m) { return m.state === 'UpdateAvailable'; });
     $('update-all').disabled = !ups.length || S.busy || S.running;
     $('list-updates').innerHTML = ups.length ? ups.map(function (m) {
@@ -554,21 +865,72 @@ table.modt { table-layout: fixed; }
     }
     var stText = m.state === 'Loaded' ? t('d.loaded') : m.state === 'Available' ? t('d.available') : m.state === 'NotDownloaded' ? t('d.notDownloaded') : t('d.outdated');
     var change = (m.changelog || []).filter(function (e) { return e.version === m.version; })[0];
+    var older = (m.changelog || []).filter(function (e) { return e !== change; });
     var main = m.state === 'NotDownloaded' ? ['load', 'b.install'] : m.state === 'UpdateAvailable' ? ['update', 'b.update'] : m.loaded ? ['unload', 'b.unload'] : ['load', 'b.load'];
     var list = function (a) { return a && a.length ? a.join(', ') : t('d.nothing'); };
-    el.innerHTML = '<div class="ph">' + esc(catLabel(m.category)) + '</div>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="" onerror="this.outerHTML=\'<div class=noimg></div>\'">' : '<div class="noimg"></div>') +
+    var shots = gallery(m);
+    el.innerHTML = '<div class="ph">' + esc(catLabel(m.category)) + '</div>' + (m.thumb ? '<button class="shot" data-gallery="' + esc(m.id) + '" title="' + esc(t('d.enlarge')) + '"><img src="' + esc(m.thumb) +
+      '" alt="" onerror="this.parentNode.outerHTML=\'<div class=noimg></div>\'"><span class="n">&#10530; ' + (shots.length > 1 ? esc(t('lb.count', { i: 1, n: shots.length })) : '') + '</span></button>' : '<div class="noimg"></div>') +
       '<div class="in"><h3>' + esc(m.name.toUpperCase()) + '</h3>' + (m.description ? '<div>' + esc(m.description) + '</div>' : '') +
       '<dl><dt>' + esc(t('d.author')) + '</dt><dd>' + esc(m.author) + '</dd><dt>' + esc(t('d.version')) + '</dt><dd>' + esc(m.version) + '</dd>' +
       '<dt>' + esc(t('d.status')) + '</dt><dd>' + esc(stText) + '</dd>' +
       (m.requires.length ? '<dt>' + esc(t('d.needs')) + '</dt><dd>' + esc(list(m.requires)) + '</dd>' : '') +
       (m.includes.length ? '<dt>' + esc(t('d.includes')) + '</dt><dd>' + esc(list(m.includes)) + '</dd>' : '') +
       (m.conflicts.length ? '<dt>' + esc(t('d.clashes')) + '</dt><dd>' + esc(list(m.conflicts)) + '</dd>' : '') +
-      (m.size ? '<dt>' + esc(t('d.size')) + '</dt><dd>' + esc(size(m.size)) + '</dd>' : '') + '</dl>' +
+      (m.size ? '<dt>' + esc(t('d.size')) + '</dt><dd>' + esc(size(m.size)) + '</dd>' : '') +
+      ratingRows(m) +
+      (m.testedBuild ? '<dt>' + esc(t('d.tested')) + '</dt><dd' + (m.tested ? '' : ' class="warn"') + '>' + esc(t(m.tested ? 'd.testedYes' : 'd.testedNo')) + '</dd>' : '') + '</dl>' +
       (change && change.notes && change.notes.length ? '<div><span class="dim">' + esc(t('d.changes', { v: m.version })) + '</span><ul>' + change.notes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' : '') +
+      (older.length ? '<details><summary>' + esc(t('d.history')) + '</summary><div class="hist">' + older.map(function (e) {
+        return '<div><b>' + esc(e.version) + '</b><ul>' + (e.notes || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>';
+      }).join('') + '</div></details>' : '') +
       '<div class="acts"><button class="btn red" data-act="' + main[0] + '" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t(main[1])) + '</button>' +
       (m.page ? '<button class="btn" data-url="' + esc(m.page) + '">' + esc(t('b.page')) + '</button>' : '') +
       (m.state !== 'NotDownloaded' ? '<button class="btn" data-act="remove" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t('b.delete')) + '</button>' : '') + '</div></div>';
   }
+
+  function ratingRows(m) {
+    var s = stat(m.id), mine = (S.settings.myRatings || {})[m.id] || 0, h = '';
+    if (s) {
+      h += '<dt>' + esc(t('d.rating')) + '</dt><dd>' + (s.ratings ? starsHtml(s.rating) + ' <span class="dim">' + esc(dec(s.rating)) + ' · ' +
+        esc(s.ratings === 1 ? t('d.ratings1') : t('d.ratings', { n: num(s.ratings) })) + '</span>' : '<span class="dim">' + esc(t('d.noRatings')) + '</span>') + '</dd>';
+      h += '<dt>' + esc(t('d.downloads')) + '</dt><dd>' + esc(num(s.downloads)) + '</dd>';
+    }
+    h += '<dt>' + esc(t('d.myRating')) + '</dt><dd>';
+    if (m.state === 'NotDownloaded' && !mine) h += '<span class="dim">' + esc(t('d.rateNeedsDownload')) + '</span>';
+    else {
+      h += '<span class="myrate">';
+      for (var i = 1; i <= 5; i++) h += '<button data-rate="' + i + '" data-rid="' + esc(m.id) + '" class="' + (i <= mine ? 'on' : '') + '" aria-label="' + i + '">&#9733;</button>';
+      h += '</span>' + (mine ? ' <button class="linkbtn" data-rate="0" data-rid="' + esc(m.id) + '">' + esc(t('d.removeRating')) + '</button>' : '');
+    }
+    return h + '</dd>';
+  }
+
+  // Name + email once per PC (kept by the launcher), then the rating that was waiting goes through.
+  var regPending = null;
+  function openReg(pending) {
+    regPending = pending || null;
+    $('reg-name').value = S.settings.profileName || ''; $('reg-email').value = S.settings.profileEmail || '';
+    $('reg-ok').querySelector('.cb').classList.toggle('on', !!S.settings.profileName);
+    $('reg-err').textContent = ''; $('reg-save').disabled = false;
+    $('reg-save').textContent = t(pending ? 'reg.save' : 'reg.saveOnly');
+    $('dlg-reg').classList.add('open'); $('reg-name').focus();
+  }
+  function rate(id, stars) {
+    if (!S.settings.profileName) { openReg({ modId: id, stars: stars }); return; }
+    send('rate', { modId: id, stars: String(stars) });
+  }
+  $('reg-ok').addEventListener('click', function (e) { if (e.target.closest('a')) return; this.querySelector('.cb').classList.toggle('on'); });
+  $('reg-cancel').addEventListener('click', function () { $('dlg-reg').classList.remove('open'); regPending = null; });
+  $('reg-save').addEventListener('click', function () {
+    var n = $('reg-name').value.trim(), em = $('reg-email').value.trim();
+    if (n.length < 2 || n.length > 40) { $('reg-err').textContent = t('reg.badName'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { $('reg-err').textContent = t('reg.badEmail'); return; }
+    if (!$('reg-ok').querySelector('.cb').classList.contains('on')) { $('reg-err').textContent = t('reg.needTick'); return; }
+    $('reg-err').textContent = t('reg.saving'); $('reg-save').disabled = true;
+    send('register', { name: n, email: em, modId: regPending ? regPending.modId : '', stars: regPending ? String(regPending.stars) : '' });
+  });
+  $('o-profile-edit').addEventListener('click', function () { openReg(null); });
 
   function syncOptions() {
     var s = S.settings;
@@ -578,6 +940,7 @@ table.modt { table-layout: fixed; }
     $('o-updates').querySelector('.cb').classList.toggle('on', s.checkUpdates !== false);
     $('o-smooth').querySelector('.cb').classList.toggle('on', s.smoothGraphics !== false);
     $('o-version').textContent = s.version || '';
+    $('o-profile').textContent = s.profileName ? s.profileName + ' · ' + s.profileEmail : t('opt.noProfile');
   }
   function renderOptionsData() {
     var st = S.state; if (!st) return;
@@ -601,15 +964,41 @@ table.modt { table-layout: fixed; }
     var dlg = $('dlg-ask'); if (!dlg.classList.contains('open')) return;
     dlg.classList.remove('open');
     if (dlg.dataset.id === 'launcherUpdate') { if (choice === 0) send('selfUpdate'); }
+    else if (dlg.dataset.id === 'deletePreset') { if (choice === 0 && pendingDelete) send('deletePreset', { id: pendingDelete }); pendingDelete = null; }
     else send('answer', { id: dlg.dataset.id, choice: String(choice) });
     if (askQueue.length) openAsk.apply(null, askQueue.shift());
   }
+  // screenshot viewer
+  var LB = { shots: [], i: 0 };
+  function openShots(m) { LB.shots = gallery(m); if (!LB.shots.length) return; LB.i = 0; showShot(); $('dlg-shots').classList.add('open'); }
+  function showShot() {
+    var n = LB.shots.length; LB.i = (LB.i + n) % n;
+    $('lb-img').src = LB.shots[LB.i];
+    $('lb-prev').style.display = $('lb-next').style.display = n > 1 ? '' : 'none';
+    $('lb-bar').innerHTML = n > 1 ? LB.shots.map(function (s, k) { return '<img src="' + esc(s) + '" alt="" data-shot="' + k + '"' + (k === LB.i ? ' class="on"' : '') + '>'; }).join('') +
+      '<span class="cnt">' + esc(t('lb.count', { i: LB.i + 1, n: n })) + '</span>' : '';
+  }
+  function closeShots() { $('dlg-shots').classList.remove('open'); $('lb-img').removeAttribute('src'); }
+  $('lb-prev').addEventListener('click', function () { LB.i--; showShot(); });
+  $('lb-next').addEventListener('click', function () { LB.i++; showShot(); });
+  $('lb-close').addEventListener('click', closeShots);
+  $('dlg-shots').addEventListener('click', function (e) {
+    if (e.target.dataset.shot !== undefined) { LB.i = +e.target.dataset.shot; showShot(); }
+    else if (e.target === this || e.target.id === 'lb-stage') closeShots();
+  });
+
   function showError(text) { $('toast-text').textContent = text; $('toast').classList.add('show'); clearTimeout(showError.timer); showError.timer = setTimeout(function () { $('toast').classList.remove('show'); }, 9000); }
 
   // ---------------------------------------------------------------- events
   document.addEventListener('click', function (e) {
-    var el = e.target.closest('[data-screen],[data-sub],[data-toggle],[data-act],[data-url],[data-news],[data-folder],[data-answer],[data-lang],tr.m');
+    if (e.target.closest('#dlg-shots')) return;
+    var el = e.target.closest('[data-screen],[data-sub],[data-toggle],[data-act],[data-url],[data-news],[data-folder],[data-answer],[data-lang],[data-view],[data-gallery],[data-open],[data-preset],[data-rate],.m[data-id]');
     if (!el) return;
+    if (el.dataset.preset) { presetAction(el.dataset.preset, el.dataset.pid); return; }
+    if (el.dataset.rate !== undefined) { rate(el.dataset.rid, +el.dataset.rate); return; }
+    if (el.dataset.view) { S.settings.modsView = el.dataset.view; send('setOption', { key: 'modsView', value: el.dataset.view }); renderMods(); return; }
+    if (el.dataset.gallery) { var gm = modById(el.dataset.gallery); if (gm) openShots(gm); return; }
+    if (el.dataset.open) { S.selected = el.dataset.open; go('mods', 'mods-loaded'); renderMods(); return; }
     if (el.dataset.lang) { setLanguage(el.dataset.lang); $('dlg-lang').classList.remove('open'); askUpdate(); return; }
     if (el.dataset.answer !== undefined) { answer(+el.dataset.answer); return; }
     if (el.dataset.screen) { go(el.dataset.screen); return; }
@@ -639,7 +1028,7 @@ table.modt { table-layout: fixed; }
       else send(a, { id: aid });
       return;
     }
-    if (el.matches('tr.m')) { S.selected = el.dataset.id; renderMods(); }
+    if (el.matches('.m[data-id]')) { S.selected = el.dataset.id; renderMods(); }
   });
   $('play').addEventListener('click', function () { send('play'); });
   $('add-files').addEventListener('click', function () { send('addFiles'); });
@@ -647,6 +1036,7 @@ table.modt { table-layout: fixed; }
   $('o-pick').addEventListener('click', function () { send('pickGame'); });
   $('o-diag').addEventListener('click', function () { send('copyDiagnostics'); });
   $('o-refresh').addEventListener('click', function () { send('refresh'); });
+  $('o-repair').addEventListener('click', function () { send('repair'); });
   $('toast-close').addEventListener('click', function () { $('toast').classList.remove('show'); });
   ['q', 'f-cat', 'f-author', 'f-sort'].forEach(function (id) { $(id).addEventListener('input', renderMods); });
   $('o-language').addEventListener('change', function () { setLanguage(this.value); });
@@ -655,6 +1045,17 @@ table.modt { table-layout: fixed; }
   $('o-updates').addEventListener('click', function () { send('setOption', { key: 'checkUpdates', value: !(S.settings.checkUpdates !== false) }); });
   $('o-smooth').addEventListener('click', function () { send('setOption', { key: 'smoothGraphics', value: !(S.settings.smoothGraphics !== false) }); });
   document.addEventListener('keydown', function (e) {
+    if ($('dlg-reg').classList.contains('open')) {
+      if (e.key === 'Escape') { $('dlg-reg').classList.remove('open'); regPending = null; }
+      else if (e.key === 'Enter' && e.target.tagName === 'INPUT') $('reg-save').click();
+      return;
+    }
+    if ($('dlg-shots').classList.contains('open')) {
+      if (e.key === 'Escape') closeShots();
+      else if (e.key === 'ArrowLeft') { LB.i--; showShot(); }
+      else if (e.key === 'ArrowRight') { LB.i++; showShot(); }
+      return;
+    }
     if (e.key === 'Escape' && $('dlg-ask').classList.contains('open')) answer(-1);
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && S.screen === 'mods') { e.preventDefault(); $('q').focus(); }
   });
@@ -675,10 +1076,14 @@ table.modt { table-layout: fixed; }
       S.settings = d;
       if (d.language) lang = d.language;
       applyStrings();
-      if (first) { first = false; go(d.startPage === 'mods' ? 'mods' : 'dashboard'); if (!d.language) $('dlg-lang').classList.add('open'); }
+      if (first) { first = false; go(d.startPage === 'mods' || d.startPage === 'presets' ? d.startPage : 'dashboard'); if (!d.language) $('dlg-lang').classList.add('open'); }
       render();
     } else if (ev === 'state') { S.state = d; S.running = d.game.running; render(); }
     else if (ev === 'news') { S.news = d; renderDashboard(); }
+    else if (ev === 'stats') { S.stats = d; renderMods(); }
+    else if (ev === 'registered') { $('dlg-reg').classList.remove('open'); regPending = null; }
+    else if (ev === 'registerFailed') { $('reg-err').textContent = d; $('reg-save').disabled = false; }
+    else if (ev === 'needRegister') openReg({ modId: d.modId, stars: d.stars });
     else if (ev === 'busy') { S.busy = d; render(); }
     else if (ev === 'gameRunning') { S.running = d; if (S.state) S.state.game.running = d; render(); }
     else if (ev === 'status') {

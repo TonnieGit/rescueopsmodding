@@ -21,6 +21,16 @@ It replaces the Mod Manager (`ModManager.cs`, built by `build.bat`), which is st
 
 It only moves or deletes files named in `mods.json` and paks the player added, never the game's own files.
 
+7. Presets (1.3) are saved in `state.json`. Share codes are `ROMOD-` + base64url of `{n: name, m: [mod ids]}`; local paks are left out.
+8. Ratings and download counts (1.3) come from the hub API in `/api` (Vercel functions):
+   - `GET /api/stats`: per mod `downloads` (GitHub's counter for `<id>.zip`, added up over every release), `rating` and `ratings`. Cached 5 minutes.
+   - `POST /api/register` `{installId, name, email, consent}`: once per PC, before the first rating.
+   - `POST /api/rate` `{installId, modId, stars}`: 1 to 5 sets the rating, 0 removes it.
+   Names, emails and ratings live in a Neon Postgres database (`DATABASE_URL`, added through Vercel Storage), never in Git.
+   The tables are created on first use. Optional env: `GITHUB_TOKEN` (higher GitHub API limit), `IP_SALT`. See `/privacy/`.
+9. `testedBuild` per mod (Steam build ids, comma-separated, set by `make-manifest.ps1`'s `$testedOn`): loaded mods not checked on the
+   player's build get a warning. Bump `$testedOn` after re-testing the mods on a new game patch.
+
 ## Code
 
 - `Launcher.cs`: entry point; loads the embedded WebView2 DLLs and extracts the UI.

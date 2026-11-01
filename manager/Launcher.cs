@@ -23,8 +23,8 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Mods for Rescue Ops: Wildfire")]
 [assembly: AssemblyCompany("Tonnie")]
 [assembly: AssemblyCopyright("Tonnie")]
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyFileVersion("1.3.0.0")]
 
 namespace RescueOpsModLauncher
 {
@@ -51,7 +51,7 @@ namespace RescueOpsModLauncher
 
     static class Program
     {
-        public const string AppVersion = "1.2.0";
+        public const string AppVersion = "1.3.0";
         public const string DefaultManifest = "https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/mods.json";
         public static readonly string DataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RescueOpsModLauncher");

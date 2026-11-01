@@ -32,6 +32,8 @@ namespace RescueOpsModLauncher
         LauncherInfo launcherUpdate;
         List<NewsItem> steamNews = new List<NewsItem>(), hubNews = new List<NewsItem>();
         string gameVersion;
+        Dictionary<string, object> stats;                // /api/stats "mods": downloads and ratings per mod id
+        const string Api = "https://rescueopsmodding.vercel.app/api/";
         bool busy, gameRunning, pageReady;
         readonly Dictionary<string, TaskCompletionSource<string>> asks = new Dictionary<string, TaskCompletionSource<string>>();
 
@@ -104,7 +106,7 @@ namespace RescueOpsModLauncher
             return int.TryParse(answer, out i) ? i : -1;
         }
 
-        void Error(string text) { Send("error", new Dictionary<string, object> { { "text", text } }); }
+        void Error(string text) { Log.Write("Error: " + text); Send("error", new Dictionary<string, object> { { "text", text } }); }
 
         // ---- Messages from the page ----
 
@@ -138,6 +140,13 @@ namespace RescueOpsModLauncher
                     case "markRead": foreach (string id in Ids(msg)) if (!settings.newsRead.Contains(id)) settings.newsRead.Add(id); settings.Save(); break;
                     case "copyDiagnostics": Clipboard.SetText(Diagnostics()); Status(T("Diagnostics copied. Paste them into your bug report.", "Diagnostic copié. Collez-le dans votre signalement."), -1); break;
                     case "selfUpdate": await Guard(DoSelfUpdate); break;
+                    case "savePreset": SavePreset(Str(msg, "name"), msg.ContainsKey("ids") ? Ids(msg) : null); break;
+                    case "renamePreset": RenamePreset(Str(msg, "id"), Str(msg, "name")); break;
+                    case "deletePreset": settings.presets.RemoveAll(p => p.id == Str(msg, "id")); settings.Save(); SendSettings(); break;
+                    case "applyPreset": { string pid = Str(msg, "id"); bool andPlay = msg.ContainsKey("play") && msg["play"] is bool && (bool)msg["play"]; await Guard(() => ApplyPreset(pid, andPlay)); break; }
+                    case "repair": await Guard(Repair); break;
+                    case "register": await Register(Str(msg, "name"), Str(msg, "email"), Str(msg, "modId"), Str(msg, "stars")); break;
+                    case "rate": await Rate(Str(msg, "modId"), Str(msg, "stars")); break;
                 }
             }
             catch (Exception ex) { Error(ex.Message); }
@@ -205,6 +214,7 @@ namespace RescueOpsModLauncher
             // News doesn't hold up the mod list.
             try { steamNews = await News.Steam(); gameVersion = News.LatestGameVersion(steamNews); } catch (Exception) { }
             try { hubNews = await News.Hub(); } catch (Exception) { }
+            await LoadStats();
             settings.Save();
             SendNews();
             await SendState();
@@ -241,8 +251,10 @@ namespace RescueOpsModLauncher
         {
             Send("settings", new Dictionary<string, object> {
                 { "version", Program.AppVersion }, { "language", settings.language }, { "afterStart", settings.afterStart },
-                { "checkUpdates", settings.checkUpdates }, { "smoothGraphics", settings.smoothGraphics }, { "startPage", settings.startPage },
-                { "gamePath", settings.gamePath }, { "devtools", opt.DevTools } });
+                { "checkUpdates", settings.checkUpdates }, { "smoothGraphics", settings.smoothGraphics }, { "startPage", settings.startPage }, { "modsView", settings.modsView },
+                { "gamePath", settings.gamePath }, { "devtools", opt.DevTools },
+                { "profileName", settings.profileName }, { "profileEmail", settings.profileEmail }, { "myRatings", settings.myRatings },
+                { "presets", settings.presets.Select(p => new Dictionary<string, object> { { "id", p.id }, { "name", p.name }, { "mods", p.mods }, { "lastPlayed", p.lastPlayed } }).ToList() } });
         }
 
         async Task SendState()
@@ -262,14 +274,14 @@ namespace RescueOpsModLauncher
                     ModInfo repl = mods.Get(m.replacedBy);
                     list.Add(new Dictionary<string, object> {
                         { "id", m.id }, { "name", m.name }, { "version", m.version }, { "author", m.author }, { "category", m.category },
-                        { "description", m.description }, { "page", m.page }, { "thumb", m.thumb }, { "hidden", m.hidden },
+                        { "description", m.description }, { "page", m.page }, { "thumb", m.thumb }, { "screenshots", m.screenshots ?? new List<string>() }, { "hidden", m.hidden },
                         { "state", st.ToString() }, { "loaded", lib != null && lib.IsLoaded(m) },
                         { "size", lib != null ? lib.SizeOf(m) : 0L },
                         { "requires", mods.Required(m).Select(r => r.name).ToList() },
                         { "includes", mods.Included(m).Select(r => r.name).ToList() },
                         { "conflicts", mods.Conflicts(m).Select(id => mods.Get(id)).Where(x => x != null).Select(x => x.name).ToList() },
                         { "replacedBy", repl != null ? repl.name : null }, { "replacedById", repl != null ? repl.id : null },
-                        { "testedBuild", m.testedBuild }, { "changelog", m.changelog } });
+                        { "testedBuild", m.testedBuild }, { "tested", TestedOn(m) }, { "changelog", m.changelog } });
                 }
             var local = new List<object>();
             if (lib != null)
@@ -303,6 +315,13 @@ namespace RescueOpsModLauncher
         }
 
         // ---- Mod changes ----
+
+        // testedBuild in mods.json: the Steam build ids the mod was checked on, comma-separated. Empty = not stated (no warning).
+        bool TestedOn(ModInfo m)
+        {
+            if (string.IsNullOrWhiteSpace(m.testedBuild) || app == null || string.IsNullOrEmpty(app.BuildId)) return true;
+            return m.testedBuild.Split(',').Any(b => b.Trim() == app.BuildId);
+        }
 
         bool IsLocal(string id) { return id != null && id.StartsWith("local:", StringComparison.Ordinal); }
 
@@ -404,6 +423,7 @@ namespace RescueOpsModLauncher
                 foreach (Tuple<ModInfo, string> s in staged) lib.Place(s.Item1, s.Item2, load);
                 if (load) foreach (ModInfo r in needed) lib.Load(r);
                 Status(T("Installed ", "Installé : ") + string.Join(", ", todo.Select(m => m.name)) + ".", -1);
+                Log.Write("Installed " + string.Join(", ", todo.Select(m => m.name + " " + m.version)));
             }
             finally
             {
@@ -463,6 +483,188 @@ namespace RescueOpsModLauncher
             }
         }
 
+        // ---- Presets ----
+
+        // Everything loaded right now, as preset ids.
+        List<string> CurrentIds()
+        {
+            if (lib == null) return new List<string>();
+            return mods.All.Where(m => lib.IsLoaded(m)).Select(m => m.id).Concat(lib.LocalMods().Where(l => l.Loaded).Select(l => l.Id)).ToList();
+        }
+
+        // Saves the loaded mods (or the ids given, for an imported code). A name that exists already is updated.
+        void SavePreset(string name, List<string> ids)
+        {
+            name = (name ?? "").Trim();
+            if (name.Length == 0) return;
+            if (name.Length > 60) name = name.Substring(0, 60);
+            List<string> list = (ids ?? CurrentIds()).Where(i => !string.IsNullOrEmpty(i)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            Preset p = settings.presets.FirstOrDefault(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
+            if (p == null) { p = new Preset { id = Guid.NewGuid().ToString("N"), name = name }; settings.presets.Add(p); }
+            p.mods = list;
+            settings.Save();
+            SendSettings();
+            Status(T("Saved the preset ", "Préréglage enregistré : ") + name + ".", -1);
+        }
+
+        void RenamePreset(string id, string name)
+        {
+            Preset p = settings.presets.FirstOrDefault(x => x.id == id);
+            name = (name ?? "").Trim();
+            if (p == null || name.Length == 0) return;
+            p.name = name.Length > 60 ? name.Substring(0, 60) : name;
+            settings.Save();
+            SendSettings();
+        }
+
+        // Makes the loaded mods exactly the preset's: downloads what's missing (into the library),
+        // then unloads everything else and loads the preset. "base" is the built-in no-mods preset.
+        async Task ApplyPreset(string id, bool andPlay)
+        {
+            Preset p = id == "base" ? new Preset { id = "base", name = T("Base game", "Jeu de base"), mods = new List<string>() } : settings.presets.FirstOrDefault(x => x.id == id);
+            if (p == null) return;
+            List<LocalMod> locals = lib.LocalMods();
+            var wanted = new List<ModInfo>();
+            var wantedLocal = new List<LocalMod>();
+            var missing = new List<string>();
+            foreach (string mid in p.mods)
+            {
+                if (IsLocal(mid)) { LocalMod l = locals.FirstOrDefault(x => string.Equals(x.Id, mid, StringComparison.OrdinalIgnoreCase)); if (l != null) wantedLocal.Add(l); else missing.Add(mid.Substring(6)); continue; }
+                ModInfo m = mods.Get(mid);
+                if (m == null) { missing.Add(mid); continue; }
+                // A mod that's been replaced loads its replacement instead.
+                ModInfo repl = mods.Get(m.replacedBy);
+                wanted.Add(repl ?? m);
+            }
+            // Two mods in the preset that clash: the first one wins.
+            foreach (ModInfo m in wanted.ToList())
+                if (wanted.Contains(m) && wanted.Any(o => o != m && wanted.IndexOf(o) < wanted.IndexOf(m) && mods.Conflicts(o).Contains(m.id))) { wanted.Remove(m); missing.Add(m.name); }
+
+            var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (ModInfo m in wanted) { keep.Add(m.id); foreach (ModInfo r in mods.Required(m)) keep.Add(r.id); foreach (ModInfo i in mods.Included(m)) keep.Add(i.id); }
+            List<ModInfo> keepMods = keep.Select(mods.Get).Where(m => m != null).ToList();
+
+            List<ModInfo> download = keepMods.Where(m => { ModState s = lib.State(m); return s == ModState.NotDownloaded || s == ModState.UpdateAvailable; }).ToList();
+            if (download.Count > 0) await Install(download, false);
+
+            List<ModInfo> off = mods.All.Where(m => lib.IsLoaded(m) && !keep.Contains(m.id)).ToList();
+            var offIds = new HashSet<string>(off.Select(m => m.id), StringComparer.OrdinalIgnoreCase);
+            foreach (ModInfo m in off) lib.Unload(m, offIds);
+            foreach (LocalMod l in lib.LocalMods().Where(l => l.Loaded && !wantedLocal.Any(w => w.Id == l.Id))) lib.UnloadLocal(l);
+            foreach (ModInfo m in keepMods) lib.Load(m);
+            foreach (LocalMod l in wantedLocal) lib.LoadLocal(l);
+
+            string text = T("Loaded the preset ", "Préréglage chargé : ") + p.name + ".";
+            if (missing.Count > 0) text += " " + T("Not available: ", "Indisponible : ") + string.Join(", ", missing) + ".";
+            Status(text, -1);
+            if (missing.Count > 0) Log.Write("Preset " + p.name + ": not available: " + string.Join(", ", missing));
+            if (andPlay)
+            {
+                Preset saved = settings.presets.FirstOrDefault(x => x.id == id);
+                if (saved != null) { saved.lastPlayed = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds; settings.Save(); SendSettings(); }
+                await Play();
+            }
+        }
+
+        // ---- Ratings and downloads (hub API) ----
+
+        async Task LoadStats()
+        {
+            try
+            {
+                var d = json.Deserialize<Dictionary<string, object>>(await Net.ReadText(Api + "stats"));
+                stats = d != null && d.ContainsKey("mods") ? d["mods"] as Dictionary<string, object> : null;
+            }
+            catch (Exception ex) { Log.Write("Stats: " + ex.Message); }
+            if (stats != null) Send("stats", stats);
+        }
+
+        // Saves name + email with the hub once, then sends the rating the player was giving.
+        async Task Register(string name, string email, string modId, string stars)
+        {
+            try
+            {
+                await Net.PostJson(Api + "register", json.Serialize(new Dictionary<string, object> {
+                    { "installId", settings.installId }, { "name", name }, { "email", email }, { "consent", true } }));
+            }
+            catch (Exception ex) { Send("registerFailed", ex.Message); return; }
+            settings.profileName = (name ?? "").Trim();
+            settings.profileEmail = (email ?? "").Trim();
+            settings.Save();
+            SendSettings();
+            Send("registered", true);
+            if (!string.IsNullOrEmpty(modId)) await Rate(modId, stars);
+        }
+
+        async Task Rate(string modId, string starsText)
+        {
+            int stars;
+            if (string.IsNullOrEmpty(modId) || !int.TryParse(starsText, out stars) || stars < 0 || stars > 5) return;
+            try
+            {
+                string reply = await Net.PostJson(Api + "rate", json.Serialize(new Dictionary<string, object> {
+                    { "installId", settings.installId }, { "modId", modId }, { "stars", stars } }));
+                var d = json.Deserialize<Dictionary<string, object>>(reply);
+                if (stars == 0) settings.myRatings.Remove(modId); else settings.myRatings[modId] = stars;
+                settings.Save();
+                if (stats == null) stats = new Dictionary<string, object>();
+                var entry = stats.ContainsKey(modId) ? stats[modId] as Dictionary<string, object> : null;
+                if (entry == null) { entry = new Dictionary<string, object> { { "downloads", 0 } }; stats[modId] = entry; }
+                entry["rating"] = d["rating"]; entry["ratings"] = d["ratings"];
+                SendSettings();
+                Send("stats", stats);
+                Status(stars == 0 ? T("Rating removed.", "Note retirée.") : T("Thanks for rating!", "Merci pour votre note !"), -1);
+            }
+            catch (Exception ex)
+            {
+                var api = ex as ApiException;
+                if (api != null && api.Status == 403 && api.Code == "register")
+                {
+                    // The hub doesn't know this PC (e.g. its database was reset): ask for the details again.
+                    settings.profileName = ""; settings.Save(); SendSettings();
+                    Send("needRegister", new Dictionary<string, object> { { "modId", modId }, { "stars", stars } });
+                }
+                else Error(T("Couldn't save your rating: ", "Impossible d'enregistrer votre note : ") + ex.Message);
+            }
+        }
+
+        // ---- Repair ----
+
+        // Re-checks every downloaded mod's files from scratch, tidies half-moved mods, re-downloads damaged or
+        // missing files, and loads what loaded mods need. Then says what it did.
+        async Task Repair()
+        {
+            Status(T("Checking every mod file...", "Vérification de tous les fichiers..."), -1);
+            Hash.Clear();
+            var report = new List<string>();
+            int checkedCount = 0;
+            foreach (ModInfo m in mods.All)
+            {
+                if (await Task.Run(() => lib.State(m)) == ModState.NotDownloaded) continue;
+                checkedCount++;
+                List<string> done = lib.Tidy(m);
+                if (done.Count > 0) report.Add(m.name + ": " + string.Join(", ", done));
+            }
+            List<ModInfo> broken = mods.All.Where(m => lib.State(m) == ModState.UpdateAvailable).ToList();
+            foreach (ModInfo m in broken.ToList())
+                if (broken.Any(o => o != m && o.includes.Contains(m.id, StringComparer.OrdinalIgnoreCase))) broken.Remove(m);
+            foreach (ModInfo m in broken)
+            {
+                await Install(new List<ModInfo> { m }, lib.IsLoaded(m));
+                report.Add(m.name + ": " + T("downloaded again", "retéléchargé"));
+            }
+            foreach (ModInfo m in mods.All.Where(x => lib.State(x) == ModState.Loaded).ToList())
+                foreach (ModInfo r in mods.Required(m))
+                    if (lib.State(r) != ModState.Loaded) { await LoadMod(r.id); report.Add(r.name + ": " + T("loaded (", "chargé (") + m.name + T(" needs it)", " en a besoin)")); }
+            Log.Write("Repair: checked " + checkedCount + " mods. " + (report.Count > 0 ? string.Join("; ", report) : "Nothing to fix."));
+            Status("", -1);
+            await SendState();
+            await Ask(T("Check and repair", "Vérifier et réparer"),
+                report.Count == 0 ? T("Checked " + checkedCount + " mods. Every file is fine.", checkedCount + " mods vérifiés. Tous les fichiers sont bons.")
+                    : T("Checked " + checkedCount + " mods and fixed:", checkedCount + " mods vérifiés. Réparé :") + "\n• " + string.Join("\n• ", report),
+                T("OK", "OK"));
+        }
+
         // ---- Play ----
 
         async Task Play()
@@ -493,6 +695,7 @@ namespace RescueOpsModLauncher
                 if (exe == null) { Error(T("Couldn't find the game's exe.", "Exécutable du jeu introuvable.")); return; }
                 Process.Start(new ProcessStartInfo(exe) { WorkingDirectory = gameDir });
             }
+            Log.Write("Play: " + string.Join(", ", CurrentIds()));
             settings.gameUpdated = false;
             settings.Save();
             Status(T("Starting the game...", "Lancement du jeu..."), -1);
@@ -511,6 +714,7 @@ namespace RescueOpsModLauncher
                 case "checkUpdates": settings.checkUpdates = value is bool && (bool)value; break;
                 case "smoothGraphics": settings.smoothGraphics = value is bool && (bool)value; break;
                 case "startPage": settings.startPage = value as string; break;
+                case "modsView": settings.modsView = value as string == "list" ? "list" : "grid"; break;
                 case "dismissGameUpdated": settings.gameUpdated = false; break;
             }
             settings.Save();
@@ -557,12 +761,29 @@ namespace RescueOpsModLauncher
             sb.AppendLine("Rescue Ops Mod Launcher " + Program.AppVersion);
             sb.AppendLine("Game: " + (app != null ? (app.Name + " (app " + app.AppId + ", build " + app.BuildId + ")") : "not found") + (gameVersion != null ? ", latest patch " + gameVersion : ""));
             sb.AppendLine("Windows: " + Environment.OSVersion.VersionString);
+            if (manifestError != null) sb.AppendLine("Mod list: " + manifestError);
             if (lib != null)
             {
+                sb.AppendLine("Game folder: " + Game.GameDirOf(paks));
                 sb.AppendLine("Loaded: " + string.Join(", ", mods.All.Where(m => lib.State(m) == ModState.Loaded).Select(m => m.name + " " + m.version)));
+                List<string> odd = mods.All.Select(m => new { m, s = lib.State(m) }).Where(x => x.s == ModState.UpdateAvailable || (x.s == ModState.Available && lib.IsLoaded(x.m)))
+                    .Select(x => x.m.name + (x.s == ModState.UpdateAvailable ? " (old or damaged files)" : " (half loaded)")).ToList();
+                if (odd.Count > 0) sb.AppendLine("Needs attention: " + string.Join(", ", odd));
+                List<string> untested = mods.All.Where(m => lib.IsLoaded(m) && !TestedOn(m)).Select(m => m.name).ToList();
+                if (untested.Count > 0) sb.AppendLine("Not checked on this game build: " + string.Join(", ", untested));
                 List<LocalMod> local = lib.LocalMods().Where(l => l.Loaded).ToList();
                 if (local.Count > 0) sb.AppendLine("Other paks loaded: " + string.Join(", ", local.Select(l => l.Name)));
+                try
+                {
+                    sb.AppendLine("Paks folder:");
+                    foreach (FileInfo f in new DirectoryInfo(paks).GetFiles().OrderBy(f => f.Name)) sb.AppendLine("  " + f.Name + "  " + f.Length);
+                    string[] sub = Directory.GetDirectories(paks);
+                    if (sub.Length > 0) sb.AppendLine("  Subfolders (the game loads these too): " + string.Join(", ", sub.Select(Path.GetFileName)));
+                }
+                catch (Exception) { }
             }
+            List<string> log = Log.Tail(15);
+            if (log.Count > 0) { sb.AppendLine("Recent launcher log:"); foreach (string l in log) sb.AppendLine("  " + l); }
             return sb.ToString();
         }
 
