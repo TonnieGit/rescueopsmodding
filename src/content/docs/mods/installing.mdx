@@ -1,11 +1,11 @@
 ---
 title: Installing mods
-description: 'How to install, update and uninstall Rescue Ops: Wildfire mods: with the Mod Manager, with Install.bat, or by copying three files into one folder by hand.'
+description: 'How to install, update and uninstall Rescue Ops: Wildfire mods: with the Mod Launcher, with Install.bat, or by copying three files into one folder by hand.'
 ---
 
 import { Steps, LinkButton } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
-import manager from '../../../assets/screenshots/mod-manager.jpg';
+import launcher from '../../../assets/screenshots/mod-launcher.jpg';
 
 :::note[You don't need Unreal Engine to play mods]
 Unreal, FModel and the other tools are only for **making** mods. To play them, you only need the game and the mod's download.
@@ -13,56 +13,64 @@ Unreal, FModel and the other tools are only for **making** mods. To play them, y
 
 Every mod here is a set of **three files** (`.pak`, `.utoc`, `.ucas`) that you add to the game. No game files are changed. There are three ways to install them. All give the same result.
 
-## Option 1: Mod Manager (easiest)
+## Option 1: Mod Launcher (easiest)
 
-The Mod Manager is a small app that installs, updates and uninstalls every mod on this site. It always shows the latest versions, so you never need to come back here to check for updates.
+The Rescue Ops Mod Launcher is a small app that downloads, updates and loads every mod on this site, then starts the game. It always shows the latest versions, so you never need to come back here to check for updates. It replaces the old Mod Manager.
 
-<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/RescueOpsModManager.exe" icon="download">Download RescueOpsModManager.exe (0.1 MB)</LinkButton>
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/RescueOpsModLauncher.exe" icon="download">Download RescueOpsModLauncher.exe (1.1 MB)</LinkButton>
 
 <Steps>
 
-1. Close the game.
+1. Double-click the downloaded **`RescueOpsModLauncher.exe`**. There's nothing to install: it's a single file you can keep anywhere, for example on your desktop.
 
-2. Double-click the downloaded **`RescueOpsModManager.exe`**. There's nothing to install: it's a single file you can keep anywhere, for example on your desktop.
+2. If Windows shows **"Windows protected your PC"**, click **More info** → **Run anyway**. It warns about every app downloaded from the internet that isn't signed.
 
-3. If Windows shows **"Windows protected your PC"**, click **More info** → **Run anyway**. It warns about every app downloaded from the internet that isn't signed.
+3. Pick **English** or **Français**. You can change it later in **Options**.
 
-4. The Mod Manager finds the game through Steam and lists every mod:
+4. The launcher finds the game through Steam. Click **Mods** → **All mods**:
 
-   <Image src={manager} alt="The Rescue Ops Mod Manager: a list of six mods with checkboxes and Installed, Latest and Status columns, showing Installed, Update available and Not installed, with Install / update ticked, Uninstall ticked, Uninstall all mods and Open mods folder buttons" />
+   <Image src={launcher} alt="The Rescue Ops Mod Launcher on the All mods tab: mods grouped under Lights and sirens, Uniforms and gear, Vehicles and liveries and Tools, each with a checkbox, thumbnail, author, version, status and size. Red + Blue Beacons is selected and its details are on the right, with a Download and load button." />
 
-   - **Installed:** you have the latest version.
-   - **Update available:** you have an older version. Tick it and click **Install / update ticked**.
-   - **Not installed:** tick it to install it.
+5. Tick a mod to load it. If it isn't downloaded yet, the launcher downloads it, checks every file, and loads it along with anything it needs.
 
-5. Tick the mods you want and click **Install / update ticked**. It downloads them, checks every file, and copies them into the game.
-
-6. Start the game.
+6. Click **Play**. The game starts through Steam with the ticked mods.
 
 </Steps>
 
-To remove mods, tick them and click **Uninstall ticked**, or click **Uninstall all mods**. **Open mods folder** shows the game's `Paks` folder.
+Untick a mod to stop it loading. Its files move to a library folder next to the game (`Wildfire\ModLibrary`), so ticking it again is instant. To delete a mod from your PC, click it and click **Delete**.
 
-What the Mod Manager does:
+- **Loaded** lists what loads with the game. **All mods** lists everything, with a search box and category, author and sort filters. **Updates** lists mods with a newer version: click **Update all**.
+- **Dashboard** shows news from the game's developers (patch notes) and from this hub, and alerts such as updates or a game update.
+- **Add mod files** adds a mod from somewhere else (its `.pak`, `.utoc` and `.ucas`, or a zip). It's listed under **Added by you** and loads like any other mod.
 
-- It finds the game in every Steam library on the PC. If it can't, click **Browse...** and pick the game folder (see [Install by hand](#option-3-install-by-hand), step 2, for how to find it).
-- It checks every downloaded file against the list of mods before copying it. If anything doesn't match, nothing is installed.
-- It only adds or removes the mod files it knows about. It never changes or deletes the game's own files.
-- If you tick two mods that change the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it tells you to pick one. If one is already installed, it asks before swapping it.
-- Some mods need a shared part ([Tonnie Core and Beacon Base](/mods/tonnie-core/)). It installs those for you, never removes a shared file another installed mod still uses, and asks before removing a mod that something else needs.
-- When a mod replaces an older version with different file names (like the v1 beacons), it removes the old files.
-- It waits for you to close the game before changing anything.
+What the launcher does:
 
-:::caution[Have Mod Manager v1.0?]
-The beacon mods and the Free Camera need **Mod Manager v1.1** or newer. v1.0 shows "too old to read the mod list": download the new one with the button above.
-:::
+- It finds the game in every Steam library on the PC. If it can't, go to **Options** → **Game** → **Change** and pick the game folder (see [Install by hand](#option-3-install-by-hand), step 2, for how to find it).
+- It checks every downloaded file against the list of mods before using it. If anything doesn't match, nothing is changed.
+- It only moves the mod files. It never changes or deletes the game's own files.
+- If you tick two mods that change the same thing (for example [Red Beacons](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/)), it asks which one to keep.
+- Some mods need a shared part ([Tonnie Core and Beacon Base](/mods/tonnie-core/)). It loads those for you and asks before unloading a mod that something else needs.
+- It locks the mod list while the game is running and unlocks it when you close the game.
+- It updates itself. When a new version is out, it asks, downloads it, checks it and restarts.
+
+Mods you installed with the old Mod Manager or by hand stay as they are: the launcher shows them as loaded.
 
 Its source code is [on GitHub](https://github.com/TonnieGit/rescueopsmodding/tree/main/manager) if you'd like to read exactly what it does.
 
-:::caution[Gotcha: "Couldn't load the list of mods"]
-**Cause:** the Mod Manager reads the list of mods from GitHub, so it needs an internet connection.
+:::caution[Gotcha: "Couldn't reach the modding hub"]
+**Cause:** the launcher reads the list of mods from GitHub, so it needs an internet connection.
 
-**Fix:** check your connection and open it again. To install without internet, use [Install.bat](#option-2-installbat) or [install by hand](#option-3-install-by-hand) from a zip you've already downloaded.
+**Fix:** check your connection and click **Retry** on the dashboard. Mods you've already downloaded still load and play without internet.
+:::
+
+:::caution[Gotcha: the launcher flickers or draws black]
+**Cause:** some graphics drivers don't get on with the launcher's glass effects.
+
+**Fix:** go to **Options** → **Launcher** and untick **Glass effects and graphics acceleration**, then restart the launcher.
+:::
+
+:::note[Still on the Mod Manager?]
+It keeps working, and shows a link to download the launcher. You can delete `RescueOpsModManager.exe` once you have the launcher.
 :::
 
 ## Option 2: Install.bat
@@ -149,7 +157,7 @@ On Medium the game shows textures at a quarter of their size, so logos and lette
 
 ## Uninstall
 
-In the Mod Manager, tick the mod and click **Uninstall ticked**.
+In the Mod Launcher, untick the mod to stop it loading, or click it and click **Delete** to remove it from your PC.
 
 By hand, delete the mod's three files from `Wildfire\Content\Paks`. `Install.bat` lists them, and so does each mod's `INSTALL.txt`.
 

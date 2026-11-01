@@ -287,7 +287,7 @@ table.modt { table-layout: fixed; }
     'col.mod': ['Mod', 'Mod'], 'col.author': ['Author', 'Auteur'], 'col.version': ['Version', 'Version'], 'col.status': ['Status', 'État'], 'col.size': ['Size', 'Taille'],
     'cat.all': ['All categories', 'Toutes les catégories'], 'author.all': ['All authors', 'Tous les auteurs'],
     'sort.category': ['Sort: category', 'Tri : catégorie'], 'sort.name': ['Sort: name', 'Tri : nom'], 'sort.author': ['Sort: author', 'Tri : auteur'],
-    'st.NotDownloaded': ['Not downloaded', 'Non téléchargé'], 'st.Available': ['', ''], 'st.Loaded': ['', ''], 'st.UpdateAvailable': ['Update to {v}', 'Mise à jour {v}'],
+    'st.NotDownloaded': ['Not downloaded', 'Non téléchargé'], 'st.Available': ['Downloaded', 'Téléchargé'], 'st.Loaded': ['', ''], 'st.UpdateAvailable': ['Update to {v}', 'Mise à jour {v}'],
     'st.replaced': ['Replaced by {b}', 'Remplacé par {b}'], 'st.local': ['Added by you', 'Ajouté par vous'], 'st.clash': ['Clashes with a loaded mod', 'En conflit avec un mod chargé'],
     'st.untested': ['Not checked on this game build', 'Non vérifié sur cette version du jeu'],
     'local': ['Local', 'Local'],
@@ -396,6 +396,7 @@ table.modt { table-layout: fixed; }
     var parts = [];
     if (m.state === 'UpdateAvailable') parts.push('<span class="tag">' + esc(t('st.UpdateAvailable', { v: m.version })) + '</span>');
     if (m.state === 'NotDownloaded') parts.push('<span class="dim">' + esc(t('st.NotDownloaded')) + '</span>');
+    if (m.state === 'Available') parts.push('<span class="dim">' + esc(t('st.Available')) + '</span>');
     if (m.replacedBy) parts.push('<span class="tag">' + esc(t('st.replaced', { b: m.replacedBy })) + '</span>');
     if (!m.loaded && m.conflicts.some(function (c) { return loadedList().some(function (l) { return l.name === c; }); })) parts.push('<span class="tag bad">' + esc(t('st.clash')) + '</span>');
     if (m.loaded && m.testedBuild && S.state.game.version && m.testedBuild !== S.state.game.version) parts.push('<span class="tag">' + esc(t('st.untested')) + '</span>');
