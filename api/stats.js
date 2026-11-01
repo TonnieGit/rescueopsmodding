@@ -1,5 +1,6 @@
 // GET /api/stats -> { updated, mods: { <id>: { downloads, rating, ratings } } }
 // Downloads = GitHub's own counter for <id>.zip, added up over every release (launcher and hub downloads both count).
+// Community mods (Mod Dev) keep one zip per version, <id>-v<version>.zip in the "community" release; those add up too.
 // Public and cached for 5 minutes at Vercel's edge.
 
 import { REPO, sql, ensureSchema } from './_shared.js';
@@ -9,13 +10,13 @@ async function downloads() {
 	if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
 	const counts = {};
 	for (let page = 1; page <= 10; page++) {
-		const r = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100&page=${page}`, { headers });
+		const r = await fetch(`${process.env.GITHUB_API_URL || 'https://api.github.com'}/repos/${REPO}/releases?per_page=100&page=${page}`, { headers });
 		if (!r.ok) throw new Error('GitHub ' + r.status);
 		const releases = await r.json();
 		for (const rel of releases)
 			for (const a of rel.assets || [])
 				if (a.name.toLowerCase().endsWith('.zip')) {
-					const id = a.name.slice(0, -4);
+					const id = a.name.slice(0, -4).replace(/-v[0-9][0-9A-Za-z.]*$/, '');
 					counts[id] = (counts[id] || 0) + a.download_count;
 				}
 		if (releases.length < 100) break;

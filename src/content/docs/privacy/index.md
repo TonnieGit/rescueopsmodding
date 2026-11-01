@@ -15,11 +15,20 @@ The first time you rate a mod, the launcher asks for a **name** and an **email a
 
 **What's public:** only each mod's average rating and how many ratings it has. Your name, email and individual ratings are never shown.
 
-**What it's used for:** running ratings and, later, letting you upload your own mods from the launcher. Your email isn't used for newsletters or marketing, and it's never sold or given to anyone.
+**What it's used for:** running ratings, feedback and reports, and Mod Dev (uploading your own mods from the launcher). Your email isn't used for newsletters or marketing, and it's never sold or given to anyone.
 
 **Where it's kept:** in a database run by [Neon](https://neon.com/), connected to this site through [Vercel](https://vercel.com/), which hosts it. It's never put in the site's public code on GitHub.
 
 The launcher also keeps your name, email and ratings on your own PC, in `%LOCALAPPDATA%\RescueOpsModLauncher\state.json`, so it doesn't ask again.
+
+## Mod Dev, feedback and reports (launcher 2.0)
+
+These use the same name and email as ratings, given once per PC.
+
+- **Mod dev accounts**: your **author name** is public: it's shown on your mods. The hub also keeps a one-way code made from your PC's secret author key and from your recovery code (neither the key nor the code itself), a link to your launcher install, and the same one-way connection code as above, used only to limit how many accounts one connection can make.
+- **Uploads**: while an upload waits for its safety check, its files and pictures are kept in the hub's database. Once it's decided they're deleted from there. Mods that go live are published on the hub's GitHub, where launchers download them, under your author name.
+- **Feedback** you send about a mod goes to its developer with **your name** (never your email), and is kept so they can read it in their launcher.
+- **Reports** go only to the modding hub team. The mod's author never sees who reported it.
 
 ## Download counts
 
@@ -31,6 +40,6 @@ The site uses Vercel Web Analytics to count page visits. It doesn't use cookies 
 
 ## Having your details removed
 
-**[Delete my details](/privacy/delete/)**: enter the email you gave and your name, email and ratings are deleted.
+**[Delete my details](/privacy/delete/)**: enter the email you gave and your name, email, ratings, feedback and reports are deleted. A mod dev account keeps its public author name and its live mods; to have those taken down too, message Tonnie (below).
 
 You can change your name or email at any time in the launcher: **Options › Launcher › Your details**. If anything goes wrong, message **Tonnie** on [Patreon](https://patreon.com/Tonnie001).

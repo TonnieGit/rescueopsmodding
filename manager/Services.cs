@@ -34,12 +34,16 @@ namespace RescueOpsModLauncher
         public string profileName { get; set; }          // given once before the first rating ("" = not yet)
         public string profileEmail { get; set; }
         public Dictionary<string, int> myRatings { get; set; }      // mod id -> stars this install gave
+        public string authorKey { get; set; }            // Mod Dev: this PC's secret author key ("" = not a mod dev here)
+        public string authorName { get; set; }           // Mod Dev: public author name
+        public string lastVersion { get; set; }          // launcher version last run, for "what's new" after an update
 
         public Settings()
         {
             language = ""; gamePath = ""; afterStart = "minimise"; checkUpdates = true; smoothGraphics = true; startPage = "dashboard"; modsView = "grid";
             lastBuildId = ""; newsRead = new List<string>(); knownMods = new Dictionary<string, string>(); modNews = new List<NewsItem>(); presets = new List<Preset>();
             installId = Guid.NewGuid().ToString("N"); profileName = ""; profileEmail = ""; myRatings = new Dictionary<string, int>();
+            authorKey = ""; authorName = ""; lastVersion = "";
         }
 
         static string FilePath { get { return Path.Combine(Program.DataDir, "state.json"); } }
@@ -62,6 +66,9 @@ namespace RescueOpsModLauncher
                         if (s.profileName == null) s.profileName = "";
                         if (s.profileEmail == null) s.profileEmail = "";
                         if (s.myRatings == null) s.myRatings = new Dictionary<string, int>();
+                        if (s.authorKey == null) s.authorKey = "";
+                        if (s.authorName == null) s.authorName = "";
+                        if (s.lastVersion == null) s.lastVersion = "";
                         if (string.IsNullOrEmpty(s.afterStart)) s.afterStart = "minimise";
                         if (string.IsNullOrEmpty(s.startPage)) s.startPage = "dashboard";
                         if (string.IsNullOrEmpty(s.modsView)) s.modsView = "grid";
@@ -191,6 +198,13 @@ namespace RescueOpsModLauncher
             }
         }
 
+        public static string RandomHex(int bytes)
+        {
+            var b = new byte[bytes];
+            using (var rng = RandomNumberGenerator.Create()) rng.GetBytes(b);
+            return BitConverter.ToString(b).Replace("-", "").ToLowerInvariant();
+        }
+
         public static string Sha256(string path)
         {
             using (FileStream s = File.OpenRead(path))
@@ -282,14 +296,17 @@ namespace RescueOpsModLauncher
         }
 
         // "New mod" / "updated" items from changes in mods.json since the last run (not on the very first run).
-        public static void TrackModReleases(Settings st, ModSet mods)
+        // Returns the ids of mods that are new since the last run (for the NEW tag).
+        public static List<string> TrackModReleases(Settings st, ModSet mods)
         {
+            var fresh = new List<string>();
             bool first = st.knownMods.Count == 0;
             foreach (ModInfo m in mods.All)
             {
                 if (m.hidden) continue;
                 string known;
                 bool had = st.knownMods.TryGetValue(m.id, out known);
+                if (!first && !had) fresh.Add(m.id);
                 if (!first && (!had || known != m.version))
                 {
                     ChangeEntry change = m.changelog.FirstOrDefault(c => c.version == m.version);
@@ -304,6 +321,7 @@ namespace RescueOpsModLauncher
                 st.knownMods[m.id] = m.version;
             }
             if (st.modNews.Count > 30) st.modNews.RemoveRange(0, st.modNews.Count - 30);
+            return fresh;
         }
 
         // The game version named in the newest patch note ("Mini patch Note 0.8.11" -> "0.8.11").

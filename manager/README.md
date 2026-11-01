@@ -31,10 +31,40 @@ It only moves or deletes files named in `mods.json` and paks the player added, n
 9. `testedBuild` per mod (Steam build ids, comma-separated, set by `make-manifest.ps1`'s `$testedOn`): loaded mods not checked on the
    player's build get a warning. Bump `$testedOn` after re-testing the mods on a new game patch.
 
+10. Mod Dev (2.0): community mods, uploads, feedback and reports. See below.
+
+## Mod Dev (2.0)
+
+Anyone can upload a mod from the launcher (**MOD DEV**). Guide for players: `/mod-dev/`, rules: `/mod-dev/rules/`.
+
+- **Accounts.** A registered launcher install picks a public author name (`POST /api/dev?a=author`). The launcher makes a random
+  author key (kept in `state.json`); the hub stores only its SHA-256 and that of a one-time recovery code
+  (`ABCD-EFGH-JKLM-NPQR`), which moves the account to another PC (`recover`, the old key stops working) and can be replaced (`newcode`).
+  Author names already in `mods.json` (Tonnie) are reserved.
+- **Uploads.** `submit` (details + file list with sizes and SHA-256) -> `chunk` (2 MB pieces, base64 JSON, under Vercel's 4.5 MB body
+  limit) -> `finish` (checks every piece arrived, Unreal .utoc header and .pak footer, JPEG headers). Limits: 100 MB per mod,
+  250 MB waiting in total, 3 waiting uploads per author, one per mod. File names must not be used by any other mod.
+  Waiting uploads live in the `submission_chunks` table and are deleted once decided.
+- **The safety check** is Tonnie's: `RescueOps_Modding	ools\modmanagereview.mjs` (`list`, `show`, `fetch`, `approve`, `reject`,
+  `reports`, `resolve`, `remove`, `claim`, `rename`), through `/api/admin` with `Authorization: Bearer <ADMIN_TOKEN>`.
+  `approve` zips the files (`Wildfire/Content/Paks/...`), uploads `<id>-v<version>.zip` and the pictures to the GitHub release
+  **community** (created on first use, never "latest"), and writes the mods.json-style entry to the `catalog` table.
+  Updates list the previous version's file names in `replaces`, so the launcher removes them.
+- **Community mods** come from `GET /api/catalog` (cached a minute) and are merged into `mods.json`'s list (same id = the catalog
+  entry wins). The launcher keeps a copy in `%LOCALAPPDATA%\RescueOpsModLauncher\catalog.json` for when the hub is unreachable.
+  `/api/stats` counts `<id>-v<version>.zip` downloads into `<id>`. Ratings work for community mods too.
+- **Feedback** (`feedback`) goes to the mod's owner (`mod_owners`) and shows in their Inbox; **reports** (`report`) go to Tonnie
+  (`review.mjs reports`). Feedback for mods.json mods reaches an author once they're claimed: `review.mjs claim <name> <modId...>`.
+- Environment (Vercel): `DATABASE_URL` (already set), **`ADMIN_TOKEN`** (24+ random characters, needed for review.mjs),
+  optional `DISCORD_WEBHOOK_URL` (a message per upload and report).
+
+Testing without the live site: `--api http://127.0.0.1:8787/api/` points the launcher at a local copy of the API.
+
 ## Code
 
 - `Launcher.cs`: entry point; loads the embedded WebView2 DLLs and extracts the UI.
 - `LauncherForm.cs`: the window and the commands from the page.
+- `ModDev.cs`: community mods, Mod Dev accounts and uploads, feedback and reports, drag and drop.
 - `Core.cs`: game discovery, mod list, library (load, unload, install files, local paks).
 - `Services.cs`: settings (`%LOCALAPPDATA%\RescueOpsModLauncher\state.json`), downloads, news, self-update.
 - `ui/`: the page (`index.html`, fonts, images), embedded in the exe.
@@ -46,7 +76,8 @@ Run `build_launcher.bat`. It uses the C# compiler that comes with Windows (.NET 
 nothing to install. It needs the WebView2 Runtime, which comes with Windows 10 and 11.
 
 Test switches: `--manifest <url or path to mods.json>`, `--game <game folder>`, `--ui <folder>` (use the UI files
-from disk) and `--devtools` (right-click menu, DevTools and remote debugging on port 9222).
+from disk), `--api <url>` (a local copy of the hub API) and `--devtools` (right-click menu, DevTools and remote debugging on
+port 9222; also lets the page pass file paths instead of opening file dialogs, for scripted tests).
 
 ## Releasing
 

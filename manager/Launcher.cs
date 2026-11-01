@@ -8,6 +8,7 @@
 //
 // Build: build_launcher.bat (C# compiler that comes with Windows, .NET Framework 4.8).
 // Switches: --manifest <url or path to mods.json>  --game <game folder>  --ui <folder with index.html>  --devtools
+//           --api <hub API base, e.g. http://127.0.0.1:8787/api/> (testing against a local copy of the API)
 
 using System;
 using System.Collections.Generic;
@@ -23,14 +24,14 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Mods for Rescue Ops: Wildfire")]
 [assembly: AssemblyCompany("Tonnie")]
 [assembly: AssemblyCopyright("Tonnie")]
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 
 namespace RescueOpsModLauncher
 {
     public class Options
     {
-        public string Manifest, Game, UiDir, Raw = "";
+        public string Manifest, Game, UiDir, Api, Raw = "";
         public bool DevTools;
 
         public static Options Parse(string[] args)
@@ -42,6 +43,7 @@ namespace RescueOpsModLauncher
                 if (args[i] == "--manifest" && next != null) { o.Manifest = next; i++; }
                 else if (args[i] == "--game" && next != null) { o.Game = next; i++; }
                 else if (args[i] == "--ui" && next != null) { o.UiDir = Path.GetFullPath(next); i++; }
+                else if (args[i] == "--api" && next != null) { o.Api = next.EndsWith("/") ? next : next + "/"; i++; }
                 else if (args[i] == "--devtools") o.DevTools = true;
             }
             o.Raw = string.Join(" ", args.Select(a => a.Contains(" ") ? "\"" + a + "\"" : a));
@@ -51,7 +53,7 @@ namespace RescueOpsModLauncher
 
     static class Program
     {
-        public const string AppVersion = "1.3.0";
+        public const string AppVersion = "2.0.0";
         public const string DefaultManifest = "https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/mods.json";
         public static readonly string DataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RescueOpsModLauncher");
