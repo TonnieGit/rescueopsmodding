@@ -72,6 +72,7 @@ export default defineConfig({
 					items: [
 						{ label: 'All mods', slug: 'mods' },
 						{ label: 'Installing mods', slug: 'mods/installing' },
+						{ label: 'Community mods', slug: 'mods/community' },
 						{ label: 'QLD RFS Uniforms', slug: 'mods/qld-rfs-uniforms' },
 						{ label: 'BR9 – Bushfire Helmet Yellow', slug: 'mods/br9-bushfire-helmet-yellow' },
 						{ label: 'QLD RFS Truck Reskin', slug: 'mods/qld-rfs-truck-reskin' },
@@ -83,6 +84,13 @@ export default defineConfig({
 						{ label: 'Free Camera', slug: 'mods/free-camera' },
 						{ label: 'Tonnie Core and Beacon Base', slug: 'mods/tonnie-core' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },
+					],
+				},
+				{
+					label: 'Mod Dev',
+					items: [
+						{ label: 'Share your mods', slug: 'mod-dev' },
+						{ label: 'Upload rules', slug: 'mod-dev/rules' },
 					],
 				},
 				{

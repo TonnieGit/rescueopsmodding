@@ -245,6 +245,47 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
 .lb .lbn:hover, .lb .lbx:hover { background: rgba(60,54,54,.85); }
 .lb .prev { left: 14px; } .lb .next { right: 14px; }
 .lb .lbx { top: 10px; right: 14px; width: 36px; height: 36px; font-size: 22px; }
+/* dashboard columns start level (the second panel isn't pushed down by .panel + .panel) */
+.dash > .panel + .panel { margin-top: 0; }
+.tag.new { color: #fff; background: var(--red); padding: 0 5px; border-radius: 3px; font-size: 10px; font-weight: 600; letter-spacing: .06em; vertical-align: 1px; }
+.mine { color: var(--muted); font-size: 11px; }
+/* mod dev */
+.devhero { padding: 22px 24px; display: grid; gap: 12px; }
+.devhero h2 { font: 44px/.9 var(--display); letter-spacing: .03em; margin: 0; font-weight: normal; }
+.devhero ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: #d6cfcc; }
+.devform { display: grid; grid-template-columns: 170px 1fr; }
+.devform > div { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.05); min-width: 0; }
+.devform > div:nth-child(odd) { color: var(--muted); padding-top: 13px; }
+.devform .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.devform input.inp, .devform select.inp, textarea.inp { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 6px 8px; }
+textarea.inp { min-height: 84px; resize: vertical; font: inherit; color: inherit; }
+input, textarea { user-select: text; }
+.dropzone { border: 1px dashed rgba(255,255,255,.25); border-radius: 8px; padding: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--muted); }
+.dropzone.over { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.07); }
+.dragging .dropzone { border-color: rgba(255,255,255,.45); }
+.flist { width: 100%; display: grid; gap: 2px; font-family: Consolas, monospace; font-size: 12px; color: var(--ink); }
+.flist:empty { display: none; }
+.flist div { display: flex; gap: 8px; align-items: center; }
+.flist .x, .pics .x { background: none; border: 0; color: var(--muted); padding: 0 4px; }
+.flist .x:hover, .pics .x:hover { color: var(--ink); }
+.pics { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; }
+.pics:empty { display: none; }
+.pics figure { margin: 0; position: relative; }
+.pics img { width: 160px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; display: block; border: 1px solid var(--line); }
+.pics .x { position: absolute; top: 3px; right: 3px; background: rgba(10,9,9,.75); border-radius: 4px; }
+.picklist { max-height: 150px; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 3px 12px; padding: 4px 0 8px; }
+.picklist .chk { font-size: 12px; }
+.devform details summary { cursor: pointer; color: var(--muted); padding-top: 5px; }
+.devfoot { padding: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.devfoot .dim { flex: 1 1 300px; }
+.inbox .msg { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.05); display: grid; gap: 4px; }
+.inbox .msg .mh { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
+.inbox .msg .mt { white-space: pre-wrap; user-select: text; }
+.recovery { font: 30px/1 Consolas, monospace; letter-spacing: .08em; text-align: center; padding: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 8px; user-select: all; }
+.st-live { color: #7fd17f; } .st-wait { color: var(--amber); } .st-no { color: #ff6b62; }
+.dropover { position: fixed; inset: 0; z-index: 70; display: none; place-items: center; background: rgba(6,5,5,.55); pointer-events: none; }
+.dropover div { font: 34px/1 var(--display); letter-spacing: .04em; padding: 22px 30px; border: 2px dashed rgba(255,255,255,.6); border-radius: 14px; background: rgba(30,26,26,.85); }
+.dragging.droplib .dropover { display: grid; }
 .toast .in { padding: 10px 12px; display: grid; gap: 8px; overflow-wrap: anywhere; max-height: 40vh; overflow: auto; }
 </style>
 </head>
@@ -257,6 +298,7 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       <button class="nav" data-screen="dashboard"><span data-t="nav.dashboard"></span></button>
       <button class="nav" data-screen="mods"><span data-t="nav.mods"></span><small id="nav-updates"></small></button>
       <button class="nav" data-screen="presets"><span data-t="nav.presets"></span></button>
+      <button class="nav" data-screen="dev"><span data-t="nav.dev"></span><small id="nav-dev"></small></button>
       <button class="nav" data-screen="options"><span data-t="nav.options"></span></button>
     </div>
     <div></div>
@@ -310,6 +352,50 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
           <button class="btn" id="pre-save" data-t="pre.save"></button>
           <span class="dim" style="flex-basis:100%" data-t="pre.importNote"></span>
         </div></div>
+    </section>
+
+    <section class="screen" id="screen-dev">
+      <div id="dev-intro" class="panel" style="display:none"><div class="devhero">
+        <h2 data-t="dev.introTitle"></h2>
+        <div data-t="dev.introText"></div>
+        <ol><li data-t="dev.step1"></li><li data-t="dev.step2"></li><li data-t="dev.step3"></li><li data-t="dev.step4"></li></ol>
+        <div class="acts"><button class="btn red" id="dev-become" data-t="dev.become"></button><button class="btn" id="dev-restore" data-t="dev.restore"></button>
+          <a href="#" class="dim" style="align-self:center;font-size:12px" data-url="https://rescueopsmodding.vercel.app/mod-dev/" data-t="dev.guide"></a></div>
+        <div class="warn" id="dev-lost" style="display:none" data-t="dev.lost"></div>
+      </div></div>
+      <div id="dev-body">
+        <div class="sub on" id="dev-mine">
+          <div class="panel"><div class="ph"><span data-t="dev.yourMods"></span><span class="r"><button class="btn red" data-devnew="1" data-t="dev.uploadNew"></button></span></div><div id="dev-mods"></div></div>
+          <div class="panel"><div class="ph"><span data-t="dev.uploads"></span><span class="r" data-t="dev.uploadsHint"></span></div><div id="dev-subs"></div></div>
+          <div class="panel"><div class="ph" data-t="dev.account"></div><div class="form">
+            <div data-t="dev.authorName"></div><div id="dev-name"></div>
+            <div data-t="dev.recovery"></div><div><button class="btn" id="dev-newcode" data-t="dev.newCode"></button><span class="note" data-t="dev.recoveryNote"></span></div>
+            <div data-t="dev.help"></div><div><a href="#" data-url="https://rescueopsmodding.vercel.app/mod-dev/" data-t="dev.guide"></a> · <a href="#" data-url="https://rescueopsmodding.vercel.app/mod-dev/rules/" data-t="dev.rules"></a></div>
+          </div></div>
+        </div>
+        <div class="sub" id="dev-submit">
+          <div class="panel"><div class="ph"><span id="up-title"></span><span class="r"><select class="inp" id="up-mode"></select></span></div>
+            <div class="devform">
+              <div data-t="up.name"></div><div><input class="inp" id="up-name" maxlength="60" spellcheck="false"><div class="hint" data-t="up.nameHint"></div></div>
+              <div data-t="up.version"></div><div><input class="inp" id="up-version" maxlength="16" style="width:120px" spellcheck="false"> <span class="hint" id="up-version-hint"></span></div>
+              <div data-t="up.category"></div><div><select class="inp" id="up-category" style="width:auto"></select></div>
+              <div data-t="up.description"></div><div><textarea class="inp" id="up-description" maxlength="2000"></textarea><div class="hint" data-t="up.descriptionHint"></div></div>
+              <div data-t="up.changes"></div><div><textarea class="inp" id="up-changes" maxlength="1000" style="min-height:60px"></textarea><div class="hint" data-t="up.changesHint"></div></div>
+              <div data-t="up.files"></div><div><div class="dropzone" data-drop="devFiles"><button class="btn" id="up-files-btn" data-t="up.chooseFiles"></button><span data-t="up.filesHint"></span><div class="flist" id="up-files"></div></div><div class="hint warn" id="up-files-warn"></div></div>
+              <div data-t="up.picture"></div><div><div class="dropzone" data-drop="devThumb"><button class="btn" id="up-thumb-btn" data-t="up.choosePicture"></button><span data-t="up.pictureHint"></span><div class="pics" id="up-thumb"></div></div></div>
+              <div data-t="up.shots"></div><div><div class="dropzone" data-drop="devShots"><button class="btn" id="up-shots-btn" data-t="up.chooseShots"></button><span data-t="up.shotsHint"></span><div class="pics" id="up-shots"></div></div></div>
+              <div data-t="up.links"></div><div><details><summary data-t="up.linksHint"></summary>
+                <div class="hint" data-t="up.needs"></div><div class="picklist" id="up-requires"></div>
+                <div class="hint" data-t="up.clashes"></div><div class="picklist" id="up-conflicts"></div></details></div>
+              <div></div><div><span class="chk" id="up-ok"><span class="cb"></span><span><span data-t="up.promise"></span> <a href="#" data-url="https://rescueopsmodding.vercel.app/mod-dev/rules/" data-t="dev.rules"></a></span></span></div>
+            </div>
+            <div class="devfoot"><button class="btn red" id="up-send" data-t="up.send"></button><span class="dim" data-t="up.sendNote"></span><span class="bad" id="up-err"></span></div>
+          </div>
+        </div>
+        <div class="sub" id="dev-inbox">
+          <div class="panel inbox"><div class="ph"><span data-t="dev.inbox"></span><span class="r" data-t="dev.inboxHint"></span></div><div id="dev-msgs"></div></div>
+        </div>
+      </div>
     </section>
 
     <section class="screen" id="screen-options">
@@ -373,6 +459,13 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
   <div class="foot"><button class="btn red" id="reg-save" data-t="reg.save"></button><button class="btn" id="reg-cancel" data-t="cancel"></button></div></div></div>
 <div class="scrim lb" id="dlg-shots" role="dialog" aria-modal="true"><div class="stage" id="lb-stage"><img id="lb-img" alt=""></div><div class="bar" id="lb-bar"></div>
   <button class="lbn prev" id="lb-prev" aria-label="Previous">&#8249;</button><button class="lbn next" id="lb-next" aria-label="Next">&#8250;</button><button class="lbx" id="lb-close" aria-label="Close">&#215;</button></div>
+<div class="scrim" id="dlg-msg" role="dialog" aria-modal="true"><div class="dlg" style="width:min(480px,100%)"><div class="ph" id="msg-title"></div><div class="in" style="white-space:normal">
+  <span id="msg-text" class="dim"></span><select class="inp" id="msg-kind"></select><textarea class="inp" id="msg-body" maxlength="1500"></textarea><div class="bad" id="msg-err"></div></div>
+  <div class="foot"><button class="btn red" id="msg-send" data-t="msg.send"></button><button class="btn" id="msg-cancel" data-t="cancel"></button></div></div></div>
+<div class="scrim" id="dlg-code" role="dialog" aria-modal="true"><div class="dlg" style="width:min(480px,100%)"><div class="ph" data-t="code.title"></div><div class="in" style="white-space:normal">
+  <span id="code-text"></span><div class="recovery" id="code-value"></div><span class="dim" data-t="code.note"></span></div>
+  <div class="foot"><button class="btn" id="code-copy" data-t="code.copy"></button><button class="btn red" id="code-done" data-t="code.done"></button></div></div></div>
+<div class="dropover"><div data-t="drop.library"></div></div>
 <div class="toast" id="toast" role="alert"><div class="ph"><span data-t="error"></span><span class="r"><button class="btn" id="toast-close">×</button></span></div><div class="in" id="toast-text"></div></div>
 
 <script>
@@ -475,7 +568,79 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     'upd.title': ['Launcher update', 'Mise à jour du launcher'], 'upd.text': ['Version {v} is available. The launcher updates itself and restarts. Your mods and settings are kept.', 'La version {v} est disponible. Le launcher se met à jour et redémarre. Vos mods et réglages sont conservés.'],
     'upd.later': ['Later', 'Plus tard'], 'upd.now': ['Update and restart', 'Mettre à jour et redémarrer'],
     'cat.Lights and sirens': ['Lights and sirens', 'Feux et sirènes'], 'cat.Vehicles and liveries': ['Vehicles and liveries', 'Véhicules et livrées'],
-    'cat.Uniforms and gear': ['Uniforms and gear', 'Tenues et équipement'], 'cat.Tools': ['Tools', 'Outils'], 'cat.Other': ['Other', 'Autres'], 'cat.Added by you': ['Added by you', 'Ajoutés par vous']
+    'cat.Uniforms and gear': ['Uniforms and gear', 'Tenues et équipement'], 'cat.Tools': ['Tools', 'Outils'], 'cat.Other': ['Other', 'Autres'], 'cat.Added by you': ['Added by you', 'Ajoutés par vous'],
+    'cat.Sounds': ['Sounds', 'Sons'], 'cat.Maps and scenarios': ['Maps and scenarios', 'Cartes et scénarios'],
+    // 2.0: Mod Dev, feedback, reports, extras
+    'nav.dev': ['MOD DEV', 'MOD DEV'], 'tab.dev': ['Mod Dev', 'Mod Dev'], 'tab.devMine': ['My mods', 'Mes mods'], 'tab.devSubmit': ['Upload', 'Envoyer'], 'tab.devInbox': ['Inbox', 'Messages'],
+    'dev.introTitle': ['SHARE YOUR MODS', 'PARTAGEZ VOS MODS'],
+    'dev.introText': ['Made a mod for Rescue Ops? Put it in the launcher for everyone, with your name on it. Players get it in one click, rate it, and send you feedback here.', 'Vous avez créé un mod pour Rescue Ops ? Mettez-le dans le launcher pour tout le monde, avec votre nom. Les joueurs l\'installent en un clic, le notent et vous envoient leurs retours ici.'],
+    'dev.step1': ['Pick the author name players will see.', 'Choisissez le nom d\'auteur que les joueurs verront.'],
+    'dev.step2': ['Save your recovery code. It moves your account to another PC.', 'Gardez votre code de récupération : il déplace votre compte sur un autre PC.'],
+    'dev.step3': ['Upload your mod\'s files with a picture and a description.', 'Envoyez les fichiers de votre mod avec une image et une description.'],
+    'dev.step4': ['We run a quick safety check on every upload, then it goes live, usually within 24 hours.', 'Nous faisons une vérification de sécurité rapide sur chaque envoi, puis il est mis en ligne, généralement sous 24 heures.'],
+    'dev.become': ['Become a mod dev', 'Devenir moddeur'], 'dev.restore': ['I have a recovery code', 'J\'ai un code de récupération'],
+    'dev.guide': ['How Mod Dev works', 'Fonctionnement de Mod Dev'], 'dev.rules': ['Upload rules', 'Règles d\'envoi'],
+    'dev.lost': ['This PC\'s mod dev key was replaced, so your account was probably restored on another PC. Use your recovery code to bring it back here.', 'La clé de moddeur de ce PC a été remplacée : votre compte a sans doute été restauré sur un autre PC. Utilisez votre code de récupération pour le ramener ici.'],
+    'dev.yourMods': ['Your mods', 'Vos mods'], 'dev.uploadNew': ['Upload a mod', 'Envoyer un mod'], 'dev.uploads': ['Uploads', 'Envois'],
+    'dev.uploadsHint': ['Every upload gets a quick safety check before it goes live', 'Chaque envoi passe une vérification de sécurité rapide avant sa mise en ligne'],
+    'dev.account': ['Account', 'Compte'], 'dev.authorName': ['Author name', 'Nom d\'auteur'], 'dev.recovery': ['Recovery code', 'Code de récupération'],
+    'dev.newCode': ['Make a new code', 'Créer un nouveau code'], 'dev.recoveryNote': ['For a lost code. The old one stops working.', 'Si vous l\'avez perdu. L\'ancien ne fonctionnera plus.'], 'dev.help': ['Help', 'Aide'],
+    'dev.noMods': ['Nothing live yet. Upload your first mod.', 'Rien en ligne pour l\'instant. Envoyez votre premier mod.'], 'dev.noSubs': ['No uploads yet.', 'Aucun envoi pour l\'instant.'],
+    'dev.colStats': ['Downloads · rating', 'Téléchargements · note'], 'dev.colFeedback': ['Feedback', 'Retours'], 'dev.colWhen': ['Sent', 'Envoyé'],
+    'dev.update': ['Upload update', 'Envoyer une mise à jour'], 'dev.withdraw': ['Withdraw', 'Retirer'], 'dev.unread': ['{n} new', '{n} nouveau(x)'], 'dev.read': ['Read', 'Lire'],
+    'dev.kind.new': ['New mod', 'Nouveau mod'], 'dev.kind.update': ['Update', 'Mise à jour'], 'dev.kind.removal': ['Taken down', 'Retrait'],
+    'dev.st.uploading': ['Upload not finished', 'Envoi inachevé'], 'dev.st.pending': ['Waiting for its safety check', 'En attente de vérification'], 'dev.st.approved': ['Live', 'En ligne'],
+    'dev.st.rejected': ['Didn\'t pass the safety check', 'Vérification non réussie'], 'dev.st.withdrawn': ['Withdrawn', 'Retiré'], 'dev.st.removed': ['Taken down', 'Retiré du launcher'],
+    'dev.inbox': ['Feedback from players', 'Retours des joueurs'], 'dev.inboxHint': ['Bugs, suggestions and thanks sent from the launcher', 'Bugs, suggestions et remerciements envoyés depuis le launcher'],
+    'dev.noMsgs': ['No messages yet. Players can send you feedback from your mods\' details.', 'Aucun message. Les joueurs peuvent vous écrire depuis la fiche de vos mods.'], 'dev.from': ['from {n}', 'de {n}'],
+    'dev.offline': ['Couldn\'t reach the modding hub: {e}', 'Impossible de joindre le hub de modding : {e}'],
+    'dev.nameTitle': ['Your author name', 'Votre nom d\'auteur'],
+    'dev.nameText': ['Players see it on your mods. 2 to 32 characters, and it can\'t be changed later.', 'Les joueurs le verront sur vos mods. 2 à 32 caractères, et il ne pourra plus être changé.'],
+    'dev.restoreTitle': ['Restore your mod dev account', 'Restaurer votre compte de moddeur'], 'dev.restoreText': ['Enter your recovery code (16 letters and numbers).', 'Entrez votre code de récupération (16 lettres et chiffres).'],
+    'dev.newCodeTitle': ['Make a new recovery code', 'Créer un nouveau code'], 'dev.newCodeText': ['Your current recovery code will stop working. Make a new one?', 'Votre code actuel ne fonctionnera plus. En créer un nouveau ?'],
+    'dev.make': ['Make a new code', 'Créer le code'], 'dev.withdrawTitle': ['Withdraw upload', 'Retirer l\'envoi'], 'dev.withdrawText': ['Withdraw {m}? It won\'t go live. You can upload it again later.', 'Retirer {m} ? Il ne sera pas mis en ligne. Vous pourrez le renvoyer plus tard.'],
+    'reg.titleOther': ['Before you continue', 'Avant de continuer'], 'reg.saveContinue': ['Save and continue', 'Enregistrer et continuer'],
+    'reg.textOther': ['Ratings, feedback and Mod Dev need a name and email, once per PC. They stay private: your email is never shown or shared.', 'Les notes, les retours et Mod Dev demandent un nom et un e-mail, une seule fois par PC. Ils restent privés : votre e-mail n\'est jamais affiché ni partagé.'],
+    'code.title': ['Your recovery code', 'Votre code de récupération'],
+    'code.first': ['You\'re a mod dev, {n}! Save this code somewhere safe, like a password manager or a photo. It\'s the only way to use your account on another PC, and it won\'t be shown again.', 'Vous êtes moddeur, {n} ! Gardez ce code en lieu sûr, par exemple dans un gestionnaire de mots de passe ou en photo. C\'est le seul moyen d\'utiliser votre compte sur un autre PC, et il ne sera plus affiché.'],
+    'code.again': ['Your new recovery code. The old one no longer works.', 'Votre nouveau code de récupération. L\'ancien ne fonctionne plus.'],
+    'code.note': ['Anyone with this code can upload as you. Don\'t share it.', 'Toute personne ayant ce code peut envoyer des mods en votre nom. Ne le partagez pas.'],
+    'code.copy': ['Copy', 'Copier'], 'code.done': ['I\'ve saved it', 'Je l\'ai noté'], 'code.copied': ['Recovery code copied.', 'Code copié.'],
+    'up.titleNew': ['Upload a new mod', 'Envoyer un nouveau mod'], 'up.titleUpdate': ['Update {m}', 'Mettre à jour {m}'], 'up.modeNew': ['A new mod', 'Un nouveau mod'], 'up.modeUpdate': ['Update: {m}', 'Mise à jour : {m}'],
+    'up.name': ['Mod name', 'Nom du mod'], 'up.nameHint': ['What players see in the launcher. 3 to 60 characters.', 'Ce que les joueurs voient dans le launcher. 3 à 60 caractères.'],
+    'up.version': ['Version', 'Version'], 'up.versionLive': ['Live now: {v}', 'En ligne : {v}'], 'up.category': ['Category', 'Catégorie'], 'up.description': ['Description', 'Description'],
+    'up.descriptionHint': ['What it changes and how to use it (keys, menus). 20 to 2000 characters.', 'Ce qu\'il change et comment l\'utiliser (touches, menus). 20 à 2000 caractères.'],
+    'up.changes': ['What\'s new', 'Nouveautés'], 'up.changesHint': ['For updates: one change per line. Shown in the version history.', 'Pour les mises à jour : un changement par ligne. Affiché dans l\'historique des versions.'],
+    'up.files': ['Mod files', 'Fichiers du mod'], 'up.chooseFiles': ['Choose files', 'Choisir des fichiers'],
+    'up.filesHint': ['or drop them here: .pak, .utoc, .ucas or a .zip, up to 100 MB', 'ou déposez-les ici : .pak, .utoc, .ucas ou un .zip, jusqu\'à 100 Mo'],
+    'up.picture': ['Picture', 'Image'], 'up.choosePicture': ['Choose picture', 'Choisir une image'], 'up.pictureHint': ['shown on the mod\'s card, cropped to 16:9', 'affichée sur la fiche du mod, recadrée en 16:9'],
+    'up.shots': ['Screenshots', 'Captures'], 'up.chooseShots': ['Add screenshots', 'Ajouter des captures'], 'up.shotsHint': ['optional, up to 6', 'facultatif, jusqu\'à 6'],
+    'up.links': ['Needs and clashes', 'Dépendances et conflits'], 'up.linksHint': ['Optional: mods yours needs, or can\'t run with', 'Facultatif : mods nécessaires ou incompatibles'],
+    'up.needs': ['Needs (installed with it):', 'Nécessite (installés avec lui) :'], 'up.clashes': ['Clashes with (only one can load):', 'En conflit avec (un seul peut être chargé) :'],
+    'up.promise': ['I made this mod, or have permission to share everything in it. It has nothing ripped from other games and nothing harmful.', 'J\'ai créé ce mod, ou j\'ai la permission de partager tout son contenu. Il ne contient rien d\'extrait d\'autres jeux et rien de nuisible.'],
+    'up.send': ['Upload', 'Envoyer'], 'up.sendNote': ['We run a quick safety check on every upload, then it goes live, usually within 24 hours.', 'Nous faisons une vérification de sécurité rapide sur chaque envoi, puis il est mis en ligne, généralement sous 24 heures.'],
+    'up.err.name': ['Give the mod a name of 3 to 60 characters.', 'Donnez au mod un nom de 3 à 60 caractères.'], 'up.err.version': ['The version should start with a number, like 1 or 1.2.', 'La version doit commencer par un chiffre, comme 1 ou 1.2.'],
+    'up.err.sameVersion': ['That version is already live. Give the update a new number.', 'Cette version est déjà en ligne. Donnez un nouveau numéro à la mise à jour.'],
+    'up.err.description': ['Write a description of at least 20 characters.', 'Écrivez une description d\'au moins 20 caractères.'], 'up.err.files': ['Add the mod\'s files.', 'Ajoutez les fichiers du mod.'],
+    'up.err.sets': ['{s} needs all three files: .pak, .utoc and .ucas.', '{s} a besoin des trois fichiers : .pak, .utoc et .ucas.'], 'up.err.noPak': ['A mod needs at least one .pak file.', 'Un mod a besoin d\'au moins un fichier .pak.'],
+    'up.err.size': ['Mods can be up to 100 MB for now.', 'Les mods sont limités à 100 Mo pour l\'instant.'], 'up.err.gameFile': ['{f} looks like one of the game\'s own files.', '{f} ressemble à un fichier du jeu.'],
+    'up.err.picture': ['Add a picture.', 'Ajoutez une image.'], 'up.err.promise': ['Tick the box to confirm the mod is yours to share.', 'Cochez la case pour confirmer que vous pouvez partager ce mod.'],
+    'up.sending': ['Uploading...', 'Envoi...'], 'up.done': ['Uploaded {m}. It shows under My mods while it waits for its safety check.', '{m} envoyé. Il apparaît dans Mes mods en attendant sa vérification.'],
+    'msg.feedbackTitle': ['Feedback on {m}', 'Avis sur {m}'], 'msg.feedbackText': ['Goes privately to {a}, the mod\'s developer, with your name.', 'Envoyé en privé à {a}, le développeur du mod, avec votre nom.'],
+    'msg.reportTitle': ['Report {m}', 'Signaler {m}'], 'msg.reportText': ['Goes privately to the modding hub team. Use it for broken, stolen or harmful mods.', 'Envoyé en privé à l\'équipe du hub. Pour les mods cassés, volés ou nuisibles.'],
+    'fb.bug': ['Bug: something doesn\'t work', 'Bug : quelque chose ne marche pas'], 'fb.idea': ['Suggestion', 'Suggestion'], 'fb.thanks': ['Thanks', 'Remerciements'],
+    'rp.broken': ['It doesn\'t work or breaks the game', 'Il ne fonctionne pas ou casse le jeu'], 'rp.stolen': ['It contains someone else\'s work', 'Il contient le travail de quelqu\'un d\'autre'],
+    'rp.harmful': ['It\'s harmful or unsafe', 'Il est nuisible ou dangereux'], 'rp.inappropriate': ['Inappropriate content', 'Contenu inapproprié'], 'rp.other': ['Something else', 'Autre chose'],
+    'msg.send': ['Send', 'Envoyer'], 'msg.short': ['Write at least 10 characters.', 'Écrivez au moins 10 caractères.'], 'msg.sending': ['Sending...', 'Envoi...'],
+    'msg.sentFeedback': ['Sent to the developer. Thanks!', 'Envoyé au développeur. Merci !'], 'msg.sentReport': ['Report sent. Thanks for looking out.', 'Signalement envoyé. Merci de votre vigilance.'],
+    'b.feedback': ['Feedback', 'Donner un avis'], 'b.report': ['Report', 'Signaler'], 'd.yours': ['Your mod', 'Votre mod'], 'd.added': ['Added', 'Ajouté le'],
+    'sort.downloads': ['Sort: most downloaded', 'Tri : plus téléchargés'], 'sort.rating': ['Sort: top rated', 'Tri : mieux notés'], 'sort.newest': ['Sort: newest', 'Tri : plus récents'],
+    'st.new': ['NEW', 'NOUVEAU'],
+    'al.devLive': ['{m} {v} is live', '{m} {v} est en ligne'], 'al.devLiveText': ['Players can find it in the launcher now.', 'Les joueurs le trouvent maintenant dans le launcher.'],
+    'al.devRejected': ['{m} {v} didn\'t pass the safety check', '{m} {v} n\'a pas passé la vérification'], 'al.devRemoved': ['{m} was taken down', '{m} a été retiré'],
+    'al.devMsgs': ['{n} new messages about your mods', '{n} nouveaux messages sur vos mods'], 'al.devMsg1': ['1 new message about your mods', '1 nouveau message sur vos mods'], 'al.open': ['Open', 'Ouvrir'],
+    'new.title': ['What\'s new in {v}', 'Nouveautés de la {v}'], 'new.text': ['The launcher updated to {v}:', 'Le launcher est passé en {v} :'],
+    'drop.library': ['Drop to add these mod files to your library', 'Déposez pour ajouter ces fichiers à votre bibliothèque']
   };
   var lang = 'en';
   function t(key, vars) {
@@ -512,8 +677,8 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = t(el.dataset.tp); });
     document.querySelectorAll('[data-tt]').forEach(function (el) { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
     var after = $('o-after'); after.innerHTML = ['minimise', 'close', 'none'].map(function (v) { return '<option value="' + v + '">' + esc(t('after.' + v)) + '</option>'; }).join('');
-    var start = $('o-start'); start.innerHTML = '<option value="dashboard">' + esc(t('tab.dashboard')) + '</option><option value="mods">' + esc(t('nav.mods').charAt(0) + t('nav.mods').slice(1).toLowerCase()) + '</option><option value="presets">' + esc(t('tab.presets')) + '</option>';
-    $('f-sort').innerHTML = ['category', 'name', 'author'].map(function (v) { return '<option value="' + v + '">' + esc(t('sort.' + v)) + '</option>'; }).join('');
+    var start = $('o-start'); start.innerHTML = '<option value="dashboard">' + esc(t('tab.dashboard')) + '</option><option value="mods">' + esc(t('nav.mods').charAt(0) + t('nav.mods').slice(1).toLowerCase()) + '</option><option value="presets">' + esc(t('tab.presets')) + '</option><option value="dev">' + esc(t('tab.dev')) + '</option>';
+    $('f-sort').innerHTML = ['category', 'name', 'author', 'downloads', 'rating', 'newest'].map(function (v) { return '<option value="' + v + '">' + esc(t('sort.' + v)) + '</option>'; }).join('');
     syncOptions();
   }
 
@@ -521,10 +686,12 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     dashboard: [['tab.dashboard', null]],
     mods: [['tab.loaded', 'mods-loaded'], ['tab.all', 'mods-all'], ['tab.updates', 'mods-updates']],
     presets: [['tab.presets', null]],
+    dev: [['tab.devMine', 'dev-mine'], ['tab.devSubmit', 'dev-submit'], ['tab.devInbox', 'dev-inbox']],
     options: [['tab.launcher', 'opt-launcher'], ['tab.game', 'opt-game'], ['tab.help', 'opt-help']]
   };
   function go(screen, sub) {
     S.screen = screen;
+    if (screen === 'dev' && !DEV) send('devLoad');
     document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('on', s.id === 'screen-' + screen); });
     document.querySelectorAll('.nav').forEach(function (n) { n.classList.toggle('on', n.dataset.screen === screen); });
     if (sub) S.sub[screen] = sub;
@@ -532,14 +699,17 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
   }
   function renderTabs() {
     var el = $('tabs'), screen = S.screen, cur = S.sub[screen] || (TABS[screen][0][1]);
-    var html = TABS[screen].map(function (tb) {
+    var tabs = screen === 'dev' && !(DEV && DEV.account) ? [['tab.dev', null]] : TABS[screen];
+    var html = tabs.map(function (tb) {
       var label = t(tb[0]);
       if (tb[1] === 'mods-updates' && countUpdates()) label += ' (' + countUpdates() + ')';
+      if (tb[1] === 'dev-inbox' && devUnread()) label += ' (' + devUnread() + ')';
       return '<button class="t' + (tb[1] === cur || !tb[1] ? ' on' : '') + '" data-sub="' + (tb[1] || '') + '">' + esc(label) + '</button>';
     }).join('');
     var right = '';
     el.innerHTML = html + '<div class="right">' + esc(right) + '</div>';
     if (cur) $('screen-' + screen).querySelectorAll('.sub').forEach(function (s) { s.classList.toggle('on', s.id === cur); });
+    if (screen === 'dev' && cur === 'dev-inbox' && devUnread()) setTimeout(function () { if (S.screen === 'dev' && S.sub.dev === 'dev-inbox') send('devRead', { ids: [] }); }, 1500);
   }
 
   // ---------------------------------------------------------------- data helpers
@@ -549,7 +719,7 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
   function localById(id) { return S.state ? S.state.local.filter(function (m) { return m.id === id; })[0] : null; }
   function countUpdates() { return mods().filter(function (m) { return m.state === 'UpdateAvailable'; }).length; }
   function loadedList() { return mods().filter(function (m) { return m.loaded; }); }
-  function loadedCount() { return loadedList().length + (S.state ? S.state.local.filter(function (l) { return l.loaded; }).length : 0); }
+  function loadedCount() { return loadedList().filter(function (m) { return !m.hidden; }).length + (S.state ? S.state.local.filter(function (l) { return l.loaded; }).length : 0); }
   function catLabel(c) { return STR['cat.' + c] ? t('cat.' + c) : c; }
   function statusHtml(m) {
     var parts = [];
@@ -559,6 +729,7 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     if (m.replacedBy) parts.push('<span class="tag">' + esc(t('st.replaced', { b: m.replacedBy })) + '</span>');
     if (!m.loaded && m.conflicts.some(function (c) { return loadedList().some(function (l) { return l.name === c; }); })) parts.push('<span class="tag bad">' + esc(t('st.clash')) + '</span>');
     if (m.loaded && m.tested === false) parts.push('<span class="tag">' + esc(t('st.untested')) + '</span>');
+    if (m.isNew) parts.unshift('<span class="tag new">' + esc(t('st.new')) + '</span>');
     return parts.join(' ');
   }
   function thumb(src) { return src ? '<img class="thumb" src="' + esc(src) + '" alt="" onerror="this.outerHTML=\'<div class=thumb>.pak</div>\'">' : '<div class="thumb">.pak</div>'; }
@@ -620,6 +791,7 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     renderMods();
     renderPresets();
     renderOptionsData();
+    renderDev();
     renderTabs();
   }
 
@@ -774,6 +946,15 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       mods().filter(function (m) { return m.replacedBy && m.state !== 'NotDownloaded'; }).forEach(function (m) {
         a.push([t('al.replaced', { a: m.name, b: m.replacedBy }), '', '<button class="btn" data-act="switch" data-id="' + esc(m.id) + '">' + esc(t('al.switch')) + '</button>']);
       });
+      // Mod Dev: decisions on uploads the author hasn't seen, and new feedback
+      if (DEV && DEV.account && DEV.submissions) {
+        DEV.submissions.filter(function (x) { return x.unseen; }).forEach(function (x) {
+          var title = x.status === 'approved' ? t('al.devLive', { m: x.name, v: x.version }) : x.status === 'removed' ? t('al.devRemoved', { m: x.name }) : t('al.devRejected', { m: x.name, v: x.version });
+          a.push([title, x.status === 'approved' ? t('al.devLiveText') : x.reason || '', '<button class="btn" data-act="devSeen">' + esc(t('al.ok')) + '</button>', x.status !== 'approved']);
+        });
+        var un = devUnread();
+        if (un) a.push([un === 1 ? t('al.devMsg1') : t('al.devMsgs', { n: un }), '', '<button class="btn" data-act="devInbox">' + esc(t('al.open')) + '</button>']);
+      }
     }
     // alerts only show when something needs attention
     $('alerts').style.display = a.length ? '' : 'none';
@@ -781,7 +962,8 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       return '<div class="al"><div>' + (x[3] ? '<span class="warn">' + esc(x[0]) + '</span>' : esc(x[0])) + (x[1] ? '<div class="dim">' + esc(x[1]) + '</div>' : '') + '</div>' + x[2] + '</div>';
     }).join('');
     // loaded mods as thumbnails; a click opens the mod on the Mods page
-    var loads = loadedList(), locals = st ? st.local.filter(function (l) { return l.loaded; }) : [], total = 0;
+    var loads = loadedList().filter(function (m) { return !m.hidden; }), locals = st ? st.local.filter(function (l) { return l.loaded; }) : [], total = 0;
+    loadedList().forEach(function (m) { if (m.hidden) total += m.size; });
     loads.forEach(function (m) { total += m.size; }); locals.forEach(function (l) { total += l.size; });
     $('loads-size').textContent = total ? size(total) : '';
     var tile = function (id, name, src, sub) {
@@ -809,8 +991,9 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     var sort = $('f-sort').value, html = '';
     if (!list.length && !locals.length) return grid ? '<div class="empty">' + esc(emptyText) + '</div>'
       : '<table class="modt"><thead>' + head() + '</thead><tbody><tr><td colspan="7" class="empty">' + esc(emptyText) + '</td></tr></tbody></table>';
-    if (sort === 'name' || sort === 'author') {
-      list = list.slice().sort(function (a, b) { return (sort === 'author' ? a.author.localeCompare(b.author) || 0 : 0) || a.name.localeCompare(b.name); });
+    if (sort !== 'category') {
+      var sv = function (m) { var x = stat(m.id) || {}; return sort === 'downloads' ? x.downloads || 0 : sort === 'rating' ? (x.rating || 0) * 1000 + (x.ratings || 0) : sort === 'newest' ? (m.isNew ? 1e13 : 0) + (m.added ? Date.parse(m.added) : 0) : 0; };
+      list = list.slice().sort(function (a, b) { return (sort === 'author' ? a.author.localeCompare(b.author) || 0 : 0) || (sv(b) - sv(a)) || a.name.localeCompare(b.name); });
       html = list.map(item).join('');
     } else {
       var cats = [];
@@ -873,6 +1056,7 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       '" alt="" onerror="this.parentNode.outerHTML=\'<div class=noimg></div>\'"><span class="n">&#10530; ' + (shots.length > 1 ? esc(t('lb.count', { i: 1, n: shots.length })) : '') + '</span></button>' : '<div class="noimg"></div>') +
       '<div class="in"><h3>' + esc(m.name.toUpperCase()) + '</h3>' + (m.description ? '<div>' + esc(m.description) + '</div>' : '') +
       '<dl><dt>' + esc(t('d.author')) + '</dt><dd>' + esc(m.author) + '</dd><dt>' + esc(t('d.version')) + '</dt><dd>' + esc(m.version) + '</dd>' +
+      (m.added ? '<dt>' + esc(t('d.added')) + '</dt><dd>' + esc(day(Date.parse(m.added) / 1000)) + '</dd>' : '') +
       '<dt>' + esc(t('d.status')) + '</dt><dd>' + esc(stText) + '</dd>' +
       (m.requires.length ? '<dt>' + esc(t('d.needs')) + '</dt><dd>' + esc(list(m.requires)) + '</dd>' : '') +
       (m.includes.length ? '<dt>' + esc(t('d.includes')) + '</dt><dd>' + esc(list(m.includes)) + '</dd>' : '') +
@@ -886,7 +1070,9 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       }).join('') + '</div></details>' : '') +
       '<div class="acts"><button class="btn red" data-act="' + main[0] + '" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t(main[1])) + '</button>' +
       (m.page ? '<button class="btn" data-url="' + esc(m.page) + '">' + esc(t('b.page')) + '</button>' : '') +
-      (m.state !== 'NotDownloaded' ? '<button class="btn" data-act="remove" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t('b.delete')) + '</button>' : '') + '</div></div>';
+      (m.state !== 'NotDownloaded' ? '<button class="btn" data-act="remove" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t('b.delete')) + '</button>' : '') + '</div>' +
+      '<div class="acts">' + (isMine(m.id) ? '<span class="mine">' + esc(t('d.yours')) + '</span>' : '<button class="linkbtn" data-act="feedback" data-id="' + esc(m.id) + '">' + esc(t('b.feedback')) + '</button>' +
+        '<button class="linkbtn" data-act="report" data-id="' + esc(m.id) + '">' + esc(t('b.report')) + '</button>') + '</div></div>';
   }
 
   function ratingRows(m) {
@@ -910,10 +1096,13 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
   var regPending = null;
   function openReg(pending) {
     regPending = pending || null;
+    var rating = !!(pending && pending.modId);
+    $('dlg-reg').querySelector('[data-t="reg.title"]').textContent = t(rating ? 'reg.title' : 'reg.titleOther');
+    $('dlg-reg').querySelector('[data-t="reg.text"]').textContent = t(rating ? 'reg.text' : 'reg.textOther');
     $('reg-name').value = S.settings.profileName || ''; $('reg-email').value = S.settings.profileEmail || '';
     $('reg-ok').querySelector('.cb').classList.toggle('on', !!S.settings.profileName);
     $('reg-err').textContent = ''; $('reg-save').disabled = false;
-    $('reg-save').textContent = t(pending ? 'reg.save' : 'reg.saveOnly');
+    $('reg-save').textContent = t(rating ? 'reg.save' : pending ? 'reg.saveContinue' : 'reg.saveOnly');
     $('dlg-reg').classList.add('open'); $('reg-name').focus();
   }
   function rate(id, stars) {
@@ -928,9 +1117,187 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { $('reg-err').textContent = t('reg.badEmail'); return; }
     if (!$('reg-ok').querySelector('.cb').classList.contains('on')) { $('reg-err').textContent = t('reg.needTick'); return; }
     $('reg-err').textContent = t('reg.saving'); $('reg-save').disabled = true;
-    send('register', { name: n, email: em, modId: regPending ? regPending.modId : '', stars: regPending ? String(regPending.stars) : '' });
+    send('register', { name: n, email: em, modId: regPending && regPending.modId ? regPending.modId : '', stars: regPending && regPending.modId ? String(regPending.stars) : '' });
   });
   $('o-profile-edit').addEventListener('click', function () { openReg(null); });
+
+  // ---------------------------------------------------------------- Mod Dev
+  var DEV = null, pendingWithdraw = null;
+  var CATS = ['Lights and sirens', 'Vehicles and liveries', 'Uniforms and gear', 'Sounds', 'Maps and scenarios', 'Tools', 'Other'];
+  var UP = { modId: '', files: [], thumb: null, shots: [] };
+  function isMine(id) { return !!(DEV && DEV.mods && DEV.mods.some(function (m) { return m.modId === id; })); }
+  function devUnread() { return DEV && DEV.inbox ? DEV.inbox.filter(function (x) { return !x.read; }).length : 0; }
+  function renderDev() {
+    var has = !!(DEV && DEV.account);
+    var badge = devUnread() + (DEV && DEV.submissions ? DEV.submissions.filter(function (x) { return x.unseen; }).length : 0);
+    $('nav-dev').textContent = badge ? String(badge) : '';
+    $('dev-intro').style.display = has ? 'none' : '';
+    $('dev-body').style.display = has ? '' : 'none';
+    $('dev-lost').style.display = DEV && DEV.lost ? '' : 'none';
+    if (!has) return;
+    $('dev-name').textContent = (DEV.author ? DEV.author.name : S.settings.authorName) + (DEV.offline ? ' · ' + t('dev.offline', { e: DEV.offline }) : '');
+    var dis = S.busy ? ' disabled' : '';
+    var mm = DEV.mods || [];
+    $('dev-mods').innerHTML = mm.length ? '<table><thead><tr><th>' + esc(t('col.mod')) + '</th><th style="width:70px">' + esc(t('col.version')) + '</th><th style="width:150px">' + esc(t('dev.colStats')) +
+      '</th><th style="width:90px">' + esc(t('dev.colFeedback')) + '</th><th style="width:150px"></th></tr></thead><tbody>' + mm.map(function (m) {
+        var live = modById(m.modId);
+        return '<tr class="m" data-open="' + esc(m.modId) + '"><td><div class="modname">' + thumb(m.thumb || (live && live.thumb)) + '<span>' + esc(m.name) + '</span></div></td><td>' + esc(m.version || '') + '</td><td class="pop">' + (popHtml(m.modId) || '&#8212;') +
+          '</td><td>' + esc(m.feedback || 0) + (m.unread ? ' <span class="tag">' + esc(t('dev.unread', { n: m.unread })) + '</span>' : '') +
+          '</td><td style="text-align:right"><button class="btn" data-act="devUpdate" data-id="' + esc(m.modId) + '"' + dis + '>' + esc(t('dev.update')) + '</button></td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">' + esc(t('dev.noMods')) + '</div>';
+    var subs = DEV.submissions || [];
+    $('dev-subs').innerHTML = subs.length ? '<table><thead><tr><th>' + esc(t('col.mod')) + '</th><th style="width:70px">' + esc(t('col.version')) + '</th><th>' + esc(t('col.status')) +
+      '</th><th style="width:80px">' + esc(t('dev.colWhen')) + '</th><th style="width:90px"></th></tr></thead><tbody>' + subs.map(function (x) {
+        var cls = x.status === 'approved' ? 'st-live' : x.status === 'pending' || x.status === 'uploading' ? 'st-wait' : x.status === 'withdrawn' ? 'dim' : 'st-no';
+        return '<tr><td>' + esc(x.name) + ' <span class="dim">· ' + esc(t('dev.kind.' + x.kind)) + '</span></td><td>' + esc(x.version || '') + '</td><td><span class="' + cls + '">' + esc(t('dev.st.' + x.status)) + '</span>' +
+          (x.reason ? '<div class="dim">' + esc(x.reason) + '</div>' : '') + '</td><td class="dim">' + esc(day(Date.parse(x.createdAt) / 1000)) + '</td><td style="text-align:right">' +
+          (x.status === 'pending' || x.status === 'uploading' ? '<button class="btn" data-act="devWithdraw" data-id="' + esc(x.id) + '"' + dis + '>' + esc(t('dev.withdraw')) + '</button>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>' : '<div class="empty">' + esc(t('dev.noSubs')) + '</div>';
+    var inbox = DEV.inbox || [];
+    $('dev-msgs').innerHTML = inbox.length ? inbox.map(function (x) {
+      var m = mm.filter(function (y) { return y.modId === x.modId; })[0];
+      return '<div class="msg"><div class="mh">' + (x.read ? '' : '<span class="unread"></span>') + '<span class="kind">' + esc(t('fb.' + x.kind).split(':')[0].toUpperCase()) + '</span><b style="color:var(--ink)">' +
+        esc(m ? m.name : x.modId) + '</b> · ' + esc(t('dev.from', { n: x.from })) + ' · ' + esc(day(Date.parse(x.createdAt) / 1000)) + '</div><div class="mt">' + esc(x.text) + '</div></div>';
+    }).join('') : '<div class="empty">' + esc(t('dev.noMsgs')) + '</div>';
+    renderUpload();
+  }
+  function needProfile(then) { if (S.settings.profileName) { then(); return; } openReg({ then: then }); }
+  $('dev-become').addEventListener('click', function () {
+    needProfile(function () { ask(t('dev.nameTitle'), t('dev.nameText'), S.settings.profileName || '', function (v) { send('devSetup', { name: v }); }); });
+  });
+  $('dev-restore').addEventListener('click', function () { ask(t('dev.restoreTitle'), t('dev.restoreText'), '', function (v) { send('devRecover', { code: v }); }); });
+  $('dev-newcode').addEventListener('click', function () { openAsk('devNewCode', t('dev.newCodeTitle'), t('dev.newCodeText'), [t('dev.make'), t('cancel')]); });
+  function openCode(code, first) {
+    $('code-text').textContent = first ? t('code.first', { n: S.settings.authorName || '' }) : t('code.again');
+    $('code-value').textContent = code; $('dlg-code').classList.add('open');
+  }
+  $('code-copy').addEventListener('click', function () { var c = $('code-value').textContent; if (navigator.clipboard) navigator.clipboard.writeText(c).then(function () { note(t('code.copied')); }); });
+  $('code-done').addEventListener('click', function () { $('dlg-code').classList.remove('open'); });
+
+  // ---- upload form
+  function ownedMods() { return DEV && DEV.mods ? DEV.mods : []; }
+  function openUpload(modId) { resetUpload(); UP.modId = modId || ''; renderUpload(); fillFromMod(); renderUpload(); go('dev', 'dev-submit'); }
+  function resetUpload() {
+    UP = { modId: '', files: [], thumb: null, shots: [] };
+    ['up-name', 'up-version', 'up-description', 'up-changes'].forEach(function (id) { $(id).value = ''; });
+    $('up-category').value = ''; $('up-ok').querySelector('.cb').classList.remove('on'); $('up-err').textContent = ''; $('up-send').disabled = false;
+    document.querySelectorAll('#up-requires .cb, #up-conflicts .cb').forEach(function (c) { c.classList.remove('on'); });
+    renderUpload();
+  }
+  function fillFromMod() {
+    var o = ownedMods().filter(function (m) { return m.modId === UP.modId; })[0], live = UP.modId ? modById(UP.modId) : null;
+    if (!o) { UP.modId = ''; return; }
+    $('up-name').value = o.name || ''; $('up-category').value = (live && live.category) || o.category || '';
+    $('up-description').value = (live && live.description) || ''; $('up-version').value = '';
+    var req = live ? (live.requiresIds || []) : [], con = live ? (live.conflictsIds || []) : [];
+    document.querySelectorAll('#up-requires [data-pick]').forEach(function (c) { c.querySelector('.cb').classList.toggle('on', req.indexOf(c.dataset.pick) >= 0); });
+    document.querySelectorAll('#up-conflicts [data-pick]').forEach(function (c) { c.querySelector('.cb').classList.toggle('on', con.indexOf(c.dataset.pick) >= 0); });
+  }
+  function renderUpload() {
+    var owned = ownedMods(), mode = $('up-mode');
+    mode.innerHTML = '<option value="">' + esc(t('up.modeNew')) + '</option>' + owned.map(function (m) { return '<option value="' + esc(m.modId) + '">' + esc(t('up.modeUpdate', { m: m.name })) + '</option>'; }).join('');
+    mode.value = UP.modId;
+    var o = owned.filter(function (m) { return m.modId === UP.modId; })[0];
+    $('up-title').textContent = o ? t('up.titleUpdate', { m: o.name }) : t('up.titleNew');
+    $('up-version-hint').textContent = o && o.version ? t('up.versionLive', { v: o.version }) : '';
+    var cat = $('up-category'), cv = cat.value;
+    cat.innerHTML = '<option value=""></option>' + CATS.map(function (c) { return '<option value="' + esc(c) + '">' + esc(catLabel(c)) + '</option>'; }).join(''); cat.value = cv;
+    // needs / clashes: every mod in the list except this one
+    ['up-requires', 'up-conflicts'].forEach(function (id) {
+      var box = $(id), on = {};
+      box.querySelectorAll('[data-pick]').forEach(function (c) { if (c.querySelector('.cb.on')) on[c.dataset.pick] = 1; });
+      box.innerHTML = mods().filter(function (m) { return m.id !== UP.modId && !m.replacedBy; }).sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (m) {
+        return '<span class="chk" data-pick="' + esc(m.id) + '"><span class="cb' + (on[m.id] ? ' on' : '') + '"></span><span>' + esc(m.name) + '</span></span>';
+      }).join('');
+    });
+    $('up-files').innerHTML = UP.files.map(function (f, i) { return '<div><span>' + esc(f.name) + '</span><span class="dim">' + esc(size(f.size)) + '</span><button class="x" data-rmfile="' + i + '" title="Remove">&#215;</button></div>'; }).join('');
+    $('up-files-warn').textContent = fileProblem() || '';
+    var pic = function (p, i, which) { return '<figure><img src="' + esc(p.preview) + '" alt=""><button class="x" data-rmpic="' + which + '" data-i="' + i + '">&#215;</button></figure>'; };
+    $('up-thumb').innerHTML = UP.thumb ? pic(UP.thumb, 0, 'thumb') : '';
+    $('up-shots').innerHTML = UP.shots.map(function (p, i) { return pic(p, i, 'shots'); }).join('');
+  }
+  function fileProblem() {
+    if (!UP.files.length) return '';
+    var names = UP.files.map(function (f) { return f.name.toLowerCase(); }), total = 0;
+    UP.files.forEach(function (f) { total += f.size; });
+    if (total > 100 * 1048576) return t('up.err.size');
+    var game = UP.files.filter(function (f) { return /^(wildfire|global)/i.test(f.name); })[0];
+    if (game) return t('up.err.gameFile', { f: game.name });
+    if (!names.some(function (n) { return /\.pak$/.test(n); })) return t('up.err.noPak');
+    for (var i = 0; i < names.length; i++) {
+      var stem = names[i].replace(/\.(pak|utoc|ucas)$/, '');
+      if (/\.(utoc|ucas)$/.test(names[i]) && !(names.indexOf(stem + '.pak') >= 0 && names.indexOf(stem + '.utoc') >= 0 && names.indexOf(stem + '.ucas') >= 0)) return t('up.err.sets', { s: stem });
+    }
+    return '';
+  }
+  function picked(id) { var out = []; $(id).querySelectorAll('[data-pick]').forEach(function (c) { if (c.querySelector('.cb.on')) out.push(c.dataset.pick); }); return out; }
+  $('up-mode').addEventListener('change', function () { UP.modId = this.value; if (UP.modId) fillFromMod(); renderUpload(); });
+  $('up-files-btn').addEventListener('click', function () { send('devPickFiles'); });
+  $('up-thumb-btn').addEventListener('click', function () { send('devPickImages', { which: 'thumb' }); });
+  $('up-shots-btn').addEventListener('click', function () { send('devPickImages', { which: 'shots' }); });
+  $('up-ok').addEventListener('click', function (e) { if (e.target.closest('a')) return; this.querySelector('.cb').classList.toggle('on'); });
+  $('dev-submit').addEventListener('click', function (e) {
+    var pk = e.target.closest('[data-pick]'); if (pk) { pk.querySelector('.cb').classList.toggle('on'); return; }
+    var rf = e.target.closest('[data-rmfile]'); if (rf) { UP.files.splice(+rf.dataset.rmfile, 1); renderUpload(); return; }
+    var rp = e.target.closest('[data-rmpic]'); if (rp) { if (rp.dataset.rmpic === 'thumb') UP.thumb = null; else UP.shots.splice(+rp.dataset.i, 1); renderUpload(); }
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-devnew]')) openUpload(''); });
+  $('up-send').addEventListener('click', function () {
+    var o = ownedMods().filter(function (m) { return m.modId === UP.modId; })[0];
+    var f = { modId: UP.modId, name: $('up-name').value.trim(), version: $('up-version').value.trim(), category: $('up-category').value,
+      description: $('up-description').value.trim(), changelog: $('up-changes').value.trim() };
+    var err = f.name.length < 3 || f.name.length > 60 ? t('up.err.name') : !/^[0-9][0-9A-Za-z.]{0,15}$/.test(f.version) ? t('up.err.version') : o && o.version === f.version ? t('up.err.sameVersion')
+      : !f.category ? t('up.category') + '?' : f.description.length < 20 ? t('up.err.description') : !UP.files.length ? t('up.err.files') : fileProblem() || (!UP.thumb ? t('up.err.picture') : '')
+      || (!$('up-ok').querySelector('.cb.on') ? t('up.err.promise') : '');
+    if (err) { $('up-err').textContent = err; return; }
+    f.files = UP.files.map(function (x) { return x.path; }); f.thumb = UP.thumb.path; f.shots = UP.shots.map(function (x) { return x.path; });
+    f.requires = picked('up-requires'); f.conflicts = picked('up-conflicts');
+    $('up-err').textContent = t('up.sending'); $('up-send').disabled = true;
+    send('devSubmit', f);
+  });
+
+  // ---- player feedback and reports
+  var MSG = { what: '', modId: '' };
+  function openMsg(what, modId) {
+    var m = modById(modId); if (!m) return;
+    needProfile(function () {
+      MSG = { what: what, modId: modId };
+      $('msg-title').textContent = t(what === 'report' ? 'msg.reportTitle' : 'msg.feedbackTitle', { m: m.name });
+      $('msg-text').textContent = t(what === 'report' ? 'msg.reportText' : 'msg.feedbackText', { a: m.author });
+      $('msg-kind').innerHTML = (what === 'report' ? ['broken', 'stolen', 'harmful', 'inappropriate', 'other'].map(function (k) { return '<option value="' + k + '">' + esc(t('rp.' + k)) + '</option>'; })
+        : ['bug', 'idea', 'thanks'].map(function (k) { return '<option value="' + k + '">' + esc(t('fb.' + k)) + '</option>'; })).join('');
+      $('msg-body').value = ''; $('msg-err').textContent = ''; $('msg-send').disabled = false;
+      $('dlg-msg').classList.add('open'); $('msg-body').focus();
+    });
+  }
+  $('msg-cancel').addEventListener('click', function () { $('dlg-msg').classList.remove('open'); });
+  $('msg-send').addEventListener('click', function () {
+    var text = $('msg-body').value.trim();
+    if (MSG.what === 'feedback' && text.length < 10) { $('msg-err').textContent = t('msg.short'); return; }
+    $('msg-err').textContent = t('msg.sending'); $('msg-send').disabled = true;
+    var o = { modId: MSG.modId, text: text }; if (MSG.what === 'report') o.reason = $('msg-kind').value; else o.kind = $('msg-kind').value;
+    send(MSG.what, o);
+  });
+
+  // ---- drag and drop: onto the upload form's boxes, or anywhere else to add mod files to the library
+  var dragDepth = 0;
+  function hasFiles(e) { return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0; }
+  function dropTarget(e) { var z = e.target.closest && e.target.closest('[data-drop]'); return z && S.screen === 'dev' ? z : null; }
+  document.addEventListener('dragenter', function (e) { if (!hasFiles(e)) return; dragDepth++; document.body.classList.add('dragging'); });
+  document.addEventListener('dragleave', function (e) { if (!hasFiles(e)) return; if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragging', 'droplib'); } });
+  document.addEventListener('dragover', function (e) {
+    if (!hasFiles(e)) return; e.preventDefault();
+    var z = dropTarget(e);
+    document.querySelectorAll('.dropzone.over').forEach(function (x) { if (x !== z) x.classList.remove('over'); });
+    if (z) z.classList.add('over');
+    document.body.classList.toggle('droplib', !z && !(S.screen === 'dev' && S.sub.dev === 'dev-submit'));
+  });
+  document.addEventListener('drop', function (e) {
+    if (!hasFiles(e)) return; e.preventDefault();
+    var z = dropTarget(e), target = z ? z.dataset.drop : S.screen === 'dev' && S.sub.dev === 'dev-submit' ? 'devFiles' : 'library';
+    dragDepth = 0; document.body.classList.remove('dragging', 'droplib'); document.querySelectorAll('.dropzone.over').forEach(function (x) { x.classList.remove('over'); });
+    if (window.chrome.webview.postMessageWithAdditionalObjects) window.chrome.webview.postMessageWithAdditionalObjects({ cmd: 'drop', target: target }, e.dataTransfer.files);
+  });
 
   function syncOptions() {
     var s = S.settings;
@@ -965,6 +1332,9 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     dlg.classList.remove('open');
     if (dlg.dataset.id === 'launcherUpdate') { if (choice === 0) send('selfUpdate'); }
     else if (dlg.dataset.id === 'deletePreset') { if (choice === 0 && pendingDelete) send('deletePreset', { id: pendingDelete }); pendingDelete = null; }
+    else if (dlg.dataset.id === 'devNewCode') { if (choice === 0) send('devNewCode'); }
+    else if (dlg.dataset.id === 'devWithdraw') { if (choice === 0 && pendingWithdraw) send('devWithdraw', { id: pendingWithdraw }); pendingWithdraw = null; }
+    else if (dlg.dataset.id === 'whatsNew') { }
     else send('answer', { id: dlg.dataset.id, choice: String(choice) });
     if (askQueue.length) openAsk.apply(null, askQueue.shift());
   }
@@ -1025,6 +1395,11 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       else if (a === 'update') send('update', { ids: [aid] });
       else if (a === 'dismissGame') { send('setOption', { key: 'dismissGameUpdated', value: true }); S.state.game.updated = false; render(); }
       else if (a === 'switch') send('switchReplaced', { id: aid });
+      else if (a === 'devSeen') { if (DEV && DEV.submissions) DEV.submissions.forEach(function (x) { x.unseen = false; }); send('devSeen'); renderDashboard(); }
+      else if (a === 'devInbox') go('dev', 'dev-inbox');
+      else if (a === 'devUpdate') { openUpload(aid); }
+      else if (a === 'devWithdraw') { pendingWithdraw = aid; var sx = (DEV.submissions || []).filter(function (x) { return String(x.id) === aid; })[0]; openAsk('devWithdraw', t('dev.withdrawTitle'), t('dev.withdrawText', { m: sx ? sx.name : '' }), [t('dev.withdraw'), t('cancel')]); }
+      else if (a === 'feedback' || a === 'report') openMsg(a, aid);
       else send(a, { id: aid });
       return;
     }
@@ -1048,6 +1423,10 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
     if ($('dlg-reg').classList.contains('open')) {
       if (e.key === 'Escape') { $('dlg-reg').classList.remove('open'); regPending = null; }
       else if (e.key === 'Enter' && e.target.tagName === 'INPUT') $('reg-save').click();
+      return;
+    }
+    if ($('dlg-msg').classList.contains('open') || $('dlg-code').classList.contains('open')) {
+      if (e.key === 'Escape') { $('dlg-msg').classList.remove('open'); $('dlg-code').classList.remove('open'); }
       return;
     }
     if ($('dlg-shots').classList.contains('open')) {
@@ -1076,14 +1455,30 @@ table.modt td.st, table.modt td.pop, table.modt td.dim { white-space: nowrap; ov
       S.settings = d;
       if (d.language) lang = d.language;
       applyStrings();
-      if (first) { first = false; go(d.startPage === 'mods' || d.startPage === 'presets' ? d.startPage : 'dashboard'); if (!d.language) $('dlg-lang').classList.add('open'); }
+      if (first) { first = false; go(d.startPage === 'mods' || d.startPage === 'presets' || d.startPage === 'dev' ? d.startPage : 'dashboard'); if (!d.language) $('dlg-lang').classList.add('open'); }
       render();
     } else if (ev === 'state') { S.state = d; S.running = d.game.running; render(); }
     else if (ev === 'news') { S.news = d; renderDashboard(); }
     else if (ev === 'stats') { S.stats = d; renderMods(); }
-    else if (ev === 'registered') { $('dlg-reg').classList.remove('open'); regPending = null; }
+    else if (ev === 'registered') { $('dlg-reg').classList.remove('open'); var then = regPending && regPending.then; regPending = null; if (then) then(); }
     else if (ev === 'registerFailed') { $('reg-err').textContent = d; $('reg-save').disabled = false; }
-    else if (ev === 'needRegister') openReg({ modId: d.modId, stars: d.stars });
+    else if (ev === 'needRegister') { if (d && d.modId) openReg({ modId: d.modId, stars: d.stars }); }
+    else if (ev === 'dev') { if (d && d.offline && DEV && DEV.account && DEV.mods) DEV.offline = d.offline; else DEV = d; if (S.screen === 'dev' && !(d && d.account)) S.sub.dev = null; renderDev(); renderDashboard(); renderDetail(); renderTabs(); }
+    else if (ev === 'devRecovery') openCode(d.code, d.first);
+    else if (ev === 'devSetupFailed' || ev === 'devRecoverFailed') { if (d === 'register') openReg({ then: function () { $('dev-become').click(); } }); else showError(d); }
+    else if (ev === 'devRecovered') go('dev', 'dev-mine');
+    else if (ev === 'devFiles') { d.forEach(function (f) { UP.files = UP.files.filter(function (x) { return x.name.toLowerCase() !== f.name.toLowerCase(); }); UP.files.push(f); }); renderUpload(); }
+    else if (ev === 'devImages') { if (d.which === 'thumb') UP.thumb = d.items[0]; else UP.shots = UP.shots.concat(d.items).slice(0, 6); renderUpload(); }
+    else if (ev === 'devSubmitResult') {
+      if (d.ok) { note(t('up.done', { m: d.name })); resetUpload(); go('dev', 'dev-mine'); }
+      else { $('up-err').textContent = d.error; $('up-send').disabled = false; }
+    }
+    else if (ev === 'sent') {
+      if (d.ok) { $('dlg-msg').classList.remove('open'); note(t(d.what === 'report' ? 'msg.sentReport' : 'msg.sentFeedback')); }
+      else if (d.error === 'register') { $('dlg-msg').classList.remove('open'); openReg({ then: function () { openMsg(MSG.what, MSG.modId); } }); }
+      else { $('msg-err').textContent = d.error; $('msg-send').disabled = false; }
+    }
+    else if (ev === 'whatsNew') openAsk('whatsNew', t('new.title', { v: d.version }), t('new.text', { v: d.version }) + '\n\n• ' + d.notes.join('\n• '), [t('ok')]);
     else if (ev === 'busy') { S.busy = d; render(); }
     else if (ev === 'gameRunning') { S.running = d; if (S.state) S.state.game.running = d; render(); }
     else if (ev === 'status') {

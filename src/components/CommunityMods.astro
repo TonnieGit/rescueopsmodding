@@ -1,0 +1,66 @@
+---
+// Live community mods (Mod Dev uploads) from /api/catalog, with downloads and ratings from /api/stats.
+// Built in the browser: everything from the API is put in with textContent, never as HTML.
+---
+
+<div class="community not-content" data-community>
+	<p class="cm-empty" data-empty hidden>No community mods yet. <a href="/mod-dev/">Be the first to upload one.</a></p>
+	<p class="cm-empty" data-error hidden>The community mod list couldn't be loaded. Try again in a minute.</p>
+	<div class="cm-list" data-list></div>
+</div>
+
+<template id="cm-card">
+	<article class="cm-card">
+		<img class="cm-thumb" alt="" loading="lazy" />
+		<div class="cm-body">
+			<h3 class="cm-name"></h3>
+			<p class="cm-meta"></p>
+			<p class="cm-stats"></p>
+			<p class="cm-desc"></p>
+		</div>
+	</article>
+</template>
+
+<script>
+	const root = document.querySelector<HTMLElement>('[data-community]');
+	if (root) {
+		const list = root.querySelector<HTMLElement>('[data-list]')!;
+		const tpl = document.getElementById('cm-card') as HTMLTemplateElement;
+		const n = (x: number) => x.toLocaleString('en-AU');
+		Promise.all([
+			fetch('/api/catalog').then((r) => (r.ok ? r.json() : Promise.reject())),
+			fetch('/api/stats').then((r) => (r.ok ? r.json() : { mods: {} })).catch(() => ({ mods: {} }))
+		])
+			.then(([cat, stats]) => {
+				const mods = (cat.mods || []).filter((m: any) => m.community).sort((a: any, b: any) => Date.parse(b.added) - Date.parse(a.added));
+				if (!mods.length) { root.querySelector<HTMLElement>('[data-empty]')!.hidden = false; return; }
+				for (const m of mods) {
+					const card = tpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
+					card.id = m.id;
+					const img = card.querySelector('img')!;
+					if (m.thumb) img.src = m.thumb; else img.remove();
+					card.querySelector('.cm-name')!.textContent = m.name;
+					card.querySelector('.cm-meta')!.textContent = `by ${m.author} · version ${m.version} · ${m.category}`;
+					const s = (stats.mods || {})[m.id];
+					card.querySelector('.cm-stats')!.textContent = s ? (s.ratings ? `★ ${s.rating} (${n(s.ratings)}) · ` : '') + `${n(s.downloads)} downloads` : '';
+					card.querySelector('.cm-desc')!.textContent = m.description;
+					list.append(card);
+				}
+				if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+			})
+			.catch(() => { root.querySelector<HTMLElement>('[data-error]')!.hidden = false; });
+	}
+</script>
+
+<style>
+	.cm-list { display: grid; gap: 1rem; margin-top: 1rem; }
+	.cm-card { display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 1rem; border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem; overflow: hidden; background: var(--sl-color-gray-6); scroll-margin-top: 5rem; }
+	.cm-card:target { border-color: var(--sl-color-accent); }
+	.cm-thumb { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+	.cm-body { padding: 0.75rem 1rem 0.75rem 0; }
+	.cm-name { margin: 0; font-size: var(--sl-text-xl); }
+	.cm-meta, .cm-stats { margin: 0.25rem 0 0; color: var(--sl-color-gray-2); font-size: var(--sl-text-sm); }
+	.cm-desc { margin: 0.5rem 0 0; }
+	.cm-empty { color: var(--sl-color-gray-2); }
+	@media (max-width: 640px) { .cm-card { grid-template-columns: 1fr; } .cm-body { padding: 0 1rem 1rem; } }
+</style>

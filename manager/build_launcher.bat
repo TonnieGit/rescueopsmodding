@@ -16,5 +16,5 @@ for %%f in (ui\*) do set "UI=!UI! /resource:ui\%%~nxf,ui/%%~nxf"
   /resource:%WV%\Microsoft.Web.WebView2.WinForms.dll,Microsoft.Web.WebView2.WinForms.dll ^
   /resource:%WV%\WebView2Loader.dll,WebView2Loader.dll ^
   !UI! ^
-  Launcher.cs LauncherForm.cs Core.cs Services.cs
+  Launcher.cs LauncherForm.cs ModDev.cs Core.cs Services.cs
 exit /b %errorlevel%

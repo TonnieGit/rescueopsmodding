@@ -16,13 +16,14 @@ using Microsoft.Web.WebView2.WinForms;
 
 namespace RescueOpsModLauncher
 {
-    public class LauncherForm : Form
+    public partial class LauncherForm : Form
     {
         readonly WebView2 view = new WebView2();
         readonly JavaScriptSerializer json = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
         readonly Options opt;
         readonly Settings settings = Settings.Load();
         readonly Timer gameTimer = new Timer { Interval = 2000 };
+        readonly Timer devTimer = new Timer { Interval = 20 * 60 * 1000 };     // Mod Dev: new feedback and decisions while open
 
         ModSet mods;
         Library lib;
@@ -33,7 +34,6 @@ namespace RescueOpsModLauncher
         List<NewsItem> steamNews = new List<NewsItem>(), hubNews = new List<NewsItem>();
         string gameVersion;
         Dictionary<string, object> stats;                // /api/stats "mods": downloads and ratings per mod id
-        const string Api = "https://rescueopsmodding.vercel.app/api/";
         bool busy, gameRunning, pageReady;
         readonly Dictionary<string, TaskCompletionSource<string>> asks = new Dictionary<string, TaskCompletionSource<string>>();
 
@@ -51,6 +51,7 @@ namespace RescueOpsModLauncher
             Controls.Add(view);
             Load += async delegate { await StartView(); };
             gameTimer.Tick += delegate { CheckGame(); };
+            devTimer.Tick += async delegate { if (!busy && !gameRunning && !string.IsNullOrEmpty(settings.authorKey)) await DevLoad(); };
         }
 
         // ---- WebView2 ----
@@ -119,7 +120,7 @@ namespace RescueOpsModLauncher
             {
                 switch (cmd)
                 {
-                    case "ready": pageReady = true; SendSettings(); await RefreshAll(true); gameTimer.Start(); break;
+                    case "ready": pageReady = true; SendSettings(); await RefreshAll(true); gameTimer.Start(); devTimer.Start(); break;
                     case "answer":
                         TaskCompletionSource<string> tcs;
                         if (asks.TryGetValue(Str(msg, "id"), out tcs)) { asks.Remove(Str(msg, "id")); tcs.TrySetResult(Str(msg, "choice")); }
@@ -147,6 +148,26 @@ namespace RescueOpsModLauncher
                     case "repair": await Guard(Repair); break;
                     case "register": await Register(Str(msg, "name"), Str(msg, "email"), Str(msg, "modId"), Str(msg, "stars")); break;
                     case "rate": await Rate(Str(msg, "modId"), Str(msg, "stars")); break;
+                    case "devLoad": await DevLoad(); break;
+                    case "devSetup": await DevSetup(Str(msg, "name")); break;
+                    case "devRecover": await DevRecover(Str(msg, "code")); break;
+                    case "devNewCode": await DevNewCode(); break;
+                    case "devPickFiles": await DevPickFiles(opt.DevTools && msg.ContainsKey("paths") ? StrList(msg, "paths") : null); break;
+                    case "devPickImages": await DevPickImages(Str(msg, "which"), opt.DevTools && msg.ContainsKey("paths") ? StrList(msg, "paths") : null); break;
+                    case "devSubmit": await DevSubmit(msg); break;
+                    case "devWithdraw": await DevSimple("withdraw", new Dictionary<string, object> { { "authorKey", settings.authorKey }, { "id", Convert.ToInt64(Str(msg, "id")) } }); break;
+                    case "devSeen": await DevSimple("seen", KeyBody()); break;
+                    case "devRead": { var b = KeyBody(); b["ids"] = StrList(msg, "ids").Select(long.Parse).ToList(); await DevSimple("read", b); break; }
+                    case "feedback": await PlayerMessage("feedback", msg); break;
+                    case "report": await PlayerMessage("report", msg); break;
+                    case "drop":
+                        {
+                            var paths = new List<string>();
+                            if (e.AdditionalObjects != null)
+                                foreach (object o in e.AdditionalObjects) { var f = o as CoreWebView2File; if (f != null && !string.IsNullOrEmpty(f.Path)) paths.Add(f.Path); }
+                            await Dropped(Str(msg, "target"), paths);
+                            break;
+                        }
                 }
             }
             catch (Exception ex) { Error(ex.Message); }
@@ -197,10 +218,20 @@ namespace RescueOpsModLauncher
                 string text = await Net.ReadText(ManifestSource);
                 Manifest m = json.Deserialize<Manifest>(text);
                 if (m == null || m.mods == null) throw new InvalidDataException("mods.json is empty.");
+                await MergeCatalog(m);
                 mods = new ModSet(m);
                 manifestError = null;
                 launcherUpdate = m.launcher != null && SelfUpdate.IsNewer(m.launcher.version) ? m.launcher : null;
-                News.TrackModReleases(settings, mods);
+                foreach (string id in News.TrackModReleases(settings, mods)) newIds.Add(id);
+                // What's new: the first start after the launcher updated itself (or after 1.x, which didn't record it).
+                if (startup && settings.lastVersion != Program.AppVersion)
+                {
+                    bool upgraded = settings.lastVersion.Length > 0 || settings.knownMods.Count > 0;
+                    if (upgraded && m.launcher != null && m.launcher.version == Program.AppVersion && m.launcher.notes != null && m.launcher.notes.Count > 0)
+                        Send("whatsNew", new Dictionary<string, object> { { "version", Program.AppVersion }, { "notes", m.launcher.notes } });
+                    settings.lastVersion = Program.AppVersion;
+                    settings.Save();
+                }
             }
             catch (Exception ex)
             {
@@ -219,6 +250,7 @@ namespace RescueOpsModLauncher
             SendNews();
             await SendState();
             if (startup && launcherUpdate != null && settings.checkUpdates) Send("launcherUpdate", LauncherUpdateInfo());
+            if (!string.IsNullOrEmpty(settings.authorKey)) await DevLoad();
         }
 
         void FindGame()
@@ -254,6 +286,7 @@ namespace RescueOpsModLauncher
                 { "checkUpdates", settings.checkUpdates }, { "smoothGraphics", settings.smoothGraphics }, { "startPage", settings.startPage }, { "modsView", settings.modsView },
                 { "gamePath", settings.gamePath }, { "devtools", opt.DevTools },
                 { "profileName", settings.profileName }, { "profileEmail", settings.profileEmail }, { "myRatings", settings.myRatings },
+                { "authorName", settings.authorName }, { "isAuthor", !string.IsNullOrEmpty(settings.authorKey) }, { "buildId", app != null ? app.BuildId : null },
                 { "presets", settings.presets.Select(p => new Dictionary<string, object> { { "id", p.id }, { "name", p.name }, { "mods", p.mods }, { "lastPlayed", p.lastPlayed } }).ToList() } });
         }
 
@@ -281,7 +314,9 @@ namespace RescueOpsModLauncher
                         { "includes", mods.Included(m).Select(r => r.name).ToList() },
                         { "conflicts", mods.Conflicts(m).Select(id => mods.Get(id)).Where(x => x != null).Select(x => x.name).ToList() },
                         { "replacedBy", repl != null ? repl.name : null }, { "replacedById", repl != null ? repl.id : null },
-                        { "testedBuild", m.testedBuild }, { "tested", TestedOn(m) }, { "changelog", m.changelog } });
+                        { "testedBuild", m.testedBuild }, { "tested", TestedOn(m) }, { "changelog", m.changelog },
+                        { "community", m.community }, { "added", m.added }, { "isNew", newIds.Contains(m.id) },
+                        { "requiresIds", m.requires }, { "conflictsIds", m.conflicts } });
                 }
             var local = new List<object>();
             if (lib != null)
@@ -751,6 +786,7 @@ namespace RescueOpsModLauncher
 
         string ResolveFile(string fileName)
         {
+            if (Net.IsWeb(fileName)) return fileName;                 // community mods give a full download URL
             if (Net.IsWeb(ManifestSource)) return new Uri(new Uri(ManifestSource), fileName).ToString();
             return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ManifestSource)), fileName);
         }

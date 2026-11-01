@@ -1,5 +1,6 @@
 // POST /api/delete-details { email }
-// Deletes every launcher install registered with that email, and their ratings (ratings go with the user row).
+// Deletes every launcher install registered with that email, and their ratings, feedback and reports (they go with the
+// user row). A mod dev account loses its link to them; its public author name and live mods stay (see /privacy/).
 // Always gives the same answer, so the form can't be used to find out whether someone is registered.
 // Keeps a note of the request with the email hashed, never the email itself.
 

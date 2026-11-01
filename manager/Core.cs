@@ -64,6 +64,8 @@ namespace RescueOpsModLauncher
         public List<string> replaces { get; set; }
         public List<ModFile> files { get; set; }
         public List<ChangeEntry> changelog { get; set; }
+        public bool community { get; set; }               // uploaded through Mod Dev (from /api/catalog, not mods.json)
+        public string added { get; set; }                 // community mods: when it first went live (ISO date)
     }
 
     public class ModFile
@@ -394,7 +396,7 @@ namespace RescueOpsModLauncher
                 if (p) inPaks++; else if (l) inLib++;
                 if ((p && Matches(InPaks(f.name), f)) || (!p && l && Matches(InLib(f.name), f))) good++;
             }
-            if (inPaks == 0 && inLib == 0) return ModState.NotDownloaded;
+            if (inPaks == 0 && inLib == 0) return OldVersionPresent(mod) ? ModState.UpdateAvailable : ModState.NotDownloaded;
             if (good < own.Count) return ModState.UpdateAvailable;
             return inPaks == own.Count ? ModState.Loaded : ModState.Available;
         }
@@ -402,7 +404,14 @@ namespace RescueOpsModLauncher
         // Whether any of the mod's own files are in the Paks folder (loaded, even if out of date).
         public bool IsLoaded(ModInfo mod)
         {
-            return Mods.OwnFiles(mod).Any(f => File.Exists(InPaks(f.name)));
+            return Mods.OwnFiles(mod).Any(f => File.Exists(InPaks(f.name))) || (mod.community && mod.replaces.Any(n => SafeName(n) && File.Exists(InPaks(n))));
+        }
+
+        // A community mod whose update renamed its files: the old version's files (its "replaces") are still here.
+        // (mods.json mods also use replaces for other mods' old files, so this only counts for community mods.)
+        bool OldVersionPresent(ModInfo mod)
+        {
+            return mod.community && mod.replaces.Any(n => SafeName(n) && (File.Exists(InPaks(n)) || File.Exists(InLib(n))));
         }
 
         public long SizeOf(ModInfo mod)
