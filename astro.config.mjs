@@ -38,6 +38,7 @@ export default defineConfig({
 			},
 			lastUpdated: true,
 			sidebar: [
+				{ label: 'News', link: '/news/' },
 				{
 					label: 'Getting started',
 					items: [

@@ -1,0 +1,22 @@
+---
+import { getNews } from '../news';
+const news = (await getNews()).filter((n) => !n.id.endsWith('news'));
+const label = { hub: 'Hub', mods: 'Mods', event: 'Event' } as const;
+const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+<ul class="news-list">
+	{news.map((n) => (
+		<li>
+			<span class="news-meta"><time datetime={n.date.toISOString().slice(0, 10)}>{fmt(n.date)}</time> · {label[n.kind]}</span>
+			<a href={n.url}>{n.title}</a>
+			<p>{n.summary}</p>
+		</li>
+	))}
+</ul>
+<style>
+	.news-list { list-style: none; padding: 0; margin: 1.5rem 0 0; }
+	.news-list li { padding: 0.9rem 0; border-bottom: 1px solid var(--sl-color-gray-5); margin: 0; }
+	.news-meta { display: block; font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); }
+	.news-list a { font-weight: 600; font-size: var(--sl-text-lg); }
+	.news-list p { margin: 0.25rem 0 0; }
+</style>
