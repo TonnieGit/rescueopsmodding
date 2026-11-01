@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rescue Ops Mod Launcher</title>
+<style>
+  body { margin: 0; background: #0d0c0c; color: #ece7e5; font: 14px "Segoe UI", sans-serif; display: grid; place-items: center; height: 100vh; }
+  h1 { font: 48px Impact, sans-serif; margin: 0 0 12px; letter-spacing: .04em; }
+  h1 span { color: #e92125; }
+  pre { color: #9a918e; }
+</style>
+</head>
+<body>
+  <div>
+    <h1>RESCUE OPS <span>MOD LAUNCHER</span></h1>
+    <pre id="out">Waiting for the launcher...</pre>
+  </div>
+<script>
+  window.chrome.webview.addEventListener('message', function (e) {
+    if (e.data.event === 'hello') document.getElementById('out').textContent = JSON.stringify(e.data.data, null, 2);
+  });
+  window.chrome.webview.postMessage({ cmd: 'hello' });
+</script>
+</body>
+</html>
