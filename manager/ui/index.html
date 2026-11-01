@@ -4,22 +4,705 @@
 <meta charset="utf-8">
 <title>Rescue Ops Mod Launcher</title>
 <style>
-  body { margin: 0; background: #0d0c0c; color: #ece7e5; font: 14px "Segoe UI", sans-serif; display: grid; place-items: center; height: 100vh; }
-  h1 { font: 48px Impact, sans-serif; margin: 0 0 12px; letter-spacing: .04em; }
-  h1 span { color: #e92125; }
-  pre { color: #9a918e; }
+@font-face { font-family: "Bebas Neue"; src: url("bebas.woff2") format("woff2"); font-display: block; }
+@font-face { font-family: "Rubik"; src: url("rubik.woff2") format("woff2"); font-weight: 300 900; font-display: block; }
+:root {
+  --bg: #0b0a0a; --panel: rgba(26,22,22,.58); --bar: rgba(255,255,255,.04); --line: rgba(255,255,255,.08);
+  --ink: #ece7e5; --muted: #9a918e; --red: #e92125; --amber: #e9a23b;
+  --display: "Bebas Neue", "Arial Narrow", Impact, sans-serif; --body: "Rubik", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 13px/1.4 var(--body); overflow: hidden; user-select: none; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 1px; }
+a { color: inherit; }
+.backdrop { position: fixed; inset: 0; z-index: -1; background: #0b0a0a url("backdrop.jpg") center / cover no-repeat; }
+.backdrop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,9,9,.25), rgba(10,9,9,.6)); }
+.flat .backdrop { background: #121010; }
+.app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 1fr 28px; height: 100%; }
+
+/* glass */
+.glass-pane { background: rgba(18,15,15,.5); backdrop-filter: blur(24px) saturate(140%); }
+.flat .glass-pane, .flat .panel, .flat .dlg, .flat .toast { backdrop-filter: none; background: #1a1717; }
+
+/* sidebar */
+.side { grid-row: 1 / 3; border-right: 1px solid var(--line); display: grid; grid-template-rows: auto auto 1fr auto; min-height: 0; }
+.brand { padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
+.brand .fit { font-family: var(--display); line-height: .84; white-space: nowrap; }
+.brand .fit.red { color: var(--red); margin-top: 4px; }
+.stripe { height: 6px; background: repeating-linear-gradient(135deg, var(--red) 0 10px, #f2eeec 10px 20px); }
+.navs { display: grid; padding: 10px 0; align-content: start; }
+.nav { font: 26px/1 var(--display); letter-spacing: .04em; color: var(--muted); padding: 9px 12px 7px; margin: 1px 10px; border-radius: 8px;
+  display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: none; border: 0; text-align: left; }
+.nav:hover { color: var(--ink); background: rgba(255,255,255,.06); }
+.nav.on { background: rgba(255,255,255,.14); color: var(--ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+.nav small { font: 12px var(--body); color: var(--amber); }
+.playbox { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 8px; }
+.playbox .info { font-size: 12px; color: var(--muted); }
+.play { height: 64px; border: 0; border-radius: 10px; background: var(--red); color: #fff; font: 40px/1 var(--display); letter-spacing: .08em; padding-top: 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+.play:hover { background: #ff2a2e; }
+.play:disabled { background: #3a3433; color: var(--muted); cursor: default; box-shadow: none; }
+
+/* main */
+.main { display: grid; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; }
+.tabs { display: flex; align-items: flex-end; gap: 2px; padding: 10px 16px 0; border-bottom: 1px solid var(--line); }
+.tabs .t { padding: 7px 14px; color: var(--muted); border: 1px solid transparent; border-bottom: 0; background: none; text-transform: uppercase; font-size: 12px; letter-spacing: .06em; border-radius: 8px 8px 0 0; }
+.tabs .t.on { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.1); color: var(--ink); margin-bottom: -1px; }
+.tabs .right { margin-left: auto; padding-bottom: 7px; color: var(--muted); font-size: 12px; }
+.screen { display: none; overflow: auto; min-height: 0; padding: 14px 16px 16px; }
+.screen.on { display: block; }
+.sub { display: none; } .sub.on { display: block; }
+
+.panel { background: var(--panel); border: 1px solid rgba(255,255,255,.09); border-radius: 10px; overflow: hidden; backdrop-filter: blur(22px) saturate(140%); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+.panel + .panel { margin-top: 12px; }
+.ph { background: var(--bar); border-bottom: 1px solid rgba(255,255,255,.06); padding: 6px 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; align-items: center; gap: 10px; min-height: 30px; }
+.ph .r { margin-left: auto; font-weight: 400; text-transform: none; letter-spacing: 0; display: flex; gap: 6px; align-items: center; }
+.btn { border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.06); padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+.btn:hover { background: rgba(255,255,255,.11); }
+.btn.red { background: var(--red); border-color: var(--red); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.22); }
+.btn.red:hover { background: #ff2a2e; }
+.btn:disabled { opacity: .45; cursor: default; }
+.warn { color: var(--amber); } .dim { color: var(--muted); } .bad { color: #ff6b62; }
+.empty { padding: 18px 12px; color: var(--muted); }
+
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.08); }
+td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
+tbody tr.m { cursor: pointer; }
+tbody tr.m:hover td { background: rgba(255,255,255,.04); }
+tr.sel td { background: rgba(255,255,255,.09) !important; }
+tr.grp td { background: rgba(0,0,0,.18); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 5px 10px; }
+td.num { text-align: right; color: var(--muted); white-space: nowrap; }
+table.modt { table-layout: fixed; }
+.cb { width: 15px; height: 15px; border: 1px solid rgba(255,255,255,.35); border-radius: 3px; display: inline-grid; place-items: center; vertical-align: middle; background: rgba(0,0,0,.25); cursor: pointer; }
+.cb.on { background: var(--ink); border-color: var(--ink); }
+.cb.on::after { content: ""; width: 7px; height: 4px; border-left: 2px solid #121010; border-bottom: 2px solid #121010; transform: rotate(-45deg) translate(1px,-1px); }
+.locked .cb, .busy .cb { opacity: .4; pointer-events: none; }
+.thumb { width: 48px; height: 27px; object-fit: cover; border-radius: 4px; background: #211e1e; flex: none; display: grid; place-items: center; color: var(--muted); font-size: 10px; }
+.modname { display: flex; align-items: center; gap: 10px; white-space: nowrap; overflow: hidden; }
+.modname span { overflow: hidden; text-overflow: ellipsis; }
+.tag { font-size: 11px; color: var(--amber); white-space: nowrap; }
+.tag.bad { color: #ff6b62; }
+.kind { display: inline-block; min-width: 62px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .08em; padding: 1px 4px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); margin-right: 8px; }
+.kind.patch { color: var(--amber); border-color: rgba(233,162,59,.4); } .kind.official { color: var(--ink); border-color: rgba(255,255,255,.25); }
+
+/* dashboard */
+.band { position: relative; height: 120px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.09); margin-bottom: 12px; background: #1a1717 url("banner.jpg") center / cover; }
+.band .cap { position: absolute; left: 0; bottom: 0; background: rgba(12,10,10,.6); backdrop-filter: blur(12px); padding: 6px 12px; font-size: 12px; border-top-right-radius: 8px; }
+.dash { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; align-items: start; }
+.news td:first-child { width: 72px; color: var(--muted); white-space: nowrap; vertical-align: top; padding-top: 9px; }
+.news tr { cursor: pointer; }
+.news tr:hover td { background: rgba(255,255,255,.04); }
+.news b { font-weight: 500; }
+.news .src { color: var(--muted); font-size: 12px; }
+.unread { display: inline-block; width: 7px; height: 7px; background: var(--amber); border-radius: 2px; margin-right: 6px; vertical-align: 1px; }
+.alerts td:last-child { text-align: right; white-space: nowrap; }
+
+/* mods */
+.searchrow { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.searchrow input, .searchrow select, select.inp, input.inp { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 5px 8px; }
+.searchrow input { flex: 1 1 220px; }
+.modsgrid { display: grid; grid-template-columns: 1fr 320px; gap: 12px; align-items: start; }
+.lockbanner { display: none; margin-bottom: 10px; padding: 7px 10px; border-radius: 8px; background: rgba(233,162,59,.1); border: 1px solid rgba(233,162,59,.35); color: var(--amber); }
+.locked .lockbanner { display: block; }
+.detail img, .detail .noimg { width: 100%; height: 170px; object-fit: cover; display: block; border-bottom: 1px solid var(--line); background: #1a1717; }
+.detail .in { padding: 10px 12px 12px; display: grid; gap: 10px; }
+.detail h3 { font: 28px/1 var(--display); letter-spacing: .03em; margin: 0; font-weight: normal; }
+.detail dl { display: grid; grid-template-columns: 96px 1fr; gap: 3px 10px; margin: 0; }
+.detail dt { color: var(--muted); } .detail dd { margin: 0; }
+.detail ul { margin: 4px 0 0; padding-left: 16px; }
+.acts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* options */
+.form { display: grid; grid-template-columns: 220px 1fr; }
+.form > div { padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; gap: 8px; min-height: 38px; min-width: 0; }
+.form .note { color: var(--muted); font-size: 12px; }
+.form code { font-family: Consolas, monospace; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; flex: 0 1 auto; min-width: 0; }
+.form .btn { flex: none; }
+.chk { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+
+/* status bar */
+.status { grid-column: 2; display: flex; align-items: center; gap: 14px; padding: 0 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; }
+.prog { width: 120px; height: 5px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; display: none; }
+.prog.on { display: block; }
+.prog i { display: block; height: 100%; background: var(--red); width: 0; transition: width .2s; }
+.status .r { margin-left: auto; }
+
+/* dialogs */
+.scrim { position: fixed; inset: 0; background: rgba(6,5,5,.5); backdrop-filter: blur(6px); display: none; place-items: center; z-index: 50; padding: 20px; }
+.scrim.open { display: grid; }
+.dlg { width: min(500px, 100%); background: rgba(30,26,26,.82); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; overflow: hidden; backdrop-filter: blur(30px) saturate(150%); box-shadow: 0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08); }
+.dlg .ph { font-size: 12px; color: var(--ink); }
+.dlg .in { padding: 14px; display: grid; gap: 10px; white-space: pre-line; }
+.dlg .foot { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,.07); display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.langs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.langs button { display: grid; gap: 12px; justify-items: center; padding: 20px 12px 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; }
+.langs button:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.28); }
+.langs svg { width: 120px; height: 80px; border-radius: 4px; box-shadow: 0 0 0 1px rgba(255,255,255,.15); }
+.langs b { font: 30px/1 var(--display); letter-spacing: .05em; font-weight: normal; }
+.note2 { text-align: center; color: var(--muted); font-size: 12px; }
+.toast { position: fixed; right: 14px; bottom: 38px; width: 360px; background: rgba(30,26,26,.85); border: 1px solid rgba(255,107,98,.5); border-radius: 12px; z-index: 60; display: none; backdrop-filter: blur(24px); }
+.toast.show { display: block; }
+.toast .in { padding: 10px 12px; display: grid; gap: 8px; overflow-wrap: anywhere; max-height: 40vh; overflow: auto; }
 </style>
 </head>
 <body>
-  <div>
-    <h1>RESCUE OPS <span>MOD LAUNCHER</span></h1>
-    <pre id="out">Waiting for the launcher...</pre>
+<div class="backdrop"></div>
+<div class="app" id="app">
+  <nav class="side glass-pane">
+    <div><div class="brand"><div class="fit" data-fit>RESCUE OPS</div><div class="fit red" data-fit>MOD LAUNCHER</div></div><div class="stripe"></div></div>
+    <div class="navs">
+      <button class="nav" data-screen="dashboard"><span data-t="nav.dashboard"></span></button>
+      <button class="nav" data-screen="mods"><span data-t="nav.mods"></span><small id="nav-updates"></small></button>
+      <button class="nav" data-screen="options"><span data-t="nav.options"></span></button>
+    </div>
+    <div></div>
+    <div class="playbox">
+      <div class="info" id="play-summary"></div>
+      <button class="play" id="play" data-t="play"></button>
+      <div class="info" id="play-info"></div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="tabs glass-pane" id="tabs"></div>
+
+    <section class="screen" id="screen-dashboard">
+      <div class="band"><div class="cap" id="band-cap"></div></div>
+      <div class="dash">
+        <div class="panel"><div class="ph"><span data-t="dash.news"></span><span class="r" id="news-count"></span></div><table class="news"><tbody id="news"></tbody></table></div>
+        <div>
+          <div class="panel"><div class="ph" data-t="dash.alerts"></div><table class="alerts"><tbody id="alerts"></tbody></table></div>
+          <div class="panel"><div class="ph"><span data-t="dash.loads"></span><span class="r" id="loads-size"></span></div><table><tbody id="loads"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-mods">
+      <div class="lockbanner" data-t="mods.locked"></div>
+      <div class="searchrow">
+        <input id="q" type="search" data-tp="mods.search">
+        <select id="f-cat"></select>
+        <select id="f-author"></select>
+        <select id="f-sort"></select>
+        <button class="btn" id="add-files" data-t="mods.add"></button>
+      </div>
+      <div class="modsgrid">
+        <div>
+          <div class="sub on" id="mods-loaded"><div class="panel"><div class="ph"><span data-t="mods.loaded"></span><span class="r" id="loaded-sum"></span></div><table class="modt"><thead id="th1"></thead><tbody id="list-loaded"></tbody></table></div></div>
+          <div class="sub" id="mods-all"><div class="panel"><div class="ph"><span data-t="mods.all"></span><span class="r" id="all-sum"></span></div><table class="modt"><thead id="th2"></thead><tbody id="list-all"></tbody></table></div></div>
+          <div class="sub" id="mods-updates"><div class="panel"><div class="ph"><span data-t="mods.updates"></span><span class="r"><button class="btn red" id="update-all" data-t="mods.updateAll"></button></span></div><table><tbody id="list-updates"></tbody></table></div></div>
+        </div>
+        <aside class="panel detail" id="detail"></aside>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-options">
+      <div class="sub on" id="opt-launcher">
+        <div class="panel"><div class="ph" data-t="opt.config"></div><div class="form">
+          <div data-t="opt.language"></div><div><select class="inp" id="o-language"><option value="en">English</option><option value="fr">Français</option></select></div>
+          <div data-t="opt.after"></div><div><select class="inp" id="o-after"></select></div>
+          <div data-t="opt.startPage"></div><div><select class="inp" id="o-start"></select></div>
+          <div></div><div><label class="chk" id="o-updates"><span class="cb"></span><span data-t="opt.checkUpdates"></span></label></div>
+        </div></div>
+        <div class="panel"><div class="ph" data-t="opt.compat"></div><div class="form">
+          <div></div><div><label class="chk" id="o-smooth"><span class="cb"></span><span data-t="opt.smooth"></span></label><span class="note" data-t="opt.smoothNote"></span></div>
+        </div></div>
+      </div>
+      <div class="sub" id="opt-game">
+        <div class="panel"><div class="ph" data-t="opt.game"></div><div class="form">
+          <div data-t="opt.gameFolder"></div><div><code id="o-game"></code><button class="btn" id="o-pick" data-t="opt.change"></button></div>
+          <div data-t="opt.edition"></div><div id="o-edition"></div>
+          <div data-t="opt.paks"></div><div><code id="o-paks"></code><button class="btn" data-folder="paks" data-t="opt.open"></button></div>
+          <div data-t="opt.library"></div><div><code id="o-lib"></code><button class="btn" data-folder="library" data-t="opt.open"></button></div>
+          <div></div><div class="note" data-t="opt.libraryNote"></div>
+        </div></div>
+      </div>
+      <div class="sub" id="opt-help">
+        <div class="panel"><div class="ph" data-t="opt.trouble"></div><div class="form">
+          <div data-t="opt.diag"></div><div><button class="btn" id="o-diag" data-t="opt.copy"></button><span class="note" data-t="opt.diagNote"></span></div>
+          <div data-t="opt.logs"></div><div><button class="btn" data-folder="logs" data-t="opt.openFolder"></button></div>
+          <div data-t="opt.refresh"></div><div><button class="btn" id="o-refresh" data-t="opt.checkNow"></button></div>
+        </div></div>
+        <div class="panel"><div class="ph" data-t="opt.about"></div><div class="form">
+          <div data-t="opt.version"></div><div id="o-version"></div>
+          <div data-t="opt.by"></div><div><a href="#" data-url="https://rescueopsmodding.vercel.app">rescueopsmodding.vercel.app</a> · <a href="#" data-url="https://patreon.com/Tonnie001">Patreon</a></div>
+          <div></div><div class="note" data-t="opt.disclaimer"></div>
+          <div></div><div class="note" data-t="opt.credits"></div>
+        </div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="status glass-pane"><span id="status-text"></span><div class="prog" id="prog"><i></i></div><span class="r" id="game-info"></span></footer>
+</div>
+
+<div class="scrim" id="dlg-ask" role="dialog" aria-modal="true"><div class="dlg"><div class="ph" id="ask-title"></div><div class="in" id="ask-text"></div><div class="foot" id="ask-buttons"></div></div></div>
+<div class="scrim" id="dlg-lang" role="dialog" aria-modal="true"><div class="dlg" style="width:min(460px,100%)"><div class="ph">Choose your language · Choisissez votre langue</div><div class="in" style="white-space:normal">
+  <div class="langs">
+    <button data-lang="en"><svg viewBox="0 0 60 30"><clipPath id="uk-s"><path d="M0,0 v30 h60 v-30 z"/></clipPath><clipPath id="uk-t"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><g clip-path="url(#uk-s)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#uk-t)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg><b>ENGLISH</b></button>
+    <button data-lang="fr"><svg viewBox="0 0 3 2"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg><b>FRANÇAIS</b></button>
   </div>
+  <div class="note2">You can change this later in Options · Modifiable plus tard dans Options</div></div></div></div>
+<div class="toast" id="toast" role="alert"><div class="ph"><span data-t="error"></span><span class="r"><button class="btn" id="toast-close">×</button></span></div><div class="in" id="toast-text"></div></div>
+
 <script>
-  window.chrome.webview.addEventListener('message', function (e) {
-    if (e.data.event === 'hello') document.getElementById('out').textContent = JSON.stringify(e.data.data, null, 2);
+(function () {
+  'use strict';
+  // ---------------------------------------------------------------- strings (EN / FR)
+  var STR = {
+    'nav.dashboard': ['DASHBOARD', 'ACCUEIL'], 'nav.mods': ['MODS', 'MODS'], 'nav.options': ['OPTIONS', 'OPTIONS'],
+    'play': ['PLAY', 'JOUER'], 'running': ['RUNNING', 'EN COURS'],
+    'play.summary': ['{n} mods load with the game', '{n} mods chargés avec le jeu'], 'play.summary1': ['1 mod loads with the game', '1 mod chargé avec le jeu'],
+    'play.summary0': ['No mods: the base game', 'Aucun mod : le jeu de base'],
+    'play.steam': ['Starts through Steam', 'Lancement via Steam'], 'play.locked': ['Mods locked until the game closes', 'Mods verrouillés jusqu\'à la fermeture du jeu'],
+    'play.noGame': ['Game not found. Choose its folder in Options.', 'Jeu introuvable. Choisissez son dossier dans Options.'],
+    'tab.dashboard': ['Dashboard', 'Accueil'], 'tab.loaded': ['Loaded', 'Chargés'], 'tab.all': ['All mods', 'Tous les mods'], 'tab.updates': ['Updates', 'Mises à jour'],
+    'tab.launcher': ['Launcher', 'Launcher'], 'tab.game': ['Game', 'Jeu'], 'tab.help': ['Help', 'Aide'],
+    'dash.news': ['News', 'Actualités'], 'dash.alerts': ['Alerts', 'Alertes'], 'dash.loads': ['Loads with the game', 'Chargés avec le jeu'],
+    'dash.unread': ['{n} unread', '{n} non lues'], 'dash.noNews': ['No news yet. It appears here once the launcher is online.', 'Pas encore d\'actualités. Elles apparaissent ici une fois en ligne.'],
+    'dash.noAlerts': ['All good. Nothing needs your attention.', 'Tout va bien. Rien ne demande votre attention.'],
+    'dash.noLoaded': ['No mods load. You\'re playing the base game.', 'Aucun mod chargé : vous jouez au jeu de base.'],
+    'dash.cap': ['{n} mods load with the game', '{n} mods chargés avec le jeu'],
+    'src.steam': ['Steam · Rescue Ops developers', 'Steam · Développeurs de Rescue Ops'], 'src.hub': ['Modding hub', 'Hub de modding'], 'src.launcher': ['Mod launcher', 'Mod launcher'],
+    'kind.patch': ['PATCH', 'PATCH'], 'kind.official': ['OFFICIAL', 'OFFICIEL'], 'kind.hub': ['HUB', 'HUB'], 'kind.mods': ['MODS', 'MODS'], 'kind.event': ['EVENT', 'ÉVÉNEMENT'],
+    'al.updates': ['{n} updates available', '{n} mises à jour disponibles'], 'al.update1': ['1 update available', '1 mise à jour disponible'],
+    'al.updateAll': ['Update all', 'Tout mettre à jour'],
+    'al.gameUpdated': ['The game has updated', 'Le jeu a été mis à jour'], 'al.gameUpdatedText': ['Mods made for the old build may not work until they\'re updated.', 'Les mods faits pour l\'ancienne version peuvent ne pas fonctionner avant leur mise à jour.'],
+    'al.ok': ['OK', 'OK'], 'al.replaced': ['{a} is now part of {b}', '{a} fait maintenant partie de {b}'], 'al.switch': ['Switch', 'Remplacer'],
+    'al.launcher': ['Launcher {v} available', 'Launcher {v} disponible'], 'al.update': ['Update', 'Mettre à jour'],
+    'al.noGame': ['Game not found', 'Jeu introuvable'], 'al.noGameText': ['Choose the game folder in Options.', 'Choisissez le dossier du jeu dans Options.'], 'al.choose': ['Choose', 'Choisir'],
+    'al.offline': ['Couldn\'t reach the modding hub', 'Impossible de joindre le hub de modding'], 'al.retry': ['Retry', 'Réessayer'],
+    'mods.search': ['Search mods or authors', 'Rechercher un mod ou un auteur'], 'mods.add': ['Add mod files', 'Ajouter des fichiers'],
+    'mods.loaded': ['Loaded', 'Chargés'], 'mods.all': ['All mods', 'Tous les mods'], 'mods.updates': ['Updates', 'Mises à jour'], 'mods.updateAll': ['Update all', 'Tout mettre à jour'],
+    'mods.locked': ['The game is running. Close it to change which mods load.', 'Le jeu est lancé. Fermez-le pour changer les mods chargés.'],
+    'mods.loadedSum': ['{n} mods · {s} · untick to stop a mod loading', '{n} mods · {s} · décochez pour ne plus charger un mod'],
+    'mods.allSum': ['{n} mods · tick to load', '{n} mods · cochez pour charger'],
+    'mods.noLoaded': ['No mods load. Tick mods in All mods to load them.', 'Aucun mod chargé. Cochez des mods dans Tous les mods.'],
+    'mods.noUpdates': ['Everything is up to date.', 'Tout est à jour.'], 'mods.noMatch': ['No mods match.', 'Aucun mod ne correspond.'],
+    'col.mod': ['Mod', 'Mod'], 'col.author': ['Author', 'Auteur'], 'col.version': ['Version', 'Version'], 'col.status': ['Status', 'État'], 'col.size': ['Size', 'Taille'],
+    'cat.all': ['All categories', 'Toutes les catégories'], 'author.all': ['All authors', 'Tous les auteurs'],
+    'sort.category': ['Sort: category', 'Tri : catégorie'], 'sort.name': ['Sort: name', 'Tri : nom'], 'sort.author': ['Sort: author', 'Tri : auteur'],
+    'st.NotDownloaded': ['Not downloaded', 'Non téléchargé'], 'st.Available': ['', ''], 'st.Loaded': ['', ''], 'st.UpdateAvailable': ['Update to {v}', 'Mise à jour {v}'],
+    'st.replaced': ['Replaced by {b}', 'Remplacé par {b}'], 'st.local': ['Added by you', 'Ajouté par vous'], 'st.clash': ['Clashes with a loaded mod', 'En conflit avec un mod chargé'],
+    'st.untested': ['Not checked on this game build', 'Non vérifié sur cette version du jeu'],
+    'local': ['Local', 'Local'],
+    'd.author': ['Author', 'Auteur'], 'd.version': ['Version', 'Version'], 'd.status': ['Status', 'État'], 'd.needs': ['Needs', 'Nécessite'],
+    'd.includes': ['Includes', 'Inclut'], 'd.clashes': ['Clashes with', 'En conflit avec'], 'd.files': ['Files', 'Fichiers'], 'd.size': ['Size', 'Taille'],
+    'd.nothing': ['Nothing', 'Rien'], 'd.changes': ['Changes in {v}', 'Nouveautés de la {v}'], 'd.pick': ['Click a mod to see its details.', 'Cliquez sur un mod pour voir ses détails.'],
+    'd.loaded': ['Loaded', 'Chargé'], 'd.available': ['Downloaded, not loaded', 'Téléchargé, non chargé'], 'd.notDownloaded': ['Not downloaded', 'Non téléchargé'], 'd.outdated': ['Update available', 'Mise à jour disponible'],
+    'b.load': ['Load', 'Charger'], 'b.unload': ['Unload', 'Décharger'], 'b.install': ['Download and load', 'Télécharger et charger'],
+    'b.update': ['Update', 'Mettre à jour'], 'b.page': ['Hub page', 'Page du hub'], 'b.delete': ['Delete', 'Supprimer'],
+    'opt.config': ['Configuration', 'Configuration'], 'opt.language': ['Language', 'Langue'], 'opt.after': ['After the game starts', 'Après le lancement du jeu'],
+    'after.minimise': ['Minimise the launcher', 'Réduire le launcher'], 'after.close': ['Close the launcher', 'Fermer le launcher'], 'after.none': ['Do nothing', 'Ne rien faire'],
+    'opt.startPage': ['Open on', 'Ouvrir sur'], 'opt.checkUpdates': ['Check for launcher and mod updates on start', 'Rechercher les mises à jour au démarrage'],
+    'opt.compat': ['Compatibility', 'Compatibilité'], 'opt.smooth': ['Glass effects and graphics acceleration', 'Effets de verre et accélération graphique'],
+    'opt.smoothNote': ['Turn off if the launcher flickers or draws black. Takes effect next start.', 'Désactivez si le launcher scintille ou s\'affiche en noir. Effet au prochain démarrage.'],
+    'opt.game': ['Game', 'Jeu'], 'opt.gameFolder': ['Game folder', 'Dossier du jeu'], 'opt.change': ['Change', 'Changer'], 'opt.edition': ['Installed', 'Installé'],
+    'opt.paks': ['Loaded mods (Paks)', 'Mods chargés (Paks)'], 'opt.library': ['Mod library', 'Bibliothèque de mods'], 'opt.open': ['Open', 'Ouvrir'],
+    'opt.libraryNote': ['Mods you untick are kept in the library, so loading them again is instant.', 'Les mods décochés sont gardés dans la bibliothèque : les recharger est instantané.'],
+    'opt.trouble': ['Troubleshooting', 'Dépannage'], 'opt.diag': ['Diagnostics', 'Diagnostic'], 'opt.copy': ['Copy', 'Copier'],
+    'opt.diagNote': ['Game build, launcher version and loaded mods, for bug reports.', 'Version du jeu, du launcher et mods chargés, pour les signalements.'],
+    'opt.logs': ['Game logs', 'Journaux du jeu'], 'opt.openFolder': ['Open folder', 'Ouvrir le dossier'], 'opt.refresh': ['Mod list and news', 'Liste des mods et actualités'], 'opt.checkNow': ['Check now', 'Vérifier'],
+    'opt.about': ['About', 'À propos'], 'opt.version': ['Version', 'Version'], 'opt.by': ['Mods by Tonnie', 'Mods par Tonnie'],
+    'opt.disclaimer': ['Community tool. Not made by or affiliated with the game\'s developers.', 'Outil communautaire, sans lien avec les développeurs du jeu.'],
+    'opt.credits': ['Uses Microsoft Edge WebView2 (BSD licence) and the fonts Bebas Neue and Rubik (SIL Open Font Licence).', 'Utilise Microsoft Edge WebView2 (licence BSD) et les polices Bebas Neue et Rubik (SIL Open Font Licence).'],
+    'edition.demo': ['Demo', 'Démo'], 'edition.full': ['Full game', 'Jeu complet'],
+    'game.info': ['{e} · build {b}', '{e} · version {b}'], 'game.running': ['Game running', 'Jeu en cours'], 'game.notRunning': ['Game not running', 'Jeu non lancé'],
+    'game.version': ['Game {v}', 'Jeu {v}'],
+    'error': ['Something went wrong', 'Un problème est survenu'],
+    'upd.title': ['Launcher update', 'Mise à jour du launcher'], 'upd.text': ['Version {v} is available. The launcher updates itself and restarts. Your mods and settings are kept.', 'La version {v} est disponible. Le launcher se met à jour et redémarre. Vos mods et réglages sont conservés.'],
+    'upd.later': ['Later', 'Plus tard'], 'upd.now': ['Update and restart', 'Mettre à jour et redémarrer'],
+    'cat.Lights and sirens': ['Lights and sirens', 'Feux et sirènes'], 'cat.Vehicles and liveries': ['Vehicles and liveries', 'Véhicules et livrées'],
+    'cat.Uniforms and gear': ['Uniforms and gear', 'Tenues et équipement'], 'cat.Tools': ['Tools', 'Outils'], 'cat.Other': ['Other', 'Autres'], 'cat.Added by you': ['Added by you', 'Ajoutés par vous']
+  };
+  var lang = 'en';
+  function t(key, vars) {
+    var s = STR[key] ? STR[key][lang === 'fr' ? 1 : 0] : key;
+    if (vars) for (var k in vars) s = s.split('{' + k + '}').join(vars[k]);
+    return s;
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function send(cmd, extra) { var m = extra || {}; m.cmd = cmd; window.chrome.webview.postMessage(m); }
+  function size(b) {
+    if (!b) return '';
+    var fr = lang === 'fr';
+    if (b < 1024 * 1024) return Math.max(1, Math.round(b / 1024)) + (fr ? ' Ko' : ' KB');
+    return (b / 1048576).toFixed(1).replace('.', fr ? ',' : '.') + (fr ? ' Mo' : ' MB');
+  }
+  function day(ts) { var d = new Date(ts * 1000); return d.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-AU', { day: 'numeric', month: 'short' }); }
+
+  // ---------------------------------------------------------------- state
+  var S = { settings: {}, state: null, news: [], screen: 'dashboard', sub: {}, selected: null, busy: false, running: false };
+
+  // ---------------------------------------------------------------- layout helpers
+  function fit() {
+    document.querySelectorAll('[data-fit]').forEach(function (el) {
+      var p = el.parentElement, cs = getComputedStyle(p);
+      var w = p.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      el.style.fontSize = '100px'; el.style.display = 'inline-block';
+      el.style.fontSize = (100 * w / el.scrollWidth) + 'px'; el.style.display = 'block';
+    });
+  }
+  function applyStrings() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = t(el.dataset.tp); });
+    var after = $('o-after'); after.innerHTML = ['minimise', 'close', 'none'].map(function (v) { return '<option value="' + v + '">' + esc(t('after.' + v)) + '</option>'; }).join('');
+    var start = $('o-start'); start.innerHTML = '<option value="dashboard">' + esc(t('tab.dashboard')) + '</option><option value="mods">' + esc(t('nav.mods').charAt(0) + t('nav.mods').slice(1).toLowerCase()) + '</option>';
+    $('f-sort').innerHTML = ['category', 'name', 'author'].map(function (v) { return '<option value="' + v + '">' + esc(t('sort.' + v)) + '</option>'; }).join('');
+    syncOptions();
+  }
+
+  var TABS = {
+    dashboard: [['tab.dashboard', null]],
+    mods: [['tab.loaded', 'mods-loaded'], ['tab.all', 'mods-all'], ['tab.updates', 'mods-updates']],
+    options: [['tab.launcher', 'opt-launcher'], ['tab.game', 'opt-game'], ['tab.help', 'opt-help']]
+  };
+  function go(screen, sub) {
+    S.screen = screen;
+    document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('on', s.id === 'screen-' + screen); });
+    document.querySelectorAll('.nav').forEach(function (n) { n.classList.toggle('on', n.dataset.screen === screen); });
+    if (sub) S.sub[screen] = sub;
+    renderTabs();
+  }
+  function renderTabs() {
+    var el = $('tabs'), screen = S.screen, cur = S.sub[screen] || (TABS[screen][0][1]);
+    var html = TABS[screen].map(function (tb) {
+      var label = t(tb[0]);
+      if (tb[1] === 'mods-updates' && countUpdates()) label += ' (' + countUpdates() + ')';
+      return '<button class="t' + (tb[1] === cur || !tb[1] ? ' on' : '') + '" data-sub="' + (tb[1] || '') + '">' + esc(label) + '</button>';
+    }).join('');
+    var right = '';
+    el.innerHTML = html + '<div class="right">' + esc(right) + '</div>';
+    if (cur) $('screen-' + screen).querySelectorAll('.sub').forEach(function (s) { s.classList.toggle('on', s.id === cur); });
+  }
+
+  // ---------------------------------------------------------------- data helpers
+  function mods() { return S.state ? S.state.mods : []; }
+  function visibleMods() { return mods().filter(function (m) { return !m.hidden || m.state !== 'NotDownloaded'; }); }
+  function modById(id) { return mods().filter(function (m) { return m.id === id; })[0]; }
+  function localById(id) { return S.state ? S.state.local.filter(function (m) { return m.id === id; })[0] : null; }
+  function countUpdates() { return mods().filter(function (m) { return m.state === 'UpdateAvailable'; }).length; }
+  function loadedList() { return mods().filter(function (m) { return m.loaded; }); }
+  function loadedCount() { return loadedList().length + (S.state ? S.state.local.filter(function (l) { return l.loaded; }).length : 0); }
+  function catLabel(c) { return STR['cat.' + c] ? t('cat.' + c) : c; }
+  function statusHtml(m) {
+    var parts = [];
+    if (m.state === 'UpdateAvailable') parts.push('<span class="tag">' + esc(t('st.UpdateAvailable', { v: m.version })) + '</span>');
+    if (m.state === 'NotDownloaded') parts.push('<span class="dim">' + esc(t('st.NotDownloaded')) + '</span>');
+    if (m.replacedBy) parts.push('<span class="tag">' + esc(t('st.replaced', { b: m.replacedBy })) + '</span>');
+    if (!m.loaded && m.conflicts.some(function (c) { return loadedList().some(function (l) { return l.name === c; }); })) parts.push('<span class="tag bad">' + esc(t('st.clash')) + '</span>');
+    if (m.loaded && m.testedBuild && S.state.game.version && m.testedBuild !== S.state.game.version) parts.push('<span class="tag">' + esc(t('st.untested')) + '</span>');
+    return parts.join(' ');
+  }
+  function thumb(src) { return src ? '<img class="thumb" src="' + esc(src) + '" alt="" onerror="this.outerHTML=\'<div class=thumb>.pak</div>\'">' : '<div class="thumb">.pak</div>'; }
+  function head() {
+    return '<tr><th style="width:34px"></th><th>' + esc(t('col.mod')) + '</th><th style="width:96px">' + esc(t('col.author')) + '</th><th style="width:64px">' + esc(t('col.version')) +
+      '</th><th style="width:170px">' + esc(t('col.status')) + '</th><th style="width:70px;text-align:right">' + esc(t('col.size')) + '</th></tr>';
+  }
+  function row(m) {
+    return '<tr class="m' + (S.selected === m.id ? ' sel' : '') + '" data-id="' + esc(m.id) + '"><td><span class="cb' + (m.loaded ? ' on' : '') + '" data-toggle="' + esc(m.id) + '"></span></td>' +
+      '<td><div class="modname" title="' + esc(m.name) + '">' + thumb(m.thumb) + '<span>' + esc(m.name) + '</span></div></td><td class="dim">' + esc(m.author) + '</td><td>' + esc(m.version) +
+      '</td><td>' + statusHtml(m) + '</td><td class="num">' + esc(size(m.size)) + '</td></tr>';
+  }
+  function localRow(l) {
+    var m = { id: l.id, name: l.name, author: t('local'), version: '', loaded: l.loaded, size: l.size, thumb: null };
+    return '<tr class="m' + (S.selected === l.id ? ' sel' : '') + '" data-id="' + esc(l.id) + '"><td><span class="cb' + (l.loaded ? ' on' : '') + '" data-toggle="' + esc(l.id) + '"></span></td>' +
+      '<td><div class="modname" title="' + esc(l.name) + '">' + thumb(null) + '<span>' + esc(l.name) + '</span></div></td><td class="dim">' + esc(m.author) + '</td><td class="dim">&#8212;</td><td class="dim">' + esc(t('st.local')) + '</td><td class="num">' + esc(size(l.size)) + '</td></tr>';
+  }
+
+  // ---------------------------------------------------------------- render
+  function render() {
+    var st = S.state;
+    document.body.classList.toggle('flat', S.settings.smoothGraphics === false);
+    $('app').classList.toggle('locked', S.running);
+    $('app').classList.toggle('busy', S.busy);
+    var n = loadedCount();
+    $('play-summary').textContent = !st ? '' : n === 0 ? t('play.summary0') : n === 1 ? t('play.summary1') : t('play.summary', { n: n });
+    $('play').textContent = S.running ? t('running') : t('play');
+    $('play').disabled = S.running || S.busy || !st || !st.game.found;
+    $('play-info').textContent = !st ? '' : !st.game.found ? t('play.noGame') : S.running ? t('play.locked') : t('play.steam');
+    var u = countUpdates();
+    $('nav-updates').textContent = u ? (lang === 'fr' ? u + ' MAJ' : u + (u === 1 ? ' update' : ' updates')) : '';
+    renderGameInfo();
+    renderDashboard();
+    renderMods();
+    renderOptionsData();
+    renderTabs();
+  }
+
+  function renderGameInfo() {
+    var st = S.state; if (!st) return;
+    var g = st.game, parts = [];
+    if (g.found) {
+      if (g.version) parts.push(t('game.version', { v: g.version }));
+      parts.push(t('game.info', { e: t(g.isDemo ? 'edition.demo' : 'edition.full'), b: g.build || '?' }));
+      parts.push(S.running ? t('game.running') : t('game.notRunning'));
+    }
+    $('game-info').textContent = parts.join(' · ');
+  }
+
+  function renderDashboard() {
+    var st = S.state;
+    $('band-cap').textContent = st ? t('dash.cap', { n: loadedCount() }) : '';
+    // news
+    var unread = S.news.filter(function (x) { return x.unread; }).length;
+    $('news-count').textContent = unread ? t('dash.unread', { n: unread }) : '';
+    $('news').innerHTML = S.news.length ? S.news.slice(0, 12).map(function (x) {
+      return '<tr data-news="' + esc(x.id) + '" data-url="' + esc(x.url || '') + '"><td>' + esc(day(x.date)) + '</td><td>' + (x.unread ? '<span class="unread"></span>' : '') +
+        '<span class="kind ' + esc(x.kind) + '">' + esc(t('kind.' + x.kind)) + '</span><b>' + esc(x.title) + '</b><div class="src">' + esc(x.summary ? x.summary : t('src.' + x.source)) + '</div></td></tr>';
+    }).join('') : '<tr><td colspan="2" class="empty">' + esc(t('dash.noNews')) + '</td></tr>';
+    // alerts
+    var a = [];
+    if (st) {
+      if (!st.game.found) a.push([t('al.noGame'), t('al.noGameText'), '<button class="btn" data-act="pickGame">' + esc(t('al.choose')) + '</button>', true]);
+      if (st.manifestError) a.push([t('al.offline'), st.manifestError, '<button class="btn" data-act="refresh">' + esc(t('al.retry')) + '</button>', true]);
+      if (st.launcherUpdate) a.push([t('al.launcher', { v: st.launcherUpdate.version }), '', '<button class="btn red" data-act="selfUpdate">' + esc(t('al.update')) + '</button>']);
+      var u = countUpdates();
+      if (u) a.push([u === 1 ? t('al.update1') : t('al.updates', { n: u }), mods().filter(function (m) { return m.state === 'UpdateAvailable'; }).map(function (m) { return m.name + ' ' + m.version; }).join(', '),
+        '<button class="btn red" data-act="updateAll">' + esc(t('al.updateAll')) + '</button>']);
+      if (st.game.updated) a.push([t('al.gameUpdated') + (st.game.version ? ' (' + st.game.version + ')' : ''), t('al.gameUpdatedText'), '<button class="btn" data-act="dismissGame">' + esc(t('al.ok')) + '</button>', true]);
+      mods().filter(function (m) { return m.replacedBy && m.state !== 'NotDownloaded'; }).forEach(function (m) {
+        a.push([t('al.replaced', { a: m.name, b: m.replacedBy }), '', '<button class="btn" data-act="switch" data-id="' + esc(m.id) + '">' + esc(t('al.switch')) + '</button>']);
+      });
+    }
+    $('alerts').innerHTML = a.length ? a.map(function (x) {
+      return '<tr><td>' + (x[3] ? '<span class="warn">' + esc(x[0]) + '</span>' : esc(x[0])) + (x[1] ? '<div class="dim">' + esc(x[1]) + '</div>' : '') + '</td><td>' + x[2] + '</td></tr>';
+    }).join('') : '<tr><td class="empty">' + esc(t('dash.noAlerts')) + '</td></tr>';
+    // loads
+    var loads = loadedList(), locals = st ? st.local.filter(function (l) { return l.loaded; }) : [], total = 0;
+    loads.forEach(function (m) { total += m.size; }); locals.forEach(function (l) { total += l.size; });
+    $('loads-size').textContent = total ? size(total) : '';
+    $('loads').innerHTML = loads.length + locals.length ? loads.map(function (m) {
+      return '<tr><td>' + esc(m.name) + (m.state === 'UpdateAvailable' ? ' <span class="tag">' + esc(t('st.UpdateAvailable', { v: m.version })) + '</span>' : '') + '</td><td class="num">' + esc(m.version) + '</td></tr>';
+    }).join('') + locals.map(function (l) { return '<tr><td>' + esc(l.name) + ' <span class="dim">· ' + esc(t('local')) + '</span></td><td class="num"></td></tr>'; }).join('')
+      : '<tr><td class="empty">' + esc(t('dash.noLoaded')) + '</td></tr>';
+  }
+
+  function filtered(list) {
+    var q = $('q').value.trim().toLowerCase(), cat = $('f-cat').value, au = $('f-author').value;
+    return list.filter(function (m) {
+      if (cat && m.category !== cat) return false;
+      if (au && m.author !== au) return false;
+      return !q || (m.name + ' ' + m.author + ' ' + (m.description || '')).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  function grouped(list, locals) {
+    var sort = $('f-sort').value, html = '';
+    if (sort === 'name' || sort === 'author') {
+      list = list.slice().sort(function (a, b) { return (sort === 'author' ? a.author.localeCompare(b.author) || 0 : 0) || a.name.localeCompare(b.name); });
+      html = list.map(row).join('');
+    } else {
+      var cats = [];
+      list.forEach(function (m) { if (cats.indexOf(m.category) < 0) cats.push(m.category); });
+      cats.sort(function (a, b) { return (a === 'Tools' || a === 'Other') - (b === 'Tools' || b === 'Other') || a.localeCompare(b); });
+      cats.forEach(function (c) {
+        html += '<tr class="grp"><td colspan="6">' + esc(catLabel(c)) + '</td></tr>' + list.filter(function (m) { return m.category === c; }).map(row).join('');
+      });
+    }
+    if (locals.length) html += '<tr class="grp"><td colspan="6">' + esc(catLabel('Added by you')) + '</td></tr>' + locals.map(localRow).join('');
+    return html;
+  }
+
+  function renderMods() {
+    var st = S.state; if (!st) return;
+    // filters keep their values across renders
+    var cats = [], authors = [];
+    visibleMods().forEach(function (m) { if (cats.indexOf(m.category) < 0) cats.push(m.category); if (authors.indexOf(m.author) < 0) authors.push(m.author); });
+    var cv = $('f-cat').value, av = $('f-author').value;
+    $('f-cat').innerHTML = '<option value="">' + esc(t('cat.all')) + '</option>' + cats.sort().map(function (c) { return '<option value="' + esc(c) + '">' + esc(catLabel(c)) + '</option>'; }).join('');
+    $('f-author').innerHTML = '<option value="">' + esc(t('author.all')) + '</option>' + authors.sort().map(function (a) { return '<option value="' + esc(a) + '">' + esc(a) + '</option>'; }).join('');
+    $('f-cat').value = cv; $('f-author').value = av;
+    $('th1').innerHTML = head(); $('th2').innerHTML = head();
+    var q = $('q').value.trim().toLowerCase();
+    var localsAll = st.local.filter(function (l) { return !q || l.name.toLowerCase().indexOf(q) >= 0; });
+    var loaded = filtered(loadedList()), localsLoaded = localsAll.filter(function (l) { return l.loaded; });
+    var total = 0; loadedList().forEach(function (m) { total += m.size; }); st.local.forEach(function (l) { if (l.loaded) total += l.size; });
+    $('loaded-sum').textContent = t('mods.loadedSum', { n: loadedCount(), s: size(total) || '0 KB' });
+    $('list-loaded').innerHTML = loaded.length + localsLoaded.length ? grouped(loaded, localsLoaded) : '<tr><td colspan="6" class="empty">' + esc(t('mods.noLoaded')) + '</td></tr>';
+    var all = filtered(visibleMods());
+    $('all-sum').textContent = t('mods.allSum', { n: visibleMods().length + st.local.length });
+    $('list-all').innerHTML = all.length + localsAll.length ? grouped(all, localsAll) : '<tr><td colspan="6" class="empty">' + esc(t('mods.noMatch')) + '</td></tr>';
+    var ups = mods().filter(function (m) { return m.state === 'UpdateAvailable'; });
+    $('update-all').disabled = !ups.length || S.busy || S.running;
+    $('list-updates').innerHTML = ups.length ? ups.map(function (m) {
+      var c = (m.changelog || []).filter(function (e) { return e.version === m.version; })[0];
+      return '<tr class="m" data-id="' + esc(m.id) + '"><td><div class="modname">' + thumb(m.thumb) + esc(m.name) + '</div></td><td class="dim">' + esc(m.author) + '</td><td>' + esc(m.version) +
+        '</td><td class="dim">' + esc(c && c.notes ? c.notes.join('; ') : '') + '</td><td style="text-align:right"><button class="btn" data-act="update" data-id="' + esc(m.id) + '"' + (S.busy || S.running ? ' disabled' : '') + '>' + esc(t('b.update')) + '</button></td></tr>';
+    }).join('') : '<tr><td class="empty">' + esc(t('mods.noUpdates')) + '</td></tr>';
+    renderDetail();
+  }
+
+  function renderDetail() {
+    var el = $('detail'), id = S.selected, m = id ? modById(id) : null, l = id ? localById(id) : null;
+    var dis = S.busy || S.running ? ' disabled' : '';
+    if (!m && !l) { el.innerHTML = '<div class="ph">' + esc(t('d.status')) + '</div><div class="empty">' + esc(t('d.pick')) + '</div>'; return; }
+    if (l) {
+      el.innerHTML = '<div class="ph">' + esc(t('local')) + '</div><div class="noimg"></div><div class="in"><h3>' + esc(l.name) + '</h3>' +
+        '<dl><dt>' + esc(t('d.author')) + '</dt><dd>' + esc(t('local')) + '</dd><dt>' + esc(t('d.status')) + '</dt><dd>' + esc(l.loaded ? t('d.loaded') : t('d.available')) + '</dd>' +
+        '<dt>' + esc(t('d.files')) + '</dt><dd>' + esc(l.files.join(', ')) + '</dd><dt>' + esc(t('d.size')) + '</dt><dd>' + esc(size(l.size)) + '</dd></dl>' +
+        '<div class="acts"><button class="btn red" data-act="' + (l.loaded ? 'unload' : 'load') + '" data-id="' + esc(l.id) + '"' + dis + '>' + esc(t(l.loaded ? 'b.unload' : 'b.load')) + '</button>' +
+        '<button class="btn" data-act="remove" data-id="' + esc(l.id) + '"' + dis + '>' + esc(t('b.delete')) + '</button></div></div>';
+      return;
+    }
+    var stText = m.state === 'Loaded' ? t('d.loaded') : m.state === 'Available' ? t('d.available') : m.state === 'NotDownloaded' ? t('d.notDownloaded') : t('d.outdated');
+    var change = (m.changelog || []).filter(function (e) { return e.version === m.version; })[0];
+    var main = m.state === 'NotDownloaded' ? ['load', 'b.install'] : m.state === 'UpdateAvailable' ? ['update', 'b.update'] : m.loaded ? ['unload', 'b.unload'] : ['load', 'b.load'];
+    var list = function (a) { return a && a.length ? a.join(', ') : t('d.nothing'); };
+    el.innerHTML = '<div class="ph">' + esc(catLabel(m.category)) + '</div>' + (m.thumb ? '<img src="' + esc(m.thumb) + '" alt="" onerror="this.outerHTML=\'<div class=noimg></div>\'">' : '<div class="noimg"></div>') +
+      '<div class="in"><h3>' + esc(m.name.toUpperCase()) + '</h3>' + (m.description ? '<div>' + esc(m.description) + '</div>' : '') +
+      '<dl><dt>' + esc(t('d.author')) + '</dt><dd>' + esc(m.author) + '</dd><dt>' + esc(t('d.version')) + '</dt><dd>' + esc(m.version) + '</dd>' +
+      '<dt>' + esc(t('d.status')) + '</dt><dd>' + esc(stText) + '</dd>' +
+      (m.requires.length ? '<dt>' + esc(t('d.needs')) + '</dt><dd>' + esc(list(m.requires)) + '</dd>' : '') +
+      (m.includes.length ? '<dt>' + esc(t('d.includes')) + '</dt><dd>' + esc(list(m.includes)) + '</dd>' : '') +
+      (m.conflicts.length ? '<dt>' + esc(t('d.clashes')) + '</dt><dd>' + esc(list(m.conflicts)) + '</dd>' : '') +
+      (m.size ? '<dt>' + esc(t('d.size')) + '</dt><dd>' + esc(size(m.size)) + '</dd>' : '') + '</dl>' +
+      (change && change.notes && change.notes.length ? '<div><span class="dim">' + esc(t('d.changes', { v: m.version })) + '</span><ul>' + change.notes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' : '') +
+      '<div class="acts"><button class="btn red" data-act="' + main[0] + '" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t(main[1])) + '</button>' +
+      (m.page ? '<button class="btn" data-url="' + esc(m.page) + '">' + esc(t('b.page')) + '</button>' : '') +
+      (m.state !== 'NotDownloaded' ? '<button class="btn" data-act="remove" data-id="' + esc(m.id) + '"' + dis + '>' + esc(t('b.delete')) + '</button>' : '') + '</div></div>';
+  }
+
+  function syncOptions() {
+    var s = S.settings;
+    $('o-language').value = s.language || lang;
+    $('o-after').value = s.afterStart || 'minimise';
+    $('o-start').value = s.startPage || 'dashboard';
+    $('o-updates').querySelector('.cb').classList.toggle('on', s.checkUpdates !== false);
+    $('o-smooth').querySelector('.cb').classList.toggle('on', s.smoothGraphics !== false);
+    $('o-version').textContent = s.version || '';
+  }
+  function renderOptionsData() {
+    var st = S.state; if (!st) return;
+    // Paths are cut from the left (direction: rtl) so the folder name stays visible; the marks keep the slashes in order.
+    function path(el, p) { $(el).textContent = p ? '‎' + p + '‎' : '—'; $(el).title = p || ''; }
+    path('o-game', st.game.folder); path('o-paks', st.game.paks); path('o-lib', st.game.library);
+    $('o-edition').textContent = st.game.found ? t(st.game.isDemo ? 'edition.demo' : 'edition.full') + (st.game.appId ? ' (Steam app ' + st.game.appId + ')' : '') : '—';
+  }
+
+  // ---------------------------------------------------------------- dialogs
+  // One question at a time: later ones wait until the open one is answered.
+  var askQueue = [];
+  function openAsk(id, title, text, buttons) {
+    if ($('dlg-ask').classList.contains('open')) { askQueue.push([id, title, text, buttons]); return; }
+    $('ask-title').textContent = title; $('ask-text').textContent = text;
+    $('ask-buttons').innerHTML = buttons.map(function (b, i) { return '<button class="btn' + (i === 0 ? ' red' : '') + '" data-answer="' + i + '">' + esc(b) + '</button>'; }).join('');
+    var dlg = $('dlg-ask'); dlg.dataset.id = id; dlg.classList.add('open');
+    var first = dlg.querySelector('[data-answer]'); if (first) first.focus();
+  }
+  function answer(choice) {
+    var dlg = $('dlg-ask'); if (!dlg.classList.contains('open')) return;
+    dlg.classList.remove('open');
+    if (dlg.dataset.id === 'launcherUpdate') { if (choice === 0) send('selfUpdate'); }
+    else send('answer', { id: dlg.dataset.id, choice: String(choice) });
+    if (askQueue.length) openAsk.apply(null, askQueue.shift());
+  }
+  function showError(text) { $('toast-text').textContent = text; $('toast').classList.add('show'); clearTimeout(showError.timer); showError.timer = setTimeout(function () { $('toast').classList.remove('show'); }, 9000); }
+
+  // ---------------------------------------------------------------- events
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-screen],[data-sub],[data-toggle],[data-act],[data-url],[data-news],[data-folder],[data-answer],[data-lang],tr.m');
+    if (!el) return;
+    if (el.dataset.lang) { setLanguage(el.dataset.lang); $('dlg-lang').classList.remove('open'); askUpdate(); return; }
+    if (el.dataset.answer !== undefined) { answer(+el.dataset.answer); return; }
+    if (el.dataset.screen) { go(el.dataset.screen); return; }
+    if (el.dataset.sub !== undefined && el.classList.contains('t')) { if (el.dataset.sub) { S.sub[S.screen] = el.dataset.sub; renderTabs(); } return; }
+    if (el.dataset.toggle) {
+      e.stopPropagation();
+      var id = el.dataset.toggle, m = modById(id), l = localById(id), on = m ? m.loaded : l && l.loaded;
+      S.selected = id; send(on ? 'unload' : 'load', { id: id }); return;
+    }
+    if (el.dataset.news) {
+      var item = S.news.filter(function (x) { return x.id === el.dataset.news; })[0];
+      if (item && item.unread) { item.unread = false; send('markRead', { ids: [item.id] }); renderDashboard(); }
+      if (el.dataset.url) send('openUrl', { url: el.dataset.url });
+      return;
+    }
+    if (el.dataset.url) { e.preventDefault(); send('openUrl', { url: el.dataset.url }); return; }
+    if (el.dataset.folder) { send('openFolder', { which: el.dataset.folder }); return; }
+    if (el.dataset.act) {
+      var a = el.dataset.act, aid = el.dataset.id;
+      if (a === 'pickGame') send('pickGame');
+      else if (a === 'refresh') send('refresh');
+      else if (a === 'selfUpdate') send('selfUpdate');
+      else if (a === 'updateAll') send('update', { ids: [] });
+      else if (a === 'update') send('update', { ids: [aid] });
+      else if (a === 'dismissGame') { send('setOption', { key: 'dismissGameUpdated', value: true }); S.state.game.updated = false; render(); }
+      else if (a === 'switch') send('switchReplaced', { id: aid });
+      else send(a, { id: aid });
+      return;
+    }
+    if (el.matches('tr.m')) { S.selected = el.dataset.id; renderMods(); }
   });
-  window.chrome.webview.postMessage({ cmd: 'hello' });
+  $('play').addEventListener('click', function () { send('play'); });
+  $('add-files').addEventListener('click', function () { send('addFiles'); });
+  $('update-all').addEventListener('click', function () { send('update', { ids: [] }); });
+  $('o-pick').addEventListener('click', function () { send('pickGame'); });
+  $('o-diag').addEventListener('click', function () { send('copyDiagnostics'); });
+  $('o-refresh').addEventListener('click', function () { send('refresh'); });
+  $('toast-close').addEventListener('click', function () { $('toast').classList.remove('show'); });
+  ['q', 'f-cat', 'f-author', 'f-sort'].forEach(function (id) { $(id).addEventListener('input', renderMods); });
+  $('o-language').addEventListener('change', function () { setLanguage(this.value); });
+  $('o-after').addEventListener('change', function () { send('setOption', { key: 'afterStart', value: this.value }); });
+  $('o-start').addEventListener('change', function () { send('setOption', { key: 'startPage', value: this.value }); });
+  $('o-updates').addEventListener('click', function () { send('setOption', { key: 'checkUpdates', value: !(S.settings.checkUpdates !== false) }); });
+  $('o-smooth').addEventListener('click', function () { send('setOption', { key: 'smoothGraphics', value: !(S.settings.smoothGraphics !== false) }); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && $('dlg-ask').classList.contains('open')) answer(-1);
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && S.screen === 'mods') { e.preventDefault(); $('q').focus(); }
+  });
+  window.addEventListener('resize', fit);
+
+  function setLanguage(l) {
+    lang = l === 'fr' ? 'fr' : 'en';
+    S.settings.language = lang;
+    send('setOption', { key: 'language', value: lang });
+    applyStrings(); render();
+  }
+
+  // ---------------------------------------------------------------- messages from C#
+  var first = true;
+  window.chrome.webview.addEventListener('message', function (e) {
+    var ev = e.data.event, d = e.data.data;
+    if (ev === 'settings') {
+      S.settings = d;
+      if (d.language) lang = d.language;
+      applyStrings();
+      if (first) { first = false; go(d.startPage === 'mods' ? 'mods' : 'dashboard'); if (!d.language) $('dlg-lang').classList.add('open'); }
+      render();
+    } else if (ev === 'state') { S.state = d; S.running = d.game.running; render(); }
+    else if (ev === 'news') { S.news = d; renderDashboard(); }
+    else if (ev === 'busy') { S.busy = d; render(); }
+    else if (ev === 'gameRunning') { S.running = d; if (S.state) S.state.game.running = d; render(); }
+    else if (ev === 'status') {
+      $('status-text').textContent = d.text || '';
+      clearTimeout(statusTimer);
+      if (d.percent < 0 && d.text) statusTimer = setTimeout(function () { $('status-text').textContent = ''; }, 12000);
+      $('prog').classList.toggle('on', d.percent >= 0);
+      $('prog').firstChild.style.width = Math.max(0, d.percent) + '%';
+    }
+    else if (ev === 'ask') openAsk(d.id, d.title, d.text, d.buttons);
+    else if (ev === 'error') showError(d.text);
+    else if (ev === 'launcherUpdate') { pendingUpdate = d; if (!$('dlg-lang').classList.contains('open')) askUpdate(); }
+  });
+  var pendingUpdate = null, statusTimer = null;
+  function askUpdate() {
+    if (!pendingUpdate) return;
+    var d = pendingUpdate; pendingUpdate = null;
+    openAsk('launcherUpdate', t('upd.title'), t('upd.text', { v: d.version }) + (d.notes && d.notes.length ? '\n\n• ' + d.notes.join('\n• ') : ''), [t('upd.now'), t('upd.later')]);
+  }
+
+  applyStrings();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit); else fit();
+  fit();
+  send('ready');
+})();
 </script>
 </body>
 </html>
