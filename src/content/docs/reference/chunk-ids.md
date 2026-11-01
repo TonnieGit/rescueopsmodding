@@ -10,13 +10,13 @@ Every mod is packaged into its own chunk (set by the PrimaryAssetLabel's **Chunk
 | Chunk ID | Container | Mod | Author |
 |---|---|---|---|
 | 1000 | `z_FirefighterTex_P` | [QLD RFS Uniforms](/mods/qld-rfs-uniforms/) | Tonnie |
-| 1001 | `z_Hazard_1000_Sounds_P` | [Hazard 1000 Tones](/mods/hazard-1000-tones/) (also in Truck Reskin) | Tonnie |
+| 1001 | `z_Hazard_1000_Sounds_P` | [Hazard 1000 Tones](/mods/hazard-1000-tones/) | Tonnie |
 | 1002 | `z_QLD_Truck_P` | [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/) | Tonnie |
 | 1003 | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P` | [BR9 – Bushfire Helmet Yellow](/mods/br9-bushfire-helmet-yellow/) (also in QLD RFS Uniforms) | Tonnie |
 | 1004 | `pakchunk1004-Beacon_Base-Windows_P` | [Beacon Base](/mods/tonnie-core/) (shared by the beacon colours). Replaces the v1 files `pakchunk1004-Red_Beacons` / `pakchunk1004-Red_Blue_Beacons` | Tonnie |
 | 1005 | `pakchunk1005-Tonnie_Core-Windows_P` | [Tonnie Core](/mods/tonnie-core/) (shared hook) | Tonnie |
 | 1006 | `pakchunk1006-Free_Camera-Windows_P` | [Free Camera](/mods/free-camera/) | Tonnie |
-| 1007 | `pakchunk1007-Red_Blue_Beacons-Windows_P` | [Red + Blue Beacons](/mods/red-blue-beacons/) colour (also in QLD RFS Truck Reskin v1.4) | Tonnie |
+| 1007 | `pakchunk1007-Red_Blue_Beacons-Windows_P` | [Red + Blue Beacons](/mods/red-blue-beacons/) colour (also in QLD RFS Truck Reskin) | Tonnie |
 | 1008 | `pakchunk1008-Red_Beacons-Windows_P` | [Red Beacons](/mods/red-beacons/) colour | Tonnie |
 | 1009 | `pakchunk1009-Brighter_Beacons-Windows_P` | [Brighter Beacons](/mods/brighter-beacons/) colour | Tonnie |
 
