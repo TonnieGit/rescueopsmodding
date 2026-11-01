@@ -2,7 +2,7 @@
 title: 'QLD RFS Truck Reskin 1.5: now with ELS'
 description: 'The QLD RFS truck now comes with the ELS light bar and sirens, plus its red and blue grille and rear beacons.'
 news: true
-date: 2026-11-01
+date: 2026-11-01T08:00:00Z
 kind: mods
 summary: 'The QLD RFS truck now comes fitted out with the ELS Light Bar and ELS sirens in place of the Hazard 1000 tones, and keeps its red and blue beacons.'
 ---
