@@ -78,6 +78,8 @@ export default defineConfig({
 						{ label: 'Brighter Beacons', slug: 'mods/brighter-beacons' },
 						{ label: 'Red Beacons', slug: 'mods/red-beacons' },
 						{ label: 'Red + Blue Beacons', slug: 'mods/red-blue-beacons' },
+						{ label: 'ELS: Emergency Lighting and Sirens', slug: 'mods/els' },
+						{ label: 'ELS Light Bar', slug: 'mods/els-light-bar' },
 						{ label: 'Free Camera', slug: 'mods/free-camera' },
 						{ label: 'Tonnie Core and Beacon Base', slug: 'mods/tonnie-core' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },

@@ -1,0 +1,65 @@
+---
+title: ELS Light Bar
+description: 'A full-width red and blue LED light bar with real light, flash patterns, traffic advisor, scene and takedown lights for the Rescue Ops: Wildfire fire truck.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import ModStats from '../../../components/ModStats.astro';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="New" variant="success" /> <Badge text="Needs ELS (included)" variant="caution" />
+
+<ModStats id="ELS_LightBar" />
+
+A full-width **red and blue LED light bar** on the main fire truck (the CCF), in place of the two front roof beacons, with a **rear traffic advisor** stick. Every module flashes on its own and throws **real light** onto the road, walls and smoke. Everything is picked from the lights menu (**U**) while you drive.
+
+- **Patterns:** Quad 2, Double, Quint, Road Runner and Slow Runner, or **Cycle** through them every 5 seconds.
+- **Traffic advisor:** left, right or centre out, on the bar and the rear stick.
+- **Scene lights:** white side lights left, right or both. **Takedown:** white front lights.
+- **Stages** 1 to 3, **Park Mode** (a calmer pattern while you're stopped), **Lens Tint** (clear or red and blue lenses) and **Clear All**.
+
+The game's own lights key still switches the bar on and off.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/ELS_LightBar.zip" icon="download">Download ELS_LightBar.zip (5 MB)</LinkButton>
+
+![The fire truck with the ELS light bar flashing red and blue on the roof](/launcher/shots/ELS_LightBar/01.jpg)
+
+![The ELS lights menu: Patterns, Traffic Adv, Scene, Stage, Takedown, Park Mode, Lens Tint and Clear All](/launcher/shots/ELS_LightBar/02.jpg)
+
+## Controls
+
+| Key | Does |
+|---|---|
+| **K** | Siren on/off (the game's own key; ELS plays its own siren) |
+| Hold **H** | Siren on: air horn. Siren off: a manual wail that winds up while held |
+| **H H** (double-tap) | Next siren tone |
+| **I** | Sirens menu |
+| **U** | Lights menu (with the [ELS Light Bar](/mods/els-light-bar/)) |
+
+In a menu, point with the mouse or scroll, then click or let go of the key to pick. Right-click goes back. The menus are in French when the game is.
+
+:::note[Needs ELS]
+The light bar runs through [ELS](/mods/els/) and [Tonnie Core](/mods/tonnie-core/) v2. Both are in the zip, and the [Mod Launcher](/mods/installing/) adds them for you.
+:::
+
+:::caution[Light bar or beacon colours]
+The light bar replaces the two front roof beacons, so it doesn't mix with [Brighter](/mods/brighter-beacons/), [Red](/mods/red-beacons/) or [Red + Blue Beacons](/mods/red-blue-beacons/), or the [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/)'s beacons. The Mod Launcher and `Install.bat` ask before swapping.
+:::
+
+## Known limitations
+
+- The lights are on your own screen only. In multiplayer, other players see their own game's beacons.
+- Real lights cost some frame rate on older graphics cards. A lighter version is on the way.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1012-ELS_LightBar-Windows_P.pak        EEC6FD1AF97EB3383FE9BB87F86C9A51E5A3437110DCB7D2DD782ACFC4FC1E04
+pakchunk1012-ELS_LightBar-Windows_P.ucas       804CD9C5D48157DBAB6A8E85E544AA2F5AB9705A5562D1E820802151B72DE51D
+pakchunk1012-ELS_LightBar-Windows_P.utoc       EE89AFB13BD8C6956BD9B52C5138F5E322C5043BC9F165C57F040851A5B77278
+```
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).
