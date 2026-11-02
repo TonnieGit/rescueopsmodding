@@ -1,0 +1,54 @@
+---
+title: 'Lights: HQ Real Light'
+description: 'Full-quality real light for Tonnie''s beacon and ELS light bar mods: shadows on every light, light in smoke and fog, and full bounce light.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import ModStats from '../../../components/ModStats.astro';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="New" variant="success" /> <Badge text="Add-on" variant="caution" />
+
+<ModStats id="Lights_HQ" />
+
+All of Tonnie's light mods ([Beacons: Blue](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red & Blue](/mods/red-blue-beacons/), [ELS: Light Bar AUS](/mods/els-light-bar/), [ELS: Light Bar France](/mods/els-france/) and the [QLD RFS: Fire Truck](/mods/qld-rfs-truck-reskin/)) now run in **Lite** mode by default. The real light no longer casts shadows and follows a real LED beam shape, so it costs almost no FPS. It also stops the light bar flooding the cab with light.
+
+**Lights: HQ** turns them back up to full quality:
+
+- **Shadows** on every light.
+- **Light in smoke and fog.**
+- **Full bounce light** off the ground and walls.
+
+It looks best, but it costs FPS. On its own it does nothing: it changes the lights of the mods above.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Lights_HQ.zip" icon="download">Download Lights_HQ.zip (10 KB)</LinkButton>
+
+![At night, coloured light from the truck's lights thrown on the ground on both sides of the truck](/launcher/shots/Lights_HQ/01.jpg)
+
+![The truck in a garage, its lights throwing coloured light on the walls](/launcher/shots/Lights_HQ/02.jpg)
+
+:::note[Needs ROMF]
+Lights: HQ starts through [ROMF](/mods/tonnie-core/), a small shared file. The [Mod Launcher](/mods/installing/) installs it for you, and the zip includes it too.
+:::
+
+:::tip[Lite or HQ?]
+Start with Lite. If your frame rate has room to spare, add Lights: HQ. Untick it in the Mod Launcher to go back to Lite.
+:::
+
+## Known limitations
+
+- The lights are on your own screen only. In multiplayer, other players see their own game's lights.
+- HQ costs frame rate. On older graphics cards, stay on Lite.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1013-Lights_HQ-Windows_P.pak   87E14CD4593DB58933A20FE00B9D0083CE373CA1662CBCABE1B28DDD7A0E3CD3
+pakchunk1013-Lights_HQ-Windows_P.ucas  6270354ED9B35CF3D4E21E2FA5D1CD6448FA443913DDDFB7CBF6C5481BB71CEB
+pakchunk1013-Lights_HQ-Windows_P.utoc  AA309862F05121C7E530D915BF73C821AFDB9FC6F83B31E24B9F7C6E0221B566
+```
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

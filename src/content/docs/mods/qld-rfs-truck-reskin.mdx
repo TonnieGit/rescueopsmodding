@@ -1,6 +1,6 @@
 ---
-title: QLD RFS Truck Reskin
-description: 'The CCF fire truck in QLD RFS golden yellow with RFS and QFD logos, red and white chevrons, the ELS light bar and sirens, and red and blue beacons.'
+title: 'QLD RFS: Fire Truck'
+description: 'The CCF fire truck in QLD RFS golden yellow with RFS and QFD logos, red and white chevrons, the ELS: Light Bar AUS and sirens, and red and blue beacons.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
@@ -9,17 +9,23 @@ import side from '../../../assets/screenshots/truck-side.jpg';
 import driving from '../../../assets/screenshots/truck-driving.jpg';
 import ModStats from '../../../components/ModStats.astro';
 
-<Badge text="v1.5" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Includes ELS + ELS Light Bar + Red + Blue Beacons" variant="caution" />
+<Badge text="v1.6" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Includes ELS: Light Bar AUS + ELS: Sirens + Beacons: Red & Blue" variant="caution" />
 
 <ModStats id="QLD_RFS_Truck_Reskin" />
 
 Repaints the main fire truck (the CCF) in **QLD RFS golden yellow** with the Rural Fire Service and Queensland Fire Department logos and **red and white rear chevrons**. It also removes the French lettering as far as the 3D model allows, and the number plates.
 
-**New in v1.5:** the truck comes fitted out with [ELS](/mods/els/) and the [ELS Light Bar](/mods/els-light-bar/):
+The truck comes fitted out with [ELS: Sirens](/mods/els/) and [ELS: Light Bar AUS](/mods/els-light-bar/):
 
 - A full-width **red and blue LED light bar** in place of the two front roof beacons, with a **rear traffic advisor**, flash patterns, scene and takedown lights. Every module throws **real light**.
 - Recorded **Hazard 1000** sirens (Wail, Yelp, Dual) plus Hi-Lo and Phaser, an air horn, a manual wail and a siren menu. ELS replaces the old Hazard 1000 tones, so the truck no longer includes them.
-- The [Red + Blue Beacons](/mods/red-blue-beacons/) stay on the grille and rear: much brighter, alternating red and blue, and throwing **real light** onto the ground, walls, trees and smoke.
+- [Beacons: Red & Blue](/mods/red-blue-beacons/) on the grille and rear: much brighter, alternating red and blue, and throwing **real light** onto the ground, walls, trees and smoke.
+
+**New in v1.6:**
+
+- **Lite by default:** the real light no longer casts shadows and follows a real LED beam shape, so it costs almost no FPS, and the light bar no longer floods the cab with light. Add [Lights: HQ Real Light](/mods/lights-hq/) for the full-quality look.
+- The light bar lens is **tinted by default**, darker, and only glows in front of the lit modules.
+- Now comes with ELS: Light Bar AUS and ELS: Sirens (the renamed ELS mods).
 
 <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/QLD_RFS_Truck_Reskin.zip" icon="download">Download QLD_RFS_Truck_Reskin.zip (12 MB)</LinkButton>
 
@@ -42,13 +48,13 @@ While driving:
 | **U** | Lights menu: patterns, traffic advisor, scene, stages, takedown, park mode, lens tint |
 | **I** | Sirens menu: Wail, Yelp, Dual, Hi-Lo, Phaser, Auto Cycle, Rumbler, Low Volume |
 
-In a menu, point with the mouse or scroll, then click or release to pick. Right-click goes back. Full details: [ELS](/mods/els/) and [ELS Light Bar](/mods/els-light-bar/).
+In a menu, point with the mouse or scroll, then click or release to pick. Right-click goes back. Full details: [ELS: Sirens](/mods/els/) and [ELS: Light Bar AUS](/mods/els-light-bar/).
 
 ## What it changes
 
 | | |
 |---|---|
-| Files | `z_QLD_Truck_P.*` (truck paint) + `pakchunk1011-ELS-Windows_P.*` (sirens and controls) + `pakchunk1012-ELS_LightBar-Windows_P.*` (light bar) + `pakchunk1007-Red_Blue_Beacons-Windows_P.*` (red + blue colour) + [Beacon Base and Tonnie Core](/mods/tonnie-core/) (chunks 1004, 1005) |
+| Files | `z_QLD_Truck_P.*` (truck paint) + `pakchunk1011-ELS-Windows_P.*` (sirens and controls) + `pakchunk1012-ELS_LightBar-Windows_P.*` and `pakchunk1015-ELS_LightBar_AUS-Windows_P.*` (light bar) + `pakchunk1007-Red_Blue_Beacons-Windows_P.*` (red and blue colour) + [Beacons: Light Engine and ROMF](/mods/tonnie-core/) (chunks 1004, 1005) |
 | Replaces | `T_CCF_Precise_D/ERM/N`, `T_CCF_VariousTiling_D`, `T_CCF_StripedMarking_D`, `T_CCF_TrimSheet_D`, the truck body mesh (front roof beacon mounts removed for the light bar), the siren sound, and the beacon colours |
 
 ## Known limitations
@@ -57,7 +63,11 @@ In a menu, point with the mouse or scroll, then click or release to pick. Right-
 - The old side lettering is **part of the 3D model**. It's painted and finished to match the body, but can still be faintly visible in some lighting. New lettering can't be painted there ([why](/reference/ccf-truck/#painting-tips)).
 - The lights and sirens are on your own screen only. In multiplayer, other players see and hear their own game's truck.
 
-[How to install](/mods/installing/). Prefer [Brighter](/mods/brighter-beacons/) or [Red Beacons](/mods/red-beacons/) on the grille and rear? Install that colour afterwards; the Mod Launcher swaps it in.
+[How to install](/mods/installing/). Prefer [Beacons: Blue](/mods/brighter-beacons/) or [Beacons: Red](/mods/red-beacons/) on the grille and rear? Install that colour afterwards; the Mod Launcher swaps it in.
+
+:::caution[Can't be used with ELS: Light Bar France]
+The truck comes with ELS: Light Bar AUS, so it can't be used with [ELS: Light Bar France](/mods/els-france/). The Mod Launcher asks which one to keep.
+:::
 
 :::caution[Updating from v1.4 or earlier]
 The Mod Launcher and `Install.bat` remove the old Hazard 1000 files and old beacon files for you. Installing by hand? First delete `z_Hazard_1000_Sounds_P.*`, `pakchunk1004-Red_Blue_Beacons-Windows_P.*` and `pakchunk1004-Red_Beacons-Windows_P.*` from `Wildfire\Content\Paks`.
@@ -67,8 +77,8 @@ The Mod Launcher and `Install.bat` remove the old Hazard 1000 files and old beac
 
 ```text
 pakchunk1004-Beacon_Base-Windows_P.pak        77CB2811D1B13753FCF400FB0B51D40839591A28E88484C8A55A7CDE9378EF4F
-pakchunk1004-Beacon_Base-Windows_P.ucas       B23FDFFE33F03C293C7FA5348415BE0CD35D18752A640DB5D400FB467BC66799
-pakchunk1004-Beacon_Base-Windows_P.utoc       971E2F25140EB470F939857971CAB61AABB45FC95A44B80A571514308870A2B4
+pakchunk1004-Beacon_Base-Windows_P.ucas       623C4121CF33B38336574220047DCA42A587A5D190C3AA4C002F6955B9049A7D
+pakchunk1004-Beacon_Base-Windows_P.utoc       EE5ADF1F10AEEB90D74483C8674ED4FA9167D8B7678C10B9F81B5B59BAB8C603
 pakchunk1005-Tonnie_Core-Windows_P.pak        9E8841E0C22C79581B2CC240265E4DFAB55775901D38004227970CFFF320BF7A
 pakchunk1005-Tonnie_Core-Windows_P.ucas       6C8697CE70B048A4E58835EDA3F21961F1D8B4E72CD0E01461AA44099A58005E
 pakchunk1005-Tonnie_Core-Windows_P.utoc       78445683496D8CBD744651B2E5E19E85DDDCBDF242DFBCC88EC3711A8FF45303
@@ -76,11 +86,14 @@ pakchunk1007-Red_Blue_Beacons-Windows_P.pak   E8ED2A71F7F5C675592784BA95CEBCE106
 pakchunk1007-Red_Blue_Beacons-Windows_P.ucas  8F851551030BA5FC868883B35F6F54103474AF1E49310BDBB6FEAB3041DD42AC
 pakchunk1007-Red_Blue_Beacons-Windows_P.utoc  F6883928C6FE9F19E184A9A0CB9DE845C82A19CB203F3FDD26E8B0D92987C2B7
 pakchunk1011-ELS-Windows_P.pak                90474E3539FB2DF742CECD664FCEE6198402286531203B183479B85FBDC1E650
-pakchunk1011-ELS-Windows_P.ucas               9B3EBDDCBD40725A6A496A67B497D981A362F205D6AC8C35708990E8A7DFD8F5
-pakchunk1011-ELS-Windows_P.utoc               6B9A95325E1B691AE6A9926492B69630280A55958E13FDCA5278C122201AD78C
-pakchunk1012-ELS_LightBar-Windows_P.pak       EEC6FD1AF97EB3383FE9BB87F86C9A51E5A3437110DCB7D2DD782ACFC4FC1E04
-pakchunk1012-ELS_LightBar-Windows_P.ucas      804CD9C5D48157DBAB6A8E85E544AA2F5AB9705A5562D1E820802151B72DE51D
-pakchunk1012-ELS_LightBar-Windows_P.utoc      EE89AFB13BD8C6956BD9B52C5138F5E322C5043BC9F165C57F040851A5B77278
+pakchunk1011-ELS-Windows_P.ucas               765F03A2462BC704DB2E13B24337A854B796A2566A80C33B96713509875D7B93
+pakchunk1011-ELS-Windows_P.utoc               E56D5E2C112774A4E8481D08E982775FD5EBA74B15BD09D903E02AA5E5C59327
+pakchunk1012-ELS_LightBar-Windows_P.pak       F70ADA2ED9C60DCB8B6BB96D25FFDA3D3D1711DC9FF6C219382A32930A733853
+pakchunk1012-ELS_LightBar-Windows_P.ucas      F835275112AA9D24080620AC8AACCAB93F13465FDB8E84C6C003F1894373FB3B
+pakchunk1012-ELS_LightBar-Windows_P.utoc      7CF981284C4FD291DC465D579409B07463AE6057301711C94168F1B7060E7BD8
+pakchunk1015-ELS_LightBar_AUS-Windows_P.pak   54C32724A92A1D572E813AC8CCEDA3623E95D96D34899A75D4DF0FA9419A1A98
+pakchunk1015-ELS_LightBar_AUS-Windows_P.ucas  B461FC4FF1310D8BE1B5D659E38D057D3094B4BAD7A45CF9152A1D39BE7BBD69
+pakchunk1015-ELS_LightBar_AUS-Windows_P.utoc  7E7EA8E6120547DD9339985514B6CB702C50083D994369C0C125250493BBD9C7
 z_QLD_Truck_P.pak                             FE2A5333D7FEB92E991CB09AB0C2DDADA0BFDA82FBF6E66DE5DC15AF3187B1D3
 z_QLD_Truck_P.ucas                            13D6A62D5EC84BEAE4BE7F019E05ABDB3177BFE73C8F2772D940E1DA0229DB0C
 z_QLD_Truck_P.utoc                            0AD938EC7E638352FCD2CFB7B536C3C8A7A791CE10D3DBB89152B03102929FFE

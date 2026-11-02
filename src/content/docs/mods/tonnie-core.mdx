@@ -1,48 +1,52 @@
 ---
-title: Tonnie Core and Beacon Base
-description: 'The two shared parts behind the beacon mods, the Free Camera and ELS, what they do and what to do after a game update.'
+title: 'ROMF and Beacons: Light Engine'
+description: 'ROMF (Rescue Ops Mod Framework) and Beacons: Light Engine, the two shared parts behind the beacon mods, the Free Camera and ELS, what they do and what to do after a game update.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
 import ModStats from '../../../components/ModStats.astro';
 
-<Badge text="Core v2 · Base v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
+<Badge text="ROMF v2 · Light Engine v2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
 
 <ModStats id="Tonnie_Core" />
 
-Two small shared parts sit under the beacon mods, the Free Camera and ELS. You don't need to install them yourself: the [Mod Launcher](/mods/installing/) adds them when a mod needs them, and every zip that needs them includes them.
+Two small shared parts sit under the beacon mods, the Free Camera, ELS and Lights: HQ. You don't need to install them yourself: the [Mod Launcher](/mods/installing/) adds them when a mod needs them, and every zip that needs them includes them.
 
 | Part | Used by | What it does |
 |---|---|---|
-| **Tonnie Core** | [Brighter](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red + Blue Beacons](/mods/red-blue-beacons/), [Free Camera](/mods/free-camera/), [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/), [ELS](/mods/els/), [ELS Light Bar](/mods/els-light-bar/) | When a fire truck appears, starts whichever of those mods you have installed. If a mod isn't installed, it's simply skipped |
-| **Beacon Base** | The three beacon colours and the Truck Reskin | The beacon materials and meshes, and a real light for each of the truck's 10 beacons. The colour comes from the beacon mod you install |
+| **ROMF: Rescue Ops Mod Framework** | [Beacons: Blue](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red & Blue](/mods/red-blue-beacons/), [Free Camera](/mods/free-camera/), [QLD RFS: Fire Truck](/mods/qld-rfs-truck-reskin/), [ELS: Sirens](/mods/els/), [ELS: Light Bar AUS](/mods/els-light-bar/), [ELS: Light Bar France](/mods/els-france/), [Lights: HQ Real Light](/mods/lights-hq/) | When a fire truck appears, starts whichever of those mods you have installed. If a mod isn't installed, it's simply skipped |
+| **Beacons: Light Engine** | The three beacon colours, the QLD RFS: Fire Truck and ELS: Light Bar France | The beacon materials and meshes, and a real light for each of the truck's 10 beacons. The colour comes from the beacon mod you install. Runs in Lite mode unless [Lights: HQ](/mods/lights-hq/) is installed |
 
-**New in Core v2:** it starts [ELS](/mods/els/). ELS needs v2; the beacon mods and the Free Camera work with either.
+ROMF was called Tonnie Core, and Beacons: Light Engine was called Beacon Base. The file names haven't changed.
+
+**ROMF v2** starts [ELS: Sirens](/mods/els/). ELS needs v2; the beacon mods and the Free Camera work with either.
+
+**New in Light Engine v2:** Lite by default. The real light no longer casts shadows and follows a real LED beam shape, so it costs almost no FPS. Add [Lights: HQ Real Light](/mods/lights-hq/) for the full-quality look.
 
 ## How it works
 
-Tonnie Core replaces one small game Blueprint, the truck's storage-box linker, with an identical copy whose storage logic matches the game's original one-to-one. The copy also starts the mods. It finds each mod by name, so a mod that isn't installed can't cause a crash.
+ROMF replaces one small game Blueprint, the truck's storage-box linker, with an identical copy whose storage logic matches the game's original one-to-one. The copy also starts the mods. It finds each mod by name, so a mod that isn't installed can't cause a crash.
 
 ## After a game update
 
-The Core copies a game file, so a game update that changes that file can break it. If the game crashes while loading after an update:
+ROMF copies a game file, so a game update that changes that file can break it. If the game crashes while loading after an update:
 
 1. Remove the three `pakchunk1005-Tonnie_Core-Windows_P` files from `Wildfire\Content\Paks` (or untick the mods that use it in the Mod Launcher).
 2. Your other mods (uniforms, helmet, truck paint, Hazard 1000 tones) keep working.
-3. Check back here, or the Mod Launcher, for an updated Core.
+3. Check back here, or the Mod Launcher, for an updated ROMF.
 
 ## Downloads
 
 You'll rarely need these on their own:
 
-<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Tonnie_Core.zip" icon="download" variant="secondary">Tonnie_Core.zip (8 KB)</LinkButton> <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Beacon_Base.zip" icon="download" variant="secondary">Beacon_Base.zip (0.2 MB)</LinkButton>
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Tonnie_Core.zip" icon="download" variant="secondary">Tonnie_Core.zip (8 KB)</LinkButton> <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Beacon_Base.zip" icon="download" variant="secondary">Beacon_Base.zip (0.3 MB)</LinkButton>
 
 ## File check (SHA-256)
 
 ```text
 pakchunk1004-Beacon_Base-Windows_P.pak   77CB2811D1B13753FCF400FB0B51D40839591A28E88484C8A55A7CDE9378EF4F
-pakchunk1004-Beacon_Base-Windows_P.ucas  B23FDFFE33F03C293C7FA5348415BE0CD35D18752A640DB5D400FB467BC66799
-pakchunk1004-Beacon_Base-Windows_P.utoc  971E2F25140EB470F939857971CAB61AABB45FC95A44B80A571514308870A2B4
+pakchunk1004-Beacon_Base-Windows_P.ucas  623C4121CF33B38336574220047DCA42A587A5D190C3AA4C002F6955B9049A7D
+pakchunk1004-Beacon_Base-Windows_P.utoc  EE5ADF1F10AEEB90D74483C8674ED4FA9167D8B7678C10B9F81B5B59BAB8C603
 pakchunk1005-Tonnie_Core-Windows_P.pak         9E8841E0C22C79581B2CC240265E4DFAB55775901D38004227970CFFF320BF7A
 pakchunk1005-Tonnie_Core-Windows_P.ucas        6C8697CE70B048A4E58835EDA3F21961F1D8B4E72CD0E01461AA44099A58005E
 pakchunk1005-Tonnie_Core-Windows_P.utoc        78445683496D8CBD744651B2E5E19E85DDDCBDF242DFBCC88EC3711A8FF45303

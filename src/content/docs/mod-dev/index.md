@@ -42,7 +42,7 @@ There are no passwords. Your account lives on your PC as a secret key, and the r
 6. **Mod files**: click **Choose files**, or drop them on the box. You can pick the `.pak`, `.utoc` and `.ucas` files or a `.zip` that holds them. Up to 100 MB.
 7. **Picture**: shown on the mod's card. Any JPG or PNG; the launcher crops it to 16:9.
 8. **Screenshots** (optional): up to 6. Players click the picture to see them full size.
-9. **Needs and clashes** (optional): tick the mods yours needs (they're installed with it, for example Tonnie Core) and the mods it can't run alongside (the launcher lets only one load).
+9. **Needs and clashes** (optional): tick the mods yours needs (they're installed with it, for example ROMF) and the mods it can't run alongside (the launcher lets only one load).
 10. Tick the box to confirm the mod is yours to share, then click **Upload**.
 
 The status bar shows the upload. Once it's done, the mod appears under **My mods > Uploads** as **Waiting for its safety check**.

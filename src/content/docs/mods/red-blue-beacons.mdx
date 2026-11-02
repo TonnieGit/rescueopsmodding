@@ -1,5 +1,5 @@
 ---
-title: Red + Blue Beacons
+title: 'Beacons: Red & Blue'
 description: 'Red and blue emergency lights for the CCF fire truck, much brighter and throwing real light, with asynchronous flash patterns.'
 ---
 
@@ -7,11 +7,11 @@ import { LinkButton, Badge } from '@astrojs/starlight/components';
 import Clip from '../../../components/Clip.astro';
 import ModStats from '../../../components/ModStats.astro';
 
-<Badge text="v2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="New in v2: real light" variant="success" /> <Badge text="Included in QLD RFS Truck Reskin v1.5" variant="caution" />
+<Badge text="v3" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Included in QLD RFS: Fire Truck v1.6" variant="caution" />
 
 <ModStats id="Red_Blue_Beacons" />
 
-Gives the main fire truck (the CCF) **red and blue** emergency lights, much brighter than the originals, and (new in v2) **real light** from every beacon. Left and right are as seen from the driver's seat:
+Gives the main fire truck (the CCF) **red and blue** emergency lights, much brighter than the originals, and **real light** from every beacon. Left and right are as seen from the driver's seat:
 
 - **Roof beacons:** red on the left, blue on the right, front and rear, shining through coloured domes.
 - **Front grille lightheads:** blue on the left, red on the right.
@@ -22,30 +22,34 @@ Gives the main fire truck (the CCF) **red and blue** emergency lights, much brig
 
 The lights key (**J**) works as normal. Install the [Free Camera](/mods/free-camera/) to film them like the clips on this page.
 
-<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Red_Blue_Beacons.zip" icon="download">Download Red_Blue_Beacons.zip (0.2 MB)</LinkButton>
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/Red_Blue_Beacons.zip" icon="download">Download Red_Blue_Beacons.zip (0.3 MB)</LinkButton>
 
-<Clip src="/media/red-blue-beacons/final.mp4" poster="/media/red-blue-beacons/final.jpg" caption="Red + Blue Beacons at night: red and blue light on the rocks, the ground and the crew." />
+<Clip src="/media/red-blue-beacons/final.mp4" poster="/media/red-blue-beacons/final.jpg" caption="Beacons: Red & Blue at night, with red and blue light on the rocks, the ground and the crew." />
 
-:::note[Needs Tonnie Core and Beacon Base]
-This mod uses two shared parts: [Tonnie Core and Beacon Base](/mods/tonnie-core/). The [Mod Manager](/mods/installing/#option-1-mod-manager-easiest) installs them for you, and the zip and its `Install.bat` include them too.
+:::note[Needs ROMF and Beacons: Light Engine]
+This mod uses two shared parts: [ROMF and Beacons: Light Engine](/mods/tonnie-core/). The [Mod Launcher](/mods/installing/) installs them for you, and the zip and its `Install.bat` include them too.
+:::
+
+:::tip[Lite by default]
+The real light runs in **Lite** mode: no shadows and a real LED beam shape, so it costs almost no FPS. Add [Lights: HQ Real Light](/mods/lights-hq/) for the full-quality look. The [ELS light bars](/mods/els-light-bar/) work with any beacon colour: the bar takes the place of the two front roof beacons.
 :::
 
 ## What it changes
 
 | | |
 |---|---|
-| Files | `pakchunk1007-Red_Blue_Beacons-Windows_P.*` (this colour) + [Beacon Base and Tonnie Core](/mods/tonnie-core/) |
-| How | Beacon Base adds a real light to each of the truck's 10 beacons and recolours the lenses when the truck appears. This mod only holds the colours. |
+| Files | `pakchunk1007-Red_Blue_Beacons-Windows_P.*` (this colour) + [Beacons: Light Engine and ROMF](/mods/tonnie-core/) |
+| How | Beacons: Light Engine adds a real light to each of the truck's 10 beacons and recolours the lenses when the truck appears. This mod only holds the colours. |
 
 ## One colour at a time
 
-**Brighter Beacons**, **Red Beacons** and **Red + Blue Beacons** colour the same lights, so install one. The Mod Manager and `Install.bat` offer to remove the other colours, and they also remove the old v1 beacon files (`pakchunk1004-Red_Beacons-Windows_P` / `pakchunk1004-Red_Blue_Beacons-Windows_P`). Installing by hand? Delete those first.
+**Beacons: Blue**, **Beacons: Red** and **Beacons: Red & Blue** colour the same lights, so install one. The Mod Launcher and `Install.bat` offer to remove the other colours, and they also remove the old v1 beacon files (`pakchunk1004-Red_Beacons-Windows_P` / `pakchunk1004-Red_Blue_Beacons-Windows_P`). Installing by hand? Delete those first. [ELS: Light Bar France](/mods/els-france/) comes with Beacons: Blue, so it can't be used with this colour.
 
 ## Known limitations
 
 - The four roof beacons **spin in step**, as in the original game.
 - The lights are drawn by your own game, so in multiplayer each player sees them only if they have the mod installed.
-- A game update can break the shared [Tonnie Core](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
+- A game update can break the shared [ROMF](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
 
 [How to install](/mods/installing/).
 
@@ -53,11 +57,11 @@ This mod uses two shared parts: [Tonnie Core and Beacon Base](/mods/tonnie-core/
 
 ```text
 pakchunk1004-Beacon_Base-Windows_P.pak        77CB2811D1B13753FCF400FB0B51D40839591A28E88484C8A55A7CDE9378EF4F
-pakchunk1004-Beacon_Base-Windows_P.ucas       B23FDFFE33F03C293C7FA5348415BE0CD35D18752A640DB5D400FB467BC66799
-pakchunk1004-Beacon_Base-Windows_P.utoc       971E2F25140EB470F939857971CAB61AABB45FC95A44B80A571514308870A2B4
+pakchunk1004-Beacon_Base-Windows_P.ucas       623C4121CF33B38336574220047DCA42A587A5D190C3AA4C002F6955B9049A7D
+pakchunk1004-Beacon_Base-Windows_P.utoc       EE5ADF1F10AEEB90D74483C8674ED4FA9167D8B7678C10B9F81B5B59BAB8C603
 pakchunk1005-Tonnie_Core-Windows_P.pak        9E8841E0C22C79581B2CC240265E4DFAB55775901D38004227970CFFF320BF7A
-pakchunk1005-Tonnie_Core-Windows_P.ucas       83A9B5109FCF95C6B479742606629A96BE0B66B1026AA78C21D440CA99FADE55
-pakchunk1005-Tonnie_Core-Windows_P.utoc       0EA1EC58D37F408E53DC7CD8FF024BE0FA749EA597390BD6B2A04F1830329CBF
+pakchunk1005-Tonnie_Core-Windows_P.ucas       6C8697CE70B048A4E58835EDA3F21961F1D8B4E72CD0E01461AA44099A58005E
+pakchunk1005-Tonnie_Core-Windows_P.utoc       78445683496D8CBD744651B2E5E19E85DDDCBDF242DFBCC88EC3711A8FF45303
 pakchunk1007-Red_Blue_Beacons-Windows_P.pak   E8ED2A71F7F5C675592784BA95CEBCE1063AB400252FCC5B2F531AD4068C4CF1
 pakchunk1007-Red_Blue_Beacons-Windows_P.ucas  8F851551030BA5FC868883B35F6F54103474AF1E49310BDBB6FEAB3041DD42AC
 pakchunk1007-Red_Blue_Beacons-Windows_P.utoc  F6883928C6FE9F19E184A9A0CB9DE845C82A19CB203F3FDD26E8B0D92987C2B7

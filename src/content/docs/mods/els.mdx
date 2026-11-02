@@ -1,22 +1,24 @@
 ---
-title: 'ELS: Emergency Lighting and Sirens'
+title: 'ELS: Sirens'
 description: 'Recorded Hazard 1000 sirens, an air horn, a manual wail and a siren menu for the Rescue Ops: Wildfire fire truck.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
 import ModStats from '../../../components/ModStats.astro';
 
-<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="New" variant="success" />
+<Badge text="v2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" />
 
 <ModStats id="ELS" />
 
-**ELS** gives the main fire truck (the CCF) a proper siren system. The game's siren is replaced by recorded **Australian Hazard 1000** tones, picked from a siren menu while you drive.
+**ELS: Sirens** gives the main fire truck (the CCF) a proper siren system. The game's siren is replaced by recorded **Australian Hazard 1000** tones, picked from a siren menu while you drive.
 
 - **Tones:** Wail, Yelp and Dual (recorded), plus Hi-Lo and Phaser.
 - **Air horn** while the siren is on, and a **manual wail** that winds up and down while the siren is off.
 - **Auto Cycle** steps through the tones, the **Rumbler** adds a low rumble, and **Low Volume** turns the sirens down for you only.
 
-ELS doesn't change the lights. Keep your beacons, or add the [ELS Light Bar](/mods/els-light-bar/) for a full LED light bar.
+ELS: Sirens runs on its own and doesn't change the lights: keep your beacons. The light bars build on it: [ELS: Light Bar AUS](/mods/els-light-bar/) (red and blue) and [ELS: Light Bar France](/mods/els-france/) (all blue, with French deux-tons sirens) both include it.
+
+**New in v2:** renamed from ELS: Emergency Lighting and Sirens. It now runs on its own as the sirens, and the light bars build on it.
 
 <LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/ELS.zip" icon="download">Download ELS.zip (0.5 MB)</LinkButton>
 
@@ -30,22 +32,22 @@ ELS doesn't change the lights. Keep your beacons, or add the [ELS Light Bar](/mo
 | Hold **H** | Siren on: air horn. Siren off: a manual wail that winds up while held |
 | **H H** (double-tap) | Next siren tone |
 | **I** | Sirens menu |
-| **U** | Lights menu (with the [ELS Light Bar](/mods/els-light-bar/)) |
+| **U** | Lights menu (with [ELS: Light Bar AUS](/mods/els-light-bar/) or [France](/mods/els-france/)) |
 
 In a menu, point with the mouse or scroll, then click or let go of the key to pick. Right-click goes back. The menus are in French when the game is.
 
 :::note[Replaces Hazard 1000 Tones]
-ELS has the Hazard 1000 tones and more, so you don't need [Hazard 1000 Tones](/mods/hazard-1000-tones/) with it. The [Mod Launcher](/mods/installing/) offers to switch you over.
+ELS: Sirens has the Hazard 1000 tones and more, so you don't need [Hazard 1000 Tones](/mods/hazard-1000-tones/) with it. The [Mod Launcher](/mods/installing/) offers to switch you over.
 :::
 
-:::note[Needs Tonnie Core v2]
-ELS starts through [Tonnie Core](/mods/tonnie-core/) **v2**. The [Mod Launcher](/mods/installing/) installs it for you, and the zip and its `Install.bat` include it too.
+:::note[Needs ROMF v2]
+ELS: Sirens starts through [ROMF](/mods/tonnie-core/) **v2**. The [Mod Launcher](/mods/installing/) installs it for you, and the zip and its `Install.bat` include it too.
 :::
 
 ## Known limitations
 
 - Siren choices are on your own screen only. In multiplayer, other players hear their own game's siren.
-- A game update can break [Tonnie Core](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
+- A game update can break [ROMF](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
 
 [How to install](/mods/installing/).
 
@@ -53,8 +55,8 @@ ELS starts through [Tonnie Core](/mods/tonnie-core/) **v2**. The [Mod Launcher](
 
 ```text
 pakchunk1011-ELS-Windows_P.pak                 90474E3539FB2DF742CECD664FCEE6198402286531203B183479B85FBDC1E650
-pakchunk1011-ELS-Windows_P.ucas                9B3EBDDCBD40725A6A496A67B497D981A362F205D6AC8C35708990E8A7DFD8F5
-pakchunk1011-ELS-Windows_P.utoc                6B9A95325E1B691AE6A9926492B69630280A55958E13FDCA5278C122201AD78C
+pakchunk1011-ELS-Windows_P.ucas                765F03A2462BC704DB2E13B24337A854B796A2566A80C33B96713509875D7B93
+pakchunk1011-ELS-Windows_P.utoc                E56D5E2C112774A4E8481D08E982775FD5EBA74B15BD09D903E02AA5E5C59327
 ```
 
 ## Credits

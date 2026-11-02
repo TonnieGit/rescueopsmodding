@@ -43,7 +43,7 @@ The CCF is the main fire truck: a French forest tanker (*camion-citerne feux de 
 
 ## Painting tips
 
-What worked for the [QLD RFS Truck Reskin](/mods/qld-rfs-truck-reskin/):
+What worked for the [QLD RFS: Fire Truck](/mods/qld-rfs-truck-reskin/):
 
 | To change… | Edit |
 |---|---|

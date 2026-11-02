@@ -1,6 +1,6 @@
 ---
 title: All mods
-description: 'Mods for Rescue Ops: Wildfire by Tonnie: QLD RFS uniforms, BR9 bushfire helmet, truck reskin, red or red and blue beacons and Hazard 1000 siren tones.'
+description: 'Mods for Rescue Ops: Wildfire by Tonnie: QLD RFS uniforms, helmet and fire truck, beacons in blue, red or red and blue, ELS sirens and light bars (AUS and France), Lights: HQ, a free camera and Hazard 1000 siren tones.'
 ---
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
@@ -14,25 +14,29 @@ All mods are for the **Steam demo** (version 0.8.4, Unreal Engine 5.8.1, October
 Mods made by other players are on [Community mods](/mods/community/). Made one yourself? [Share it with Mod Dev](/mod-dev/).
 
 <CardGrid>
-	<LinkCard title="QLD RFS Uniforms" href="/mods/qld-rfs-uniforms/" description="Gold bushfire gear with RURAL FIRE BRIGADE on the back, plus the BR9 bushfire helmet. 4K." />
-	<LinkCard title="BR9 – Bushfire Helmet Yellow" href="/mods/br9-bushfire-helmet-yellow/" description="Yellow bushfire helmet with brim, neck flap and a clear face shield. New 3D model." />
-	<LinkCard title="QLD RFS Truck Reskin" href="/mods/qld-rfs-truck-reskin/" description="The CCF in golden yellow with RFS and QFD logos, red and white chevrons, plus the ELS light bar and sirens and red and blue beacons." />
-	<LinkCard title="Brighter Beacons" href="/mods/brighter-beacons/" description="New: the truck's blue beacons, much brighter, throwing real blue light." />
-	<LinkCard title="Red Beacons" href="/mods/red-beacons/" description="All the truck's emergency lights in red, much brighter and throwing real red light." />
-	<LinkCard title="Red + Blue Beacons" href="/mods/red-blue-beacons/" description="Red and blue beacons that throw real light in their own colours." />
-	<LinkCard title="Free Camera" href="/mods/free-camera/" description="New: fly anywhere, hide the HUD and change the time of day. For screenshots and video." />
-	<LinkCard title="ELS: Emergency Lighting and Sirens" href="/mods/els/" description="New: recorded Hazard 1000 sirens, air horn, manual wail and a siren menu." />
-	<LinkCard title="ELS Light Bar" href="/mods/els-light-bar/" description="New: a full-width LED light bar with real light, patterns, traffic advisor, scene and takedown lights." />
-	<LinkCard title="Hazard 1000 Tones" href="/mods/hazard-1000-tones/" description="Australian siren and horn for the fire truck. Sounds only. ELS now includes these tones." />
+	<LinkCard title="QLD RFS: Uniforms" href="/mods/qld-rfs-uniforms/" description="Gold bushfire gear with RURAL FIRE BRIGADE on the back, plus the BR9 bushfire helmet. 4K." />
+	<LinkCard title="QLD RFS: BR9 Helmet Yellow" href="/mods/br9-bushfire-helmet-yellow/" description="Yellow bushfire helmet with brim, neck flap and a clear face shield. New 3D model." />
+	<LinkCard title="QLD RFS: Fire Truck" href="/mods/qld-rfs-truck-reskin/" description="The CCF in golden yellow with RFS and QFD logos, red and white chevrons, plus ELS: Light Bar AUS, ELS: Sirens and red and blue beacons." />
+	<LinkCard title="Beacons: Blue" href="/mods/brighter-beacons/" description="The truck's blue beacons, much brighter, throwing real blue light." />
+	<LinkCard title="Beacons: Red" href="/mods/red-beacons/" description="All the truck's emergency lights in red, much brighter and throwing real red light." />
+	<LinkCard title="Beacons: Red & Blue" href="/mods/red-blue-beacons/" description="Red and blue beacons that throw real light in their own colours." />
+	<LinkCard title="Lights: HQ Real Light" href="/mods/lights-hq/" description="New: full-quality real light for the beacons and light bars: shadows, light in smoke and fog, full bounce light. Costs FPS." />
+	<LinkCard title="Free Camera" href="/mods/free-camera/" description="Fly anywhere, hide the HUD and change the time of day. For screenshots and video." />
+	<LinkCard title="ELS: Sirens" href="/mods/els/" description="Recorded Hazard 1000 sirens, air horn, manual wail and a siren menu." />
+	<LinkCard title="ELS: Light Bar AUS" href="/mods/els-light-bar/" description="A full-width red and blue LED light bar with real light, patterns, traffic advisor, scene and takedown lights. Includes ELS: Sirens." />
+	<LinkCard title="ELS: Light Bar France" href="/mods/els-france/" description="New: an all-blue light bar, blue beacons and five French deux-tons pompiers sirens. Includes ELS: Sirens." />
+	<LinkCard title="Hazard 1000 Tones" href="/mods/hazard-1000-tones/" description="Australian siren and horn for the fire truck. Sounds only. ELS: Sirens now includes these tones." />
 </CardGrid>
 
-Brighter, Red and Red + Blue Beacons, the Free Camera and ELS share two small parts, [Tonnie Core and Beacon Base](/mods/tonnie-core/). The [Mod Launcher](/mods/installing/) installs them for you. The ELS Light Bar takes the place of the two front roof beacons and works with any beacon colour.
+The beacons, the Free Camera, ELS and Lights: HQ share two small parts, [ROMF and Beacons: Light Engine](/mods/tonnie-core/). The [Mod Launcher](/mods/installing/) installs them for you. Both ELS light bars take the place of the two front roof beacons: AUS works with any beacon colour, France comes with Beacons: Blue.
+
+All the light mods run in **Lite** mode by default: no shadows and a real LED beam shape, so they cost almost no FPS. Add [Lights: HQ Real Light](/mods/lights-hq/) for the full-quality look.
 
 ## Compatibility
 
-| | Uniforms | BR9 Helmet | Truck Reskin | Beacon colours (Brighter / Red / Red + Blue) | Free Camera | Hazard 1000 Tones |
-|---|---|---|---|---|---|---|
-| Files added | `z_FirefighterTex_P.*` + `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.*` | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.*` | `z_QLD_Truck_P.*` + ELS + ELS Light Bar + Red + Blue Beacons | `pakchunk1009-Brighter_Beacons` / `pakchunk1008-Red_Beacons` / `pakchunk1007-Red_Blue_Beacons-Windows_P.*` + Beacon Base + Tonnie Core | `pakchunk1006-Free_Camera-Windows_P.*` + Tonnie Core | `z_Hazard_1000_Sounds_P.*` |
-| Works with the others | ✅ | ✅ (the Uniforms already include it) | ✅ (comes with Red + Blue; installing another colour swaps it) | ✅ one colour at a time | ✅ with everything | ✅ (ELS replaces it; the Truck Reskin now comes with ELS) |
+| | Uniforms | BR9 Helmet | Fire Truck | Beacon colours (Blue / Red / Red & Blue) | ELS: Light Bar AUS / France | Lights: HQ | Free Camera | Hazard 1000 Tones |
+|---|---|---|---|---|---|---|---|---|
+| Files added | `z_FirefighterTex_P.*` + `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.*` | `pakchunk1003-BR9_Bushfire_Helmet_Yellow-Windows_P.*` | `z_QLD_Truck_P.*` + ELS: Light Bar AUS + Beacons: Red & Blue | `pakchunk1009-Brighter_Beacons` / `pakchunk1008-Red_Beacons` / `pakchunk1007-Red_Blue_Beacons-Windows_P.*` + Light Engine + ROMF | `pakchunk1012-ELS_LightBar` + `pakchunk1015-ELS_LightBar_AUS` / `pakchunk1014-ELS_France_Override-Windows_P.*` + ELS: Sirens + ROMF (France also Beacons: Blue) | `pakchunk1013-Lights_HQ-Windows_P.*` + ROMF | `pakchunk1006-Free_Camera-Windows_P.*` + ROMF | `z_Hazard_1000_Sounds_P.*` |
+| Works with the others | ✅ | ✅ (the Uniforms already include it) | ✅ (comes with Red & Blue; installing another colour swaps it). Not with ELS: Light Bar France | ✅ one colour at a time | ✅ one light bar at a time. France: not with Beacons: Red, Red & Blue or the Fire Truck | ✅ with everything (on its own it does nothing) | ✅ with everything | ✅ (ELS: Sirens replaces it) |
 
 Mod by **Tonnie**. If you enjoy them, [support my mods on Patreon](https://patreon.com/Tonnie001).
