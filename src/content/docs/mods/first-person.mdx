@@ -1,0 +1,69 @@
+---
+title: 'Camera: First Person'
+description: 'A first-person view for Rescue Ops: Wildfire, on foot and in every seat of the fire trucks, with free look, zoom and FOV settings.'
+---
+
+import { LinkButton, Badge } from '@astrojs/starlight/components';
+import ModStats from '../../../components/ModStats.astro';
+
+<Badge text="v1" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" />
+
+<ModStats id="First_Person" />
+
+A **first-person view**. See the fire from your firefighter's eyes, and drive the truck from the driver's seat. Press **B** to switch between the game's normal camera and first person; the mod remembers your choice for next time.
+
+<LinkButton href="https://github.com/TonnieGit/rescueopsmodding/releases/latest/download/First_Person.zip" icon="download">Download First_Person.zip (26 KB)</LinkButton>
+
+![First person on foot: the hose stream hitting a line of fire in the forest](/media/first-person/nozzle.jpg)
+
+## Keys
+
+| Key | Does |
+|---|---|
+| **B** | First person on/off |
+| **Mouse** | On foot: look and turn, as usual. In a truck: look around the cab |
+| Hold **Alt** | Free look on foot: turn your head without turning your body. Let go and the view swings back |
+| Double-tap **Alt** | Lock free look on. Tap **Alt** again to unlock |
+| Hold **right mouse** | Zoom |
+
+## On foot and in the truck
+
+- **On foot** the camera rides your firefighter's head, so it moves as you walk. Your own body is hidden from you, but its shadow stays.
+- **In a fire truck** the camera is fixed in your seat and moves with the truck. It works in every seat: the driver's seat, the front passenger seat and both rear seats.
+
+![First person in the driver's seat of the fire truck, looking through the windscreen](/media/first-person/cab.jpg)
+
+## Settings
+
+In the pause menu, **Settings › General** gets two new rows:
+
+- **First Person FOV**: 70 to 120 (default 90).
+- **First Person Head Bob**: 0 to 100 % (default 100 %). Turn it down if walking in first person makes you feel sick.
+
+Your settings are saved and come back next time.
+
+It only changes your own screen. In multiplayer, other players see you as normal.
+
+:::note[Needs ROMF]
+First person starts through [ROMF](/mods/tonnie-core/), a small shared file. The [Mod Launcher](/mods/installing/) installs it for you, and the zip and its `Install.bat` include it too.
+:::
+
+## Known limitations
+
+- First person appears once a **fire truck** has spawned, which is the case in the lobby and on every mission. The two settings rows only show in the pause menu during a game, not in the main menu.
+- Some of the game's own close-up views (for example opening a storage) may show in first person instead of their usual angle. Press **B** for the normal camera if one looks odd.
+- A game update can break [ROMF](/mods/tonnie-core/#after-a-game-update). If the game crashes while loading after an update, remove its three files until a new version is out.
+
+[How to install](/mods/installing/).
+
+## File check (SHA-256)
+
+```text
+pakchunk1016-First_Person-Windows_P.pak   343886DB7422B93BB5B7857C3B74DDC46EF3974A30157C5803F50E13F80D1FA6
+pakchunk1016-First_Person-Windows_P.ucas  B6D47E680CBD3C89A538AF7F0D3ABFCA7ADA948409192A108F3FE6B9E584BF19
+pakchunk1016-First_Person-Windows_P.utoc  43B483AD5ABA8D4255066489A2DDCC1668D759DCB7B67E883B83017E0A0D2D1D
+```
+
+## Credits
+
+Mod by **Tonnie**. [Support my mods on Patreon](https://patreon.com/Tonnie001).

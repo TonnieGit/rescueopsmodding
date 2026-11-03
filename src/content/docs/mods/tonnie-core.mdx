@@ -1,25 +1,25 @@
 ---
 title: 'ROMF and Beacons: Light Engine'
-description: 'ROMF (Rescue Ops Mod Framework) and Beacons: Light Engine, the two shared parts behind the beacon mods, the Free Camera and ELS, what they do and what to do after a game update.'
+description: 'ROMF (Rescue Ops Mod Framework) and Beacons: Light Engine, the two shared parts behind the beacon mods, the Free Camera, First Person and ELS, what they do and what to do after a game update.'
 ---
 
 import { LinkButton, Badge } from '@astrojs/starlight/components';
 import ModStats from '../../../components/ModStats.astro';
 
-<Badge text="ROMF v2 · Light Engine v2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
+<Badge text="ROMF v3 · Light Engine v2" variant="danger" /> <Badge text="Demo · UE 5.8.1" variant="note" /> <Badge text="Installed automatically" variant="note" />
 
 <ModStats id="Tonnie_Core" />
 
-Two small shared parts sit under the beacon mods, the Free Camera, ELS and Lights: HQ. You don't need to install them yourself: the [Mod Launcher](/mods/installing/) adds them when a mod needs them, and every zip that needs them includes them.
+Two small shared parts sit under the beacon mods, the Free Camera, Camera: First Person, ELS and Lights: HQ. You don't need to install them yourself: the [Mod Launcher](/mods/installing/) adds them when a mod needs them, and every zip that needs them includes them.
 
 | Part | Used by | What it does |
 |---|---|---|
-| **ROMF: Rescue Ops Mod Framework** | [Beacons: Blue](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red & Blue](/mods/red-blue-beacons/), [Free Camera](/mods/free-camera/), [QLD RFS: Fire Truck](/mods/qld-rfs-truck-reskin/), [ELS: Sirens](/mods/els/), [ELS: Light Bar AUS](/mods/els-light-bar/), [ELS: Light Bar France](/mods/els-france/), [Lights: HQ Real Light](/mods/lights-hq/) | When a fire truck appears, starts whichever of those mods you have installed. If a mod isn't installed, it's simply skipped |
+| **ROMF: Rescue Ops Mod Framework** | [Beacons: Blue](/mods/brighter-beacons/), [Red](/mods/red-beacons/) and [Red & Blue](/mods/red-blue-beacons/), [Free Camera](/mods/free-camera/), [Camera: First Person](/mods/first-person/), [QLD RFS: Fire Truck](/mods/qld-rfs-truck-reskin/), [ELS: Sirens](/mods/els/), [ELS: Light Bar AUS](/mods/els-light-bar/), [ELS: Light Bar France](/mods/els-france/), [Lights: HQ Real Light](/mods/lights-hq/) | When a fire truck appears, starts whichever of those mods you have installed. If a mod isn't installed, it's simply skipped |
 | **Beacons: Light Engine** | The three beacon colours, the QLD RFS: Fire Truck and ELS: Light Bar France | The beacon materials and meshes, and a real light for each of the truck's 10 beacons. The colour comes from the beacon mod you install. Runs in Lite mode unless [Lights: HQ](/mods/lights-hq/) is installed |
 
 ROMF was called Tonnie Core, and Beacons: Light Engine was called Beacon Base. The file names haven't changed.
 
-**ROMF v2** starts [ELS: Sirens](/mods/els/). ELS needs v2; the beacon mods and the Free Camera work with either.
+**ROMF v3** starts [Camera: First Person](/mods/first-person/), which needs v3. **ROMF v2** started [ELS: Sirens](/mods/els/). The other mods work with any version from v2 on.
 
 **New in Light Engine v2:** Lite by default. The real light no longer casts shadows and follows a real LED beam shape, so it costs almost no FPS. Add [Lights: HQ Real Light](/mods/lights-hq/) for the full-quality look.
 
@@ -48,8 +48,8 @@ pakchunk1004-Beacon_Base-Windows_P.pak   77CB2811D1B13753FCF400FB0B51D40839591A2
 pakchunk1004-Beacon_Base-Windows_P.ucas  623C4121CF33B38336574220047DCA42A587A5D190C3AA4C002F6955B9049A7D
 pakchunk1004-Beacon_Base-Windows_P.utoc  EE5ADF1F10AEEB90D74483C8674ED4FA9167D8B7678C10B9F81B5B59BAB8C603
 pakchunk1005-Tonnie_Core-Windows_P.pak         9E8841E0C22C79581B2CC240265E4DFAB55775901D38004227970CFFF320BF7A
-pakchunk1005-Tonnie_Core-Windows_P.ucas        6C8697CE70B048A4E58835EDA3F21961F1D8B4E72CD0E01461AA44099A58005E
-pakchunk1005-Tonnie_Core-Windows_P.utoc        78445683496D8CBD744651B2E5E19E85DDDCBDF242DFBCC88EC3711A8FF45303
+pakchunk1005-Tonnie_Core-Windows_P.ucas        5820DA719D3343AA3E3A6AECD87F11C89C14FC1218ED72D7BF1783AFB88B544C
+pakchunk1005-Tonnie_Core-Windows_P.utoc        37B6956AA035679ACCFC3E43E6AC8E3ECBEB91B7B25D0AF7A17F69945587FCFE
 ```
 
 ## Credits

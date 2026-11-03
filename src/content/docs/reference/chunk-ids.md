@@ -24,6 +24,7 @@ Every mod is packaged into its own chunk (set by the PrimaryAssetLabel's **Chunk
 | 1013 | `pakchunk1013-Lights_HQ-Windows_P` | [Lights: HQ Real Light](/mods/lights-hq/) | Tonnie |
 | 1014 | `pakchunk1014-ELS_France_Override-Windows_P` | [ELS: Light Bar France](/mods/els-france/) (blue bar and French sirens) | Tonnie |
 | 1015 | `pakchunk1015-ELS_LightBar_AUS-Windows_P` | [ELS: Light Bar AUS](/mods/els-light-bar/) (marker file, also in QLD RFS: Fire Truck) | Tonnie |
+| 1016 | `pakchunk1016-First_Person-Windows_P` | [Camera: First Person](/mods/first-person/) | Tonnie |
 
 ## Conventions
 

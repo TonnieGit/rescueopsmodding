@@ -84,6 +84,7 @@ export default defineConfig({
 						{ label: 'ELS: Light Bar AUS', slug: 'mods/els-light-bar' },
 						{ label: 'ELS: Light Bar France', slug: 'mods/els-france' },
 						{ label: 'Free Camera', slug: 'mods/free-camera' },
+						{ label: 'Camera: First Person', slug: 'mods/first-person' },
 						{ label: 'ROMF and Beacons: Light Engine', slug: 'mods/tonnie-core' },
 						{ label: 'Hazard 1000 Tones', slug: 'mods/hazard-1000-tones' },
 					],
